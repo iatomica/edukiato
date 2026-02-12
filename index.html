@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edukiato | Modern Education</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              primary: {
+                50: 'hsl(var(--primary-h) var(--primary-s) 95%)',
+                100: 'hsl(var(--primary-h) var(--primary-s) 90%)',
+                200: 'hsl(var(--primary-h) var(--primary-s) 80%)',
+                300: 'hsl(var(--primary-h) var(--primary-s) 70%)',
+                400: 'hsl(var(--primary-h) var(--primary-s) 60%)',
+                500: 'hsl(var(--primary-h) var(--primary-s) 50%)',
+                600: 'hsl(var(--primary-h) var(--primary-s) 40%)',
+                700: 'hsl(var(--primary-h) var(--primary-s) 30%)',
+                800: 'hsl(var(--primary-h) var(--primary-s) 20%)',
+                900: 'hsl(var(--primary-h) var(--primary-s) 10%)',
+              },
+              secondary: {
+                DEFAULT: 'hsl(var(--secondary-h) var(--secondary-s) 50%)',
+                50: 'hsl(var(--secondary-h) var(--secondary-s) 95%)',
+                100: 'hsl(var(--secondary-h) var(--secondary-s) 90%)',
+                500: 'hsl(var(--secondary-h) var(--secondary-s) 50%)',
+                900: 'hsl(var(--secondary-h) var(--secondary-s) 10%)',
+              },
+              surface: '#ffffff',
+              background: '#f8fafc',
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        background-color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+      }
+      /* Custom scrollbar for a cleaner look */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "date-fns": "https://esm.sh/date-fns@^4.1.0",
+    "@nestjs/common": "https://esm.sh/@nestjs/common@^11.1.13",
+    "bcrypt": "https://esm.sh/bcrypt@^6.0.0",
+    "passport-jwt": "https://esm.sh/passport-jwt@^4.0.1",
+    "@nestjs/passport": "https://esm.sh/@nestjs/passport@^11.0.5",
+    "@nestjs/jwt": "https://esm.sh/@nestjs/jwt@^11.0.2",
+    "class-validator": "https://esm.sh/class-validator@^0.14.3",
+    "class-transformer": "https://esm.sh/class-transformer@^0.5.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.3",
+    "vite": "https://esm.sh/vite@^7.3.1"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

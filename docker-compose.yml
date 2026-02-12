@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # --- Database ---
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-edukiato_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d # Init scripts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - edukiato-network
+
+  # --- Backend (API) ---
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-edukiato_db}
+      PORT: 3000
+      JWT_SECRET: ${JWT_SECRET:-please_change_this_secret_in_prod}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - edukiato-network
+
+  # --- Frontend (Web App) ---
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "${PORT:-8000}:80"
+    depends_on:
+      - backend
+    networks:
+      - edukiato-network
+
+volumes:
+  postgres_data:
+
+networks:
+  edukiato-network:
+    driver: bridge
