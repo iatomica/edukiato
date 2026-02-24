@@ -26,20 +26,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
   const { can } = usePermissions();
   const { theme } = useTheme();
   const { clearInstitution } = useAuth();
-  const { notifications } = useTenantData();
-
-  // Trigger Tour automatically if not seen for this specific view
-  useEffect(() => {
-    // Only auto-trigger if:
-    // 1. We haven't seen it yet
-    // 2. The tour is NOT currently open (prevents reset loop)
-    if (!hasSeenTour(currentView) && !isOpen) {
-      const timer = setTimeout(() => {
-        startTour(currentView);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [currentView, hasSeenTour, startTour, isOpen]);
+  const { notifications, aulas, ninos } = useTenantData();
 
   // Close notifications on click outside
   useEffect(() => {
@@ -54,23 +41,36 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
 
   // Filter notifications relevant to the current user
   const userNotifications = notifications.filter(n => {
+    // 0. General Announcements go to everyone
+    if (n.type === 'ANNOUNCEMENT' && !n.courseId && !n.recipientId) return true;
+
     // 1. Direct recipient
     if (n.recipientId && n.recipientId === user.id) return true;
+    if (n.recipientId && n.recipientId !== user.id) return false;
 
-    // 2. Course broadcast (check if user is in that course - naive check for now, ideally user.enrolledCourses)
-    // For MVP/Mock, we assume if user is student they might be in the course if we had that data handy.
-    // Let's rely on a simplified check: if it's a course notification, and I'm a student/teacher, I assume relevance 
-    // UNLESS we implemented enrolled courses check. 
-    // To make it robust without full enrollment data: check valid courseId.
-    // Ideally: if (n.courseId && user.enrollments.includes(n.courseId)) ...
+    // 2. Admins can see broadcasts and room-specific announcements
+    if (user.role === 'ADMIN_INSTITUCION' || user.role === 'SUPER_ADMIN') {
+      return true;
+    }
 
-    // For this specific requested fix: match EXACT logic if possible.
-    // If I am Admin, I might see everything? Or just SYSTEM.
-    // Let's strict filter:
+    // 3. Room-specific broadcast (courseId mapped to aulaId conceptually for announcements)
+    if (n.courseId) {
+      const aula = aulas.find(a => a.id === n.courseId);
+      if (!aula) return false;
 
-    if (n.recipientId && n.recipientId !== user.id) return false; // Addressed to someone else
+      if (user.role === 'DOCENTE' || user.role === 'ESPECIALES') {
+        return aula.teachers.includes(user.id) || !!aula.assistants?.includes(user.id);
+      }
 
-    return true; // Broadcast or mine
+      if (user.role === 'PADRE') {
+        return ninos.some(nino => nino.aulaId === aula.id && nino.parentId === user.id);
+      }
+
+      return false; // Other roles shouldn't see it if it's strictly for this room
+    }
+
+    // If no courseId and no recipientId, it's a general broadcast
+    return true;
   });
 
   const unreadCount = userNotifications.filter(n => !n.isRead).length;

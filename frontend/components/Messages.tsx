@@ -4,8 +4,7 @@ import { Search, Send, UserPlus, X, Mail, Phone, Video, MoreVertical, Paperclip,
 import { format } from 'date-fns';
 import { useAuth } from '../contexts/AuthContext';
 import { useAppState } from '../contexts/AppStateContext';
-import { usersApi } from '../services/api';
-import { MOCK_MESSAGES } from '../services/mockData';
+import { usersApi, messagesApi } from '../services/api';
 
 export const Messages: React.FC = () => {
   const { user: currentUser, currentInstitution, token } = useAuth();
@@ -17,10 +16,16 @@ export const Messages: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Sidebar Tab State
+  const [sidebarTab, setSidebarTab] = useState<'chats' | 'contacts'>('chats');
+  const [conversations, setConversations] = useState<{ contactId: string, lastMessage: any }[]>([]);
+
   // Chat State
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [inputText, setInputText] = useState('');
-  const [messagesState, setMessagesState] = useState(MOCK_MESSAGES);
+  const [messagesState, setMessagesState] = useState<Record<string, any[]>>({});
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const isSuperAdmin = currentUser?.role === 'SUPER_ADMIN';
   const isAdmin = currentUser?.role === 'ADMIN_INSTITUCION' || isSuperAdmin;
@@ -44,6 +49,35 @@ export const Messages: React.FC = () => {
     };
     fetchUsers();
   }, [currentInstitution, token]);
+
+  // Load Conversations List
+  const fetchConversations = async () => {
+    if (!currentUser || !token) return;
+    try {
+      const result = await messagesApi.getConversations(currentUser.id, token);
+      setConversations(result);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchConversations();
+  }, [currentUser, token]); // Initialize on mount and user change
+
+  // Load Messages for Selected User
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (!currentUser || !selectedUserId || !token) return;
+      try {
+        const msgs = await messagesApi.getMessages(currentUser.id, selectedUserId, token);
+        setMessagesState(prev => ({ ...prev, [selectedUserId]: msgs }));
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+    fetchMessages();
+  }, [selectedUserId, currentUser, token]);
 
   // 2. Filter Visible Users Based on Rules
   const visibleUsers = useMemo(() => {
@@ -118,25 +152,71 @@ export const Messages: React.FC = () => {
     }
   };
 
-  const handleSend = (e: React.FormEvent) => {
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      alert("El archivo supera el límite de 10MB.");
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    setSelectedFile(file);
+  };
+
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim() || !selectedUserId) return;
+    if ((!inputText.trim() && !selectedFile) || !selectedUserId || !currentUser || !token) return;
 
-    const newMessage = {
-      id: `new-${Date.now()}`,
-      senderId: 'me',
-      content: inputText,
-      timestamp: new Date(),
-      isRead: false
-    };
+    const tempText = inputText;
+    const fileToSend = selectedFile;
 
-    const chatId = `chat_${currentUser?.id}_${selectedUserId}`;
-
-    setMessagesState(prev => ({
-      ...prev,
-      [selectedUserId]: [...(prev[selectedUserId] || []), newMessage]
-    }));
     setInputText('');
+    setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+
+    try {
+      let fileData = undefined;
+
+      if (fileToSend) {
+        // In a real app we would upload the file to a server/S3 and get a URL.
+        // For the mock, we create a generic URL or use objectURL if you want preview
+        const fakeUrl = URL.createObjectURL(fileToSend);
+        fileData = {
+          name: fileToSend.name,
+          url: fakeUrl,
+          type: fileToSend.type,
+          size: fileToSend.size
+        };
+      }
+
+      const newMessage = await messagesApi.sendMessage(
+        currentUser.id,
+        selectedUserId,
+        fileData && !tempText ? `\uD83D\uDCCE Archivo adjunto: ${fileData.name}` : tempText,
+        token,
+        fileData
+      );
+
+      setMessagesState(prev => ({
+        ...prev,
+        [selectedUserId]: [...(prev[selectedUserId] || []), newMessage]
+      }));
+
+      // Refresh conversations list to update order and last message, and handle new chats
+      fetchConversations();
+
+      // If we were in 'contacts' tab and started talking, auto-switch to 'chats' tab
+      if (sidebarTab === 'contacts') {
+        setSidebarTab('chats');
+      }
+
+    } catch (error) {
+      console.error("Failed to send message", error);
+    }
   };
 
   const selectedUser = visibleUsers.find(u => u.id === selectedUserId);
@@ -165,17 +245,25 @@ export const Messages: React.FC = () => {
       <div className="w-80 border-r border-slate-200 flex flex-col bg-slate-50/50">
         <div className="p-4 border-b border-slate-200">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-slate-900">Directorio y Chat</h2>
-            {isAdmin && (
-              <button
-                onClick={() => setIsAddModalOpen(true)}
-                className="p-2 bg-primary-50 text-primary-600 rounded-lg hover:bg-primary-100 transition-colors"
-                title="Añadir Usuario"
-              >
-                <UserPlus size={18} />
-              </button>
-            )}
+            <h2 className="text-xl font-bold text-slate-900">Mensajes</h2>
           </div>
+
+          {/* Tabs */}
+          <div className="flex bg-slate-100 p-1 rounded-lg mb-4">
+            <button
+              onClick={() => setSidebarTab('chats')}
+              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${sidebarTab === 'chats' ? 'bg-white text-primary-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              Chats
+            </button>
+            <button
+              onClick={() => setSidebarTab('contacts')}
+              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${sidebarTab === 'contacts' ? 'bg-white text-primary-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              Directorio
+            </button>
+          </div>
+
           <div className="relative">
             <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
             <input
@@ -190,41 +278,91 @@ export const Messages: React.FC = () => {
 
         <div className="flex-1 overflow-y-auto p-3">
           {isLoadingUsers ? (
-            <div className="text-center p-4 text-slate-500 text-sm">Cargando directorio...</div>
-          ) : visibleUsers.length > 0 ? (
-            visibleUsers.map(u => {
-              const hasUnread = false; // Mock
-              const roleLabel = getRoleLabel(u.role);
-              const myKids = state.ninos.filter(n => n.parentId === u.id);
-              const displayName = u.role === 'PADRE' && myKids.length > 0
-                ? `Familia de ${myKids.map(k => k.name.split(' ')[0]).join(', ')}`
-                : u.name;
+            <div className="text-center p-4 text-slate-500 text-sm">Cargando...</div>
+          ) : sidebarTab === 'contacts' ? (
+            // Contacts List View
+            visibleUsers.length > 0 ? (
+              visibleUsers.map(u => {
+                const roleLabel = getRoleLabel(u.role);
+                const myKids = state.ninos.filter(n => n.parentId === u.id);
+                const displayName = u.role === 'PADRE' && myKids.length > 0
+                  ? `Familia de ${myKids.map(k => k.name.split(' ')[0]).join(', ')}`
+                  : u.name;
 
-              return (
-                <button
-                  key={u.id}
-                  onClick={() => setSelectedUserId(u.id)}
-                  className={`w-full flex items-center p-3 rounded-xl mb-1 transition-colors ${selectedUserId === u.id ? 'bg-white shadow-sm ring-1 ring-slate-200' : 'hover:bg-slate-100'}`}
-                >
-                  <div className="relative">
+                return (
+                  <button
+                    key={u.id}
+                    onClick={() => setSelectedUserId(u.id)}
+                    className={`w-full flex items-center p-3 rounded-xl mb-1 transition-colors ${selectedUserId === u.id ? 'bg-primary-50 ring-1 ring-primary-100' : 'hover:bg-slate-100'}`}
+                  >
                     <img src={u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}`} alt="" className="w-10 h-10 rounded-full object-cover border border-slate-200" />
-                    {hasUnread && (
-                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
-                    )}
-                  </div>
-                  <div className="ml-3 text-left flex-1 min-w-0">
-                    <div className="flex justify-between items-baseline">
-                      <p className={`text-sm font-semibold truncate ${selectedUserId === u.id ? 'text-primary-700' : 'text-slate-700'}`}>{displayName}</p>
+                    <div className="ml-3 text-left flex-1 min-w-0">
+                      <p className={`text-sm font-semibold truncate ${selectedUserId === u.id ? 'text-primary-800' : 'text-slate-700'}`}>{displayName}</p>
+                      <p className={`text-[10px] font-bold mt-0.5 inline-block px-1.5 rounded-sm ${getRoleBadgeColor(u.role)}`}>
+                        {roleLabel}
+                      </p>
                     </div>
-                    <p className={`text-[10px] font-bold mt-0.5 inline-block px-1.5 rounded-sm ${getRoleBadgeColor(u.role)}`}>
-                      {roleLabel}
-                    </p>
-                  </div>
-                </button>
-              );
-            })
+                  </button>
+                );
+              })
+            ) : (
+              <div className="text-center p-4 text-slate-500 text-sm">No se encontraron contactos en tu red.</div>
+            )
           ) : (
-            <div className="text-center p-4 text-slate-500 text-sm">No se encontraron contactos.</div>
+            // Conversations List View
+            conversations.length > 0 ? (
+              conversations.map(conv => {
+                // Find full user details
+                const contact = users.find(u => u.id === conv.contactId);
+                // Si la persona de ese chat ya no es visible por permisos, no deberíamos mostrarlo o se muestra sin rol context. 
+                // Optemos por mostrar siempre los chats históricos, pero si un admin le quita permisos, que quede claro.
+                if (!contact) return null;
+
+                const displayName = contact.role === 'PADRE'
+                  ? `Familia de ${state.ninos.filter(n => n.parentId === contact.id).map(k => k.name.split(' ')[0]).join(', ')}`
+                  : contact.name;
+
+                const isMsgMine = conv.lastMessage.senderId === currentUser?.id;
+                const date = new Date(conv.lastMessage.timestamp);
+                const showDate = format(date, 'd MMM'); // e.g. "4 Ago"
+                const showTime = format(date, 'h:mm a'); // e.g. "2:30 PM"
+                const isToday = new Date().toDateString() === date.toDateString();
+                const displayTime = isToday ? showTime : showDate;
+
+                return (
+                  <button
+                    key={conv.contactId}
+                    onClick={() => setSelectedUserId(conv.contactId)}
+                    className={`w-full flex items-center p-3 rounded-xl mb-1 transition-colors ${selectedUserId === conv.contactId ? 'bg-white shadow-sm ring-1 ring-slate-200 border border-slate-100/50' : 'hover:bg-slate-100'}`}
+                  >
+                    <div className="relative">
+                      <img src={contact.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(contact.name)}`} alt="" className="w-12 h-12 rounded-full object-cover border border-slate-200" />
+                    </div>
+                    <div className="ml-3 flex-1 min-w-0 flex flex-col justify-center">
+                      <div className="flex justify-between items-baseline mb-0.5">
+                        <p className={`text-[13px] font-bold truncate ${selectedUserId === conv.contactId ? 'text-primary-800' : 'text-slate-800'}`}>{displayName}</p>
+                        <span className="text-[10px] text-slate-400 font-medium ml-2 whitespace-nowrap">{displayTime}</span>
+                      </div>
+                      <div className="flex items-center text-xs text-slate-500">
+                        {isMsgMine && <CheckCheck size={14} className="mr-1 inline text-primary-400" />}
+                        <span className="truncate">{conv.lastMessage.content}</span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })
+            ) : (
+              <div className="text-center p-6 text-slate-400 text-sm flex flex-col items-center">
+                <MessageSquare size={24} className="mb-2 text-slate-300" />
+                <p>Aún no hay mensajes activos.</p>
+                <button
+                  onClick={() => setSidebarTab('contacts')}
+                  className="mt-3 text-primary-600 font-medium hover:underline"
+                >
+                  Buscar en el directorio
+                </button>
+              </div>
+            )
           )}
         </div>
       </div>
@@ -248,11 +386,6 @@ export const Messages: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="flex items-center space-x-3 text-slate-400">
-              <button className="p-2 hover:bg-slate-50 hover:text-primary-600 rounded-full transition-colors"><Phone size={20} /></button>
-              <button className="p-2 hover:bg-slate-50 hover:text-primary-600 rounded-full transition-colors"><Video size={20} /></button>
-              <button className="p-2 hover:bg-slate-50 hover:text-slate-600 rounded-full transition-colors"><MoreVertical size={20} /></button>
-            </div>
           </div>
 
           {/* Messages Feed */}
@@ -266,7 +399,7 @@ export const Messages: React.FC = () => {
               </div>
             ) : (
               currentMessages.map((msg, idx) => {
-                const isMe = msg.senderId === 'me';
+                const isMe = msg.senderId === currentUser?.id;
                 const showAvatar = idx === 0 || currentMessages[idx - 1].senderId !== msg.senderId;
 
                 return (
@@ -281,6 +414,18 @@ export const Messages: React.FC = () => {
                         ? 'bg-primary-600 text-white rounded-br-none'
                         : 'bg-white text-slate-700 border border-slate-200 rounded-bl-none'
                         }`}>
+                        {msg.file && msg.file.type.startsWith('image/') ? (
+                          <div className="mb-2">
+                            <img src={msg.file.url} alt="adjunto" className="max-w-full max-h-60 rounded-lg" />
+                          </div>
+                        ) : msg.file ? (
+                          <div className="mb-2 p-2 rounded bg-white/10 flex items-center gap-2 border border-white/20">
+                            <Paperclip size={16} className={isMe ? 'text-white' : 'text-slate-500'} />
+                            <a href={msg.file.url} download={msg.file.name} target="_blank" rel="noreferrer" className="underline truncate max-w-[200px]" title={msg.file.name}>
+                              {msg.file.name}
+                            </a>
+                          </div>
+                        ) : null}
                         {msg.content}
                       </div>
                       <div className={`text-[10px] text-slate-400 mt-1 flex items-center ${isMe ? 'justify-end' : 'justify-start'}`}>
@@ -295,9 +440,29 @@ export const Messages: React.FC = () => {
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-white border-t border-slate-100">
+          <div className="p-4 bg-white border-t border-slate-100 flex flex-col gap-2">
+            {selectedFile && (
+              <div className="flex items-center p-2 bg-slate-100 rounded-lg w-fit text-sm">
+                <Paperclip size={14} className="text-primary-600 mr-2" />
+                <span className="truncate max-w-[200px] font-medium mr-2">{selectedFile.name}</span>
+                <span className="text-slate-500 text-xs mr-3">({Math.round(selectedFile.size / 1024)} KB)</span>
+                <button type="button" onClick={() => { setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }} className="p-1 hover:bg-slate-200 rounded-full text-slate-500">
+                  <X size={14} />
+                </button>
+              </div>
+            )}
             <form onSubmit={handleSend} className="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-primary-100 focus-within:border-primary-300 transition-all">
-              <button type="button" className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200/50">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className={`p-2 rounded-lg transition-colors ${selectedFile ? 'text-primary-600 bg-primary-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-200/50'}`}
+              >
                 <Paperclip size={20} />
               </button>
               <input
@@ -309,7 +474,7 @@ export const Messages: React.FC = () => {
               />
               <button
                 type="submit"
-                disabled={!inputText.trim()}
+                disabled={!inputText.trim() && !selectedFile}
                 className="p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <Send size={18} />

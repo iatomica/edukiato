@@ -8,7 +8,8 @@
  * preparing for real multi-tenant API calls.
  */
 
-import { User, UserRole, UserInstitution, Course } from '../types';
+import { User, UserRole, UserInstitution, Course, Message } from '../types';
+import { MOCK_COURSES, MOCK_PAYMENTS, INST_VINCULOS, MOCK_AULAS, MOCK_NINOS, MOCK_MESSAGES } from './mockData';
 
 // ── Config ────────────────────────────────────────────────────
 
@@ -71,7 +72,7 @@ const especiales = [
     };
 });
 
-const MOCK_USERS: MockUser[] = [
+const defaultMockUsers: MockUser[] = [
     // Dueñas (SUPER_ADMIN)
     {
         emailPattern: 'seila',
@@ -127,6 +128,9 @@ const MOCK_USERS: MockUser[] = [
         institutions: MOCK_INSTITUTIONS,
     },
 ];
+
+const storedUsers = typeof window !== 'undefined' ? localStorage.getItem('MOCK_USERS') : null;
+let MOCK_USERS: MockUser[] = storedUsers ? JSON.parse(storedUsers) : defaultMockUsers;
 
 // ── Auth API ──────────────────────────────────────────────────
 
@@ -333,6 +337,7 @@ export const usersApi = {
                 user: newUser,
                 institutions: [{ ...MOCK_INSTITUTIONS[0], role: newUser.role }]
             });
+            if (typeof window !== 'undefined') localStorage.setItem('MOCK_USERS', JSON.stringify(MOCK_USERS));
             return newUser;
         }
     },
@@ -357,6 +362,7 @@ export const usersApi = {
                 if (data.role) {
                     MOCK_USERS[mockIndex].institutions[0].role = data.role;
                 }
+                if (typeof window !== 'undefined') localStorage.setItem('MOCK_USERS', JSON.stringify(MOCK_USERS));
                 return MOCK_USERS[mockIndex].user;
             }
             throw new Error("Usuario no encontrado en los datos de prueba");
@@ -441,5 +447,64 @@ export const coursesApi = {
             nextSession: c.nextSession?.date || 'TBD',
             description: c.description
         };
+    }
+};
+
+// ── Messages API ──────────────────────────────────────────────
+
+export const messagesApi = {
+    getMessages: async (userId: string, targetUserId: string, token: string): Promise<Message[]> => {
+        // Simular retraso de red
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        // Enforce the same key regardless of who is sender/receiver
+        const chatId = [userId, targetUserId].sort().join('|');
+        return MOCK_MESSAGES[chatId] || [];
+    },
+
+    sendMessage: async (senderId: string, recipientId: string, content: string, token: string, file?: Message['file']): Promise<Message> => {
+        // Simular retraso de red
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        const chatId = [senderId, recipientId].sort().join('|');
+
+        const newMessage: Message = {
+            id: `msg_${Date.now()}`,
+            senderId,
+            content,
+            timestamp: new Date(),
+            isRead: false,
+            ...(file && { file })
+        };
+
+        if (!MOCK_MESSAGES[chatId]) {
+            MOCK_MESSAGES[chatId] = [];
+        }
+
+        MOCK_MESSAGES[chatId].push(newMessage);
+        if (typeof window !== 'undefined') localStorage.setItem('MOCK_MESSAGES', JSON.stringify(MOCK_MESSAGES));
+        return newMessage;
+    },
+
+    getConversations: async (userId: string, token: string): Promise<{ contactId: string, lastMessage: Message }[]> => {
+        // Simular retraso de red
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        const conversations: { contactId: string, lastMessage: Message }[] = [];
+
+        for (const [chatId, messages] of Object.entries(MOCK_MESSAGES)) {
+            if (chatId.includes(userId) && messages.length > 0) {
+                // chatId format is "id1|id2", get the other id
+                const ids = chatId.split('|');
+                const contactId = ids[0] === userId ? ids[1] : ids[0];
+                const lastMessage = messages[messages.length - 1];
+                conversations.push({ contactId, lastMessage });
+            }
+        }
+
+        // Sort by most recent message
+        return conversations.sort((a, b) =>
+            new Date(b.lastMessage.timestamp).getTime() - new Date(a.lastMessage.timestamp).getTime()
+        );
     }
 };

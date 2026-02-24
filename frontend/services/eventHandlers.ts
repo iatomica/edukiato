@@ -322,7 +322,9 @@ function handleCommunicationSent(dispatch: Dispatch) {
             notifType,
             `Nuevo Comunicado: ${comm.title}`,
             comm.content.substring(0, 50) + (comm.content.length > 50 ? '...' : ''),
-            '/communications' // Action link to redirect
+            '/communications', // Action link to redirect
+            comm.recipientId,
+            comm.courseId
         );
 
         // 2. Activity log

@@ -76,9 +76,11 @@ export const MOCK_FEED: FeedItem[] = [
   }
 ];
 
-export const MOCK_NOTIFICATIONS: Notification[] = [];
+const storedNotifications = typeof window !== 'undefined' ? localStorage.getItem('MOCK_NOTIFICATIONS') : null;
+export const MOCK_NOTIFICATIONS: Notification[] = storedNotifications ? JSON.parse(storedNotifications) : [];
 export const MOCK_CONVERSATIONS: Conversation[] = [];
-export const MOCK_MESSAGES: Record<string, Message[]> = {};
+const storedMessages = typeof window !== 'undefined' ? localStorage.getItem('MOCK_MESSAGES') : null;
+export const MOCK_MESSAGES: Record<string, Message[]> = storedMessages ? JSON.parse(storedMessages) : {};
 export const MOCK_PAYMENTS: Payment[] = [];
 
 export const MOCK_REVENUE_DATA: Record<string, Array<{ name: string; value: number }>> = {
@@ -95,7 +97,8 @@ export const MOCK_ATTENDANCE_DATA: Record<string, Array<{ name: string; value: n
   ]
 };
 
-export const MOCK_COMMUNICATIONS: Communication[] = [
+const storedCommunications = typeof window !== 'undefined' ? localStorage.getItem('MOCK_COMMUNICATIONS') : null;
+export const MOCK_COMMUNICATIONS: Communication[] = storedCommunications ? JSON.parse(storedCommunications) : [
   {
     id: 'comm_vinculos_1',
     institutionId: INST_VINCULOS,

@@ -152,14 +152,20 @@ function appReducer(state: AppState, action: AppAction): AppState {
         case 'ADD_PAYMENT':
             return { ...state, payments: [action.payload, ...state.payments] };
 
-        case 'ADD_NOTIFICATION':
-            return { ...state, notifications: [action.payload, ...state.notifications] };
+        case 'ADD_NOTIFICATION': {
+            const newNotifs = [action.payload, ...state.notifications];
+            try { localStorage.setItem('MOCK_NOTIFICATIONS', JSON.stringify(newNotifs)); } catch (e) { }
+            return { ...state, notifications: newNotifs };
+        }
 
         case 'ADD_CONVERSATION':
             return { ...state, conversations: [...state.conversations, action.payload] };
 
-        case 'ADD_COMMUNICATION':
-            return { ...state, communications: [action.payload, ...state.communications] };
+        case 'ADD_COMMUNICATION': {
+            const newComms = [action.payload, ...state.communications];
+            try { localStorage.setItem('MOCK_COMMUNICATIONS', JSON.stringify(newComms)); } catch (e) { }
+            return { ...state, communications: newComms };
+        }
 
         case 'UPDATE_CONVERSATION':
             return {
@@ -229,7 +235,10 @@ export const AppStateProvider: React.FC<{ children: ReactNode }> = ({ children }
         if (isAuthenticated && token) {
             const hydrateAppData = async () => {
                 try {
-                    // Start with mock data base (since we haven't implemented all backend APIs yet)
+                    // Parse local storage dynamically to get the latest (to prevent soft-logout staleness)
+                    const storedComms = localStorage.getItem('MOCK_COMMUNICATIONS');
+                    const storedNotifs = localStorage.getItem('MOCK_NOTIFICATIONS');
+
                     let baseData: Partial<AppState> = {
                         courses: MOCK_COURSES,
                         aulas: MOCK_AULAS,
@@ -238,9 +247,9 @@ export const AppStateProvider: React.FC<{ children: ReactNode }> = ({ children }
                         events: MOCK_EVENTS,
                         feed: MOCK_FEED,
                         payments: MOCK_PAYMENTS,
-                        notifications: MOCK_NOTIFICATIONS,
+                        notifications: storedNotifs ? JSON.parse(storedNotifs) : MOCK_NOTIFICATIONS,
                         conversations: MOCK_CONVERSATIONS,
-                        communications: MOCK_COMMUNICATIONS,
+                        communications: storedComms ? JSON.parse(storedComms) : MOCK_COMMUNICATIONS,
                     };
 
                     // Fetch courses

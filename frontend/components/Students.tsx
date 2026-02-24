@@ -11,130 +11,256 @@ import { usersApi } from '../services/api';
 
 // ── SUB-COMPONENTS ───────────────────────────────────────────
 
-const CommunicationsModal = ({ onClose, students, courses, onSend }: { onClose: () => void, students: Student[], courses: any[], onSend: (data: any) => void }) => {
+const CommunicationsModal = ({ onClose, students, aulas, user, ninos, onSend }: { onClose: () => void, students: Student[], aulas: Aula[], user: any, ninos: Nino[], onSend: (data: any) => void }) => {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-  const [recipientType, setRecipientType] = useState<'INDIVIDUAL' | 'COURSE' | 'ALL'>('INDIVIDUAL');
+
+  const isAdmin = user?.role === 'ADMIN_INSTITUCION' || user?.role === 'SUPER_ADMIN';
+  const initialCommType: CommunicationType = isAdmin ? 'ANUNCIO_GENERAL' : 'ANUNCIO_SALA';
+  const [commType, setCommType] = useState<CommunicationType>(initialCommType);
+
+  // Destinatarios states
   const [selectedCourse, setSelectedCourse] = useState('');
-  const [selectedStudent, setSelectedStudent] = useState('');
-  const [commType, setCommType] = useState<CommunicationType>('ANUNCIO_GENERAL');
+  const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
+  const [searchPadre, setSearchPadre] = useState('');
+
+  // Filter Aulas for Dropdown
+  const availableAulas = useMemo(() => {
+    if (isAdmin) return aulas;
+    if (user?.role === 'DOCENTE') {
+      return aulas.filter(a => a.teachers.includes(user.id));
+    }
+    return [];
+  }, [aulas, isAdmin, user]);
+
+  // Derived options for recipients
+  const availableRecipients = useMemo(() => {
+    // Exclude SUPER_ADMIN from being messaged
+    let baseUsers = students.filter(s => s.role !== 'SUPER_ADMIN');
+
+    if (isAdmin) {
+      return baseUsers.filter(s => s.role === 'PADRE' || s.role === 'DOCENTE' || s.role === 'ADMIN_INSTITUCION');
+    }
+
+    if (user?.role === 'DOCENTE') {
+      const teacherAulas = availableAulas.map(a => a.id);
+      const teacherNinos = ninos.filter(n => teacherAulas.includes(n.aulaId));
+      const teacherParentsIds = teacherNinos.map(n => n.parentId);
+
+      return baseUsers.filter(s => {
+        if (s.role === 'PADRE') return teacherParentsIds.includes(s.id);
+        if (s.role === 'DOCENTE' || s.role === 'ADMIN_INSTITUCION') return true;
+        return false;
+      });
+    }
+
+    return [];
+  }, [students, isAdmin, user, availableAulas, ninos]);
+
+  const filteredRecipients = availableRecipients.filter(p => p.name.toLowerCase().includes(searchPadre.toLowerCase()));
+
+  const toggleRecipient = (id: string) => {
+    if (selectedRecipients.includes(id)) {
+      setSelectedRecipients(selectedRecipients.filter(r => r !== id));
+    } else {
+      setSelectedRecipients([...selectedRecipients, id]);
+    }
+  };
+
+  const selectAllRecipients = () => {
+    setSelectedRecipients(availableRecipients.map(p => p.id));
+  };
+
+  const deselectAllRecipients = () => {
+    setSelectedRecipients([]);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSend({
+
+    const baseData = {
       type: commType,
       title: subject,
       content: message,
-      recipientId: recipientType === 'INDIVIDUAL' ? selectedStudent : null,
-      courseId: recipientType === 'COURSE' ? selectedCourse : null,
-    });
+    };
+
+    if (commType === 'ANUNCIO_GENERAL') {
+      onSend({ ...baseData, recipientId: null, courseId: null });
+    } else if (commType === 'ANUNCIO_SALA') {
+      onSend({ ...baseData, recipientId: null, courseId: selectedCourse });
+    } else if (commType === 'NOTIFICACION_INDIVIDUAL') {
+      // If multiple selected, we send multiple communications (or you could adapt your backend to accept an array)
+      if (selectedRecipients.length === 0) return alert('Debes seleccionar al menos un destinatario.');
+
+      selectedRecipients.forEach(recipientId => {
+        onSend({ ...baseData, recipientId, courseId: null });
+      });
+    }
+
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-scale-in flex flex-col max-h-[90vh]">
-        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-          <h3 className="font-bold text-slate-800 text-lg">Enviar Comunicado</h3>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200">
+
+        {/* Header */}
+        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-24 bg-primary-50 rounded-full transform translate-x-12 -translate-y-12"></div>
+          <div className="relative flex items-center space-x-4">
+            <div className="w-12 h-12 bg-primary-100 text-primary-600 rounded-xl flex items-center justify-center shadow-sm">
+              <MessageSquare size={24} />
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-800 text-xl tracking-tight">Nuevo Comunicado</h3>
+              <p className="text-sm text-slate-500">Envía información importante a tu comunidad</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="relative p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors">
             <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
-          <div className="grid grid-cols-2 gap-4">
+        {/* Formulary Area */}
+        <form id="communication-form" onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1 flex flex-col gap-6 bg-slate-50/30">
+
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Tipo de Comunicado</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Tipo de Comunicado</label>
               <select
                 value={commType}
-                onChange={(e) => setCommType(e.target.value as CommunicationType)}
-                className="w-full text-sm border-slate-200 rounded-lg focus:ring-primary-500"
+                onChange={(e) => {
+                  setCommType(e.target.value as CommunicationType);
+                  // Reset previous selections when changing type
+                  setSelectedRecipients([]);
+                  setSelectedCourse('');
+                }}
+                className="w-full text-sm border-slate-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 bg-slate-50 py-2.5 px-3"
               >
-                <option value="ANUNCIO_GENERAL">Anuncio general (todo el jardín)</option>
-                <option value="ANUNCIO_SALA">Anuncio por sala</option>
-                <option value="NOTIFICACION_INDIVIDUAL">Notificación individual por familia</option>
+                {isAdmin && <option value="ANUNCIO_GENERAL">📢 Anuncio general (Todo el jardín)</option>}
+                <option value="ANUNCIO_SALA">🏫 Anuncio por sala / curso</option>
+                <option value="NOTIFICACION_INDIVIDUAL">👤 Notificación individual a familias / personal</option>
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Destinatarios</label>
-              <select
-                value={recipientType}
-                onChange={(e) => setRecipientType(e.target.value as any)}
-                className="w-full text-sm border-slate-200 rounded-lg focus:ring-primary-500"
-              >
-                <option value="INDIVIDUAL">Estudiante Individual</option>
-                <option value="COURSE">Curso Completo</option>
-                <option value="ALL">Todos los Estudiantes</option>
-              </select>
-            </div>
+
+            {commType === 'ANUNCIO_SALA' && (
+              <div className="animate-fade-in">
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Seleccionar Curso o Sala</label>
+                <select
+                  value={selectedCourse}
+                  onChange={(e) => setSelectedCourse(e.target.value)}
+                  required
+                  className="w-full text-sm border-slate-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 bg-white py-2.5 px-3"
+                >
+                  <option value="">Selecciona la sala destinataria...</option>
+                  {availableAulas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                </select>
+              </div>
+            )}
+
+            {commType === 'NOTIFICACION_INDIVIDUAL' && (
+              <div className="animate-fade-in space-y-3">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="block text-sm font-semibold text-slate-700">Seleccionar Destinatarios</label>
+                  <div className="space-x-2 text-xs">
+                    <button type="button" onClick={selectAllRecipients} className="text-primary-600 hover:underline font-medium">Seleccionar todos</button>
+                    <span className="text-slate-300">|</span>
+                    <button type="button" onClick={deselectAllRecipients} className="text-slate-500 hover:underline">Ninguno</button>
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Buscar familia o miembro del personal..."
+                    value={searchPadre}
+                    onChange={(e) => setSearchPadre(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 text-sm border-slate-200 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+                  />
+                </div>
+
+                <div className="border border-slate-200 rounded-xl max-h-48 overflow-y-auto bg-white">
+                  {filteredRecipients.length === 0 ? (
+                    <div className="p-4 text-center text-sm text-slate-500">No se encontraron destinatarios.</div>
+                  ) : (
+                    <div className="divide-y divide-slate-100">
+                      {filteredRecipients.map(padre => (
+                        <label key={padre.id} className="flex items-center p-3 hover:bg-slate-50 cursor-pointer transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={selectedRecipients.includes(padre.id)}
+                            onChange={() => toggleRecipient(padre.id)}
+                            className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500 mr-3"
+                          />
+                          <div className="flex items-center gap-3">
+                            <img src={padre.avatar} alt="avatar" className="w-6 h-6 rounded-full border border-slate-200" />
+                            <div>
+                              <p className="text-sm font-medium text-slate-900">{padre.name}</p>
+                              <p className="text-xs text-slate-500">{padre.email}</p>
+                            </div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {selectedRecipients.length > 0 && (
+                  <p className="text-xs text-primary-600 font-medium">{selectedRecipients.length} destinatarios seleccionados.</p>
+                )}
+              </div>
+            )}
           </div>
 
-          {recipientType === 'INDIVIDUAL' && (
+          <div className="flex flex-col gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Seleccionar Estudiante</label>
-              <select
-                value={selectedStudent}
-                onChange={(e) => setSelectedStudent(e.target.value)}
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Asunto del Comunicado</label>
+              <input
+                type="text"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
                 required
-                className="w-full text-sm border-slate-200 rounded-lg focus:ring-primary-500"
-              >
-                <option value="">Buscar estudiante...</option>
-                {students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-              </select>
+                className="w-full text-sm border-slate-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 px-4 py-2.5 shadow-sm"
+                placeholder="Escribe un título claro... (Ej. Suspensión de actividades)"
+              />
             </div>
-          )}
 
-          {recipientType === 'COURSE' && (
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Seleccionar Curso</label>
-              <select
-                value={selectedCourse}
-                onChange={(e) => setSelectedCourse(e.target.value)}
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Mensaje</label>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
                 required
-                className="w-full text-sm border-slate-200 rounded-lg focus:ring-primary-500"
-              >
-                <option value="">Seleccionar curso...</option>
-                {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
-              </select>
+                rows={6}
+                className="w-full text-sm border-slate-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 px-4 py-3 shadow-sm resize-none"
+                placeholder="Desarrolla el contenido del comunicado aquí..."
+              />
             </div>
-          )}
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Asunto</label>
-            <input
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              required
-              className="w-full text-sm border-slate-200 rounded-lg focus:ring-primary-500"
-              placeholder="Ej. Reporte de inasistencia"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Mensaje</label>
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              required
-              rows={6}
-              className="w-full text-sm border-slate-200 rounded-lg focus:ring-primary-500 resize-none"
-              placeholder="Escribe tu mensaje aquí..."
-            />
-          </div>
-
-          <div className="flex items-center space-x-2 text-sm text-slate-500">
-            <button type="button" className="flex items-center px-3 py-2 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">
-              <Paperclip size={16} className="mr-2" /> Adjuntar archivo
-            </button>
-            <span className="text-xs italic">Soporta PDF, JPG, PNG (Max 5MB)</span>
+            <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl">
+              <div className="flex items-center space-x-3 text-sm text-slate-600">
+                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                  <Paperclip size={18} className="text-slate-500" />
+                </div>
+                <div>
+                  <p className="font-medium text-slate-800">Adjuntar archivo</p>
+                  <p className="text-xs text-slate-500">Soporta PDF, JPG, PNG (Max 5MB)</p>
+                </div>
+              </div>
+              <button type="button" className="px-3 py-1.5 text-sm bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg font-medium transition-colors">
+                Explorar...
+              </button>
+            </div>
           </div>
         </form>
 
-        <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end space-x-3">
-          <button onClick={onClose} className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg">Cancelar</button>
-          <button onClick={handleSubmit} className="px-6 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 flex items-center">
-            <Send size={16} className="mr-2" /> Enviar Comunicado
+        {/* Footer */}
+        <div className="p-4 border-t border-slate-100 bg-white flex justify-end items-center gap-3">
+          <button type="button" onClick={onClose} className="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-50 rounded-xl transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" form="communication-form" className="px-6 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 shadow-md shadow-primary-200 flex items-center transition-all hover:scale-105 active:scale-95">
+            <Send size={18} className="mr-2" /> Enviar Comunicado
           </button>
         </div>
       </div>
@@ -240,11 +366,32 @@ const NotebookView = ({ communications }: { communications: Communication[] }) =
   );
 };
 
-const StudentDetail = ({ student, onClose, communications }: { student: Student, onClose: () => void, communications: Communication[] }) => {
+const StudentDetail = ({ student, onClose, communications, aulas, ninos }: { student: Student, onClose: () => void, communications: Communication[], aulas: Aula[], ninos: Nino[] }) => {
   const [activeTab, setActiveTab] = useState<'INFO' | 'ACADEMIC' | 'COMMUNICATIONS'>('INFO');
 
   // Filter comms for this student
-  const studentComms = communications.filter(c => c.recipientId === student.id || !c.recipientId);
+  const studentComms = communications.filter(c => {
+    // 0. General announcements go to everyone
+    if (c.type === 'ANUNCIO_GENERAL') return true;
+
+    if (c.recipientId && c.recipientId === student.id) return true;
+    if (c.recipientId && c.recipientId !== student.id) return false;
+
+    if (c.courseId) {
+      if (student.role === 'ADMIN_INSTITUCION' || student.role === 'SUPER_ADMIN') return true;
+
+      if (student.role === 'PADRE') {
+        return ninos.some(n => n.aulaId === c.courseId && n.parentId === student.id);
+      }
+      if (student.role === 'DOCENTE' || student.role === 'ESPECIALES') {
+        const aula = aulas.find(a => a.id === c.courseId);
+        return aula?.teachers.includes(student.id) || !!aula?.assistants?.includes(student.id);
+      }
+      return false;
+    }
+
+    return true;
+  });
 
   return (
     <div className="flex flex-col h-full bg-white rounded-2xl shadow-sm overflow-hidden animate-fade-in relative border border-slate-200">
@@ -375,7 +522,7 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK' }> = ({ 
   const [activeTab, setActiveTab] = useState<'ALUMNOS' | 'PADRES'>('ALUMNOS');
 
   const { t } = useLanguage();
-  const { students, courses, communications, dispatch, emitEvent } = useTenantData();
+  const { students, courses, communications, aulas, ninos, dispatch, emitEvent } = useTenantData();
   const { can } = usePermissions();
   const { user, currentInstitution, token } = useAuth();
 
@@ -507,14 +654,35 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK' }> = ({ 
         student={selectedStudentDetail}
         onClose={() => setSelectedStudentDetail(null)}
         communications={communications}
+        aulas={aulas}
+        ninos={ninos}
       />
     );
   }
 
   // If in Notebook Mode (Student View)
   if (viewMode === 'NOTEBOOK') {
-    // Filter by auth.user.id
-    const myComms = communications.filter(c => c.recipientId === user?.id || !c.recipientId);
+    const myComms = communications.filter(c => {
+      // 0. General announcements go to everyone
+      if (c.type === 'ANUNCIO_GENERAL') return true;
+
+      // 1. Direct recipient
+      if (c.recipientId && c.recipientId !== user?.id) return false;
+
+      if (user?.role === 'ADMIN_INSTITUCION' || user?.role === 'SUPER_ADMIN') return true;
+
+      if (c.courseId) {
+        if (user?.role === 'PADRE') {
+          return ninos.some(n => n.aulaId === c.courseId && n.parentId === user?.id);
+        }
+        if (user?.role === 'DOCENTE' || user?.role === 'ESPECIALES') {
+          const aula = aulas.find(a => a.id === c.courseId);
+          return aula?.teachers.includes(user?.id) || !!aula?.assistants?.includes(user?.id);
+        }
+        return false;
+      }
+      return true;
+    });
 
     return (
       <div className="space-y-6">
@@ -732,7 +900,9 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK' }> = ({ 
         <CommunicationsModal
           onClose={() => setIsCommModalOpen(false)}
           students={students}
-          courses={courses}
+          aulas={aulas}
+          user={user}
+          ninos={ninos}
           onSend={handleSendCommunication}
         />
       )}

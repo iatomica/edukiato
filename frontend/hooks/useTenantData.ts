@@ -88,9 +88,21 @@ export function useTenantData() {
         ];
     }, [students]);
 
+    const aulas = useMemo(
+        () => (institutionId ? state.aulas.filter(a => a.institutionId === institutionId) : []),
+        [institutionId, state.aulas]
+    );
+
+    const ninos = useMemo(
+        () => (institutionId ? state.ninos.filter(n => n.institutionId === institutionId) : []),
+        [institutionId, state.ninos]
+    );
+
     return {
         institutionId,
         courses,
+        aulas,
+        ninos,
         students,
         events,
         feed,

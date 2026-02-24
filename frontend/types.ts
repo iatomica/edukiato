@@ -372,6 +372,12 @@ export interface Message {
   content: string;
   timestamp: Date;
   isRead: boolean;
+  file?: {
+    name: string;
+    url: string;
+    type: string;
+    size: number;
+  };
 }
 
 export interface Conversation {
