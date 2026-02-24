@@ -9,21 +9,49 @@ export class AuthService {
   constructor(
     // private usersService: UsersService,
     private jwtService: JwtService
-  ) {}
+  ) { }
 
   // Mock DB call for MVP demonstration purposes
   // In real app: this.usersService.findByEmail(email)
   private async findUserByEmail(email: string) {
-    // This mocks the DB lookup. 
-    // In production, inject your DB repository here.
+    if (email === 'superadmin@edukiato.edu') {
+      return {
+        id: 'su0eebc99-9c0b-4ef8-bb6d-6bb9bd380su',
+        email: 'superadmin@edukiato.edu',
+        password_hash: 'hashed_pass',
+        role: 'SUPER_ADMIN',
+        full_name: 'Super Admin',
+        avatar_url: 'https://picsum.photos/seed/superadmin/200'
+      };
+    }
     if (email === 'admin@edukiato.edu') {
       return {
         id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
         email: 'admin@edukiato.edu',
-        password_hash: '$2b$10$X7...', // Hash of 'password'
-        role: 'ADMIN',
+        password_hash: 'hashed_pass',
+        role: 'ADMIN_INSTITUCION',
         full_name: 'Alex Rivera',
         avatar_url: 'https://picsum.photos/seed/alex/200'
+      };
+    }
+    if (email === 'elena@edukiato.edu') {
+      return {
+        id: 't1eebc99-9c0b-4ef8-bb6d-6bb9bd380t11',
+        email: 'elena@edukiato.edu',
+        password_hash: 'hashed_pass',
+        role: 'DOCENTE',
+        full_name: 'Elena Fisher',
+        avatar_url: 'https://picsum.photos/seed/elena/200'
+      };
+    }
+    if (email === 'sofia@student.com') {
+      return {
+        id: 's1eebc99-9c0b-4ef8-bb6d-6bb9bd380s11',
+        email: 'sofia@student.com',
+        password_hash: 'hashed_pass',
+        role: 'ESTUDIANTE',
+        full_name: 'Sofía Chen',
+        avatar_url: 'https://picsum.photos/seed/sofia/200'
       };
     }
     return null;
@@ -31,12 +59,10 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.findUserByEmail(email);
-    
+
     if (user) {
-      // In real app: await bcrypt.compare(pass, user.password_hash);
-      // For MVP seed data compatibility (where seed has 'hashed_pass' string):
-      const isMatch = pass === 'password' || user.password_hash === 'hashed_pass'; 
-      
+      const isMatch = pass === 'password' || pass === 'demo' || user.password_hash === 'hashed_pass';
+
       if (isMatch) {
         const { password_hash, ...result } = user;
         return result;

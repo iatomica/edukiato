@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Req } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto, UpdateCourseDto } from './dto/create-course.dto';
 import { CreateSessionDto } from './dto/create-session.dto';
@@ -12,7 +12,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 @Controller('courses')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class CoursesController {
-  constructor(private readonly coursesService: CoursesService) {}
+  constructor(private readonly coursesService: CoursesService) { }
 
   // --- CORE COURSE MANAGEMENT ---
 
@@ -54,13 +54,13 @@ export class CoursesController {
   @Post(':id/assignments/:assignmentId/submit')
   // Students can submit
   submitAssignment(
-    @Param('id') courseId: string, 
+    @Param('id') courseId: string,
     @Param('assignmentId') assignmentId: string,
-    @Body() dto: SubmitAssignmentDto
+    @Body() dto: SubmitAssignmentDto,
+    @Req() req: any
   ) {
-    // In real app, get studentId from Request user
-    const mockStudentId = 's1eebc99-9c0b-4ef8-bb6d-6bb9bd380s11'; 
-    return this.coursesService.submitAssignment(courseId, assignmentId, mockStudentId, dto);
+    const studentId = req.user.id;
+    return this.coursesService.submitAssignment(courseId, assignmentId, studentId, dto);
   }
 
   // --- STUDENT ENROLLMENT ---
