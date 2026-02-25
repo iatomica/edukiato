@@ -535,18 +535,18 @@ const StudentDetail = ({ student, onClose, communications, aulas, ninos }: { stu
 
 // ── MAIN COMPONENT ───────────────────────────────────────────
 
-export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initialCommParams?: any }> = ({ initialViewMode = 'LIST', initialCommParams }) => {
+export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initialCommParams?: any, onViewChange?: (view: any, params?: any) => void }> = ({ initialViewMode = 'LIST', initialCommParams, onViewChange }) => {
   const [selectedStudentForCert, setSelectedStudentForCert] = useState<Student | null>(null);
   const [selectedStudentDetail, setSelectedStudentDetail] = useState<Student | null>(null);
   const [isCommModalOpen, setIsCommModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'LIST' | 'NOTEBOOK'>(initialViewMode);
-  const [activeTab, setActiveTab] = useState<'ALUMNOS' | 'PADRES'>('ALUMNOS');
+  const { user, currentInstitution, token } = useAuth();
+  const [activeTab, setActiveTab] = useState<'ALUMNOS' | 'PADRES'>(user?.role === 'PADRE' ? 'PADRES' : 'ALUMNOS');
 
   const { t } = useLanguage();
   const { students, courses, communications, aulas, ninos, dispatch, emitEvent } = useTenantData();
   const { can } = usePermissions();
-  const { user, currentInstitution, token } = useAuth();
 
   const isAdmin = user?.role === 'ADMIN_INSTITUCION' || user?.role === 'SUPER_ADMIN';
 
@@ -593,6 +593,18 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
       return baseUsers.filter(s => {
         if (s.role === 'PADRE') return parentUserIds.includes(s.id);
         if (s.role === 'ESTUDIANTE') return teacherNinos.some(n => n.name === s.name);
+        return false;
+      });
+    }
+
+    if (user?.role === 'PADRE') {
+      const myKidsAulaIds = ninos.filter(n => n.parentIds?.includes(user.id)).map(n => n.aulaId);
+      const kidsInSameAulas = ninos.filter(n => myKidsAulaIds.includes(n.aulaId));
+      const parentIdsInSameAulas = Array.from(new Set(kidsInSameAulas.flatMap(n => n.parentIds || [])));
+
+      return baseUsers.filter(s => {
+        // Padres see other padres in same aulas
+        if (s.role === 'PADRE') return parentIdsInSameAulas.includes(s.id);
         return false;
       });
     }
@@ -824,12 +836,14 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
 
       {/* Tabs */}
       <div className="flex space-x-2 border-b border-slate-200">
-        <button
-          onClick={() => setActiveTab('ALUMNOS')}
-          className={`flex items-center gap-2 px-6 py-3 font-semibold text-sm rounded-t-xl transition-colors ${activeTab === 'ALUMNOS' ? 'bg-white text-primary-600 border-t border-x border-slate-200 -mb-[1px]' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
-        >
-          <GraduationCap size={16} /> Alumnos
-        </button>
+        {user?.role !== 'PADRE' && (
+          <button
+            onClick={() => setActiveTab('ALUMNOS')}
+            className={`flex items-center gap-2 px-6 py-3 font-semibold text-sm rounded-t-xl transition-colors ${activeTab === 'ALUMNOS' ? 'bg-white text-primary-600 border-t border-x border-slate-200 -mb-[1px]' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+          >
+            <GraduationCap size={16} /> Alumnos
+          </button>
+        )}
         <button
           onClick={() => setActiveTab('PADRES')}
           className={`flex items-center gap-2 px-6 py-3 font-semibold text-sm rounded-t-xl transition-colors ${activeTab === 'PADRES' ? 'bg-white text-primary-600 border-t border-x border-slate-200 -mb-[1px]' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
@@ -868,10 +882,14 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
           <table className="w-full text-left">
             <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-semibold tracking-wider">
               <tr>
-                <th className="px-6 py-4">{t.students.table.student}</th>
-                <th className="px-6 py-4">{t.students.table.program}</th>
-                <th className="px-6 py-4">{t.students.table.status}</th>
-                <th className="px-6 py-4">{t.students.table.attendance}</th>
+                <th className="px-6 py-4">{activeTab === 'PADRES' ? 'Familiar' : t.students.table.student}</th>
+                <th className="px-6 py-4">{activeTab === 'PADRES' ? 'Alumnos' : t.students.table.program}</th>
+                {activeTab !== 'PADRES' && (
+                  <>
+                    <th className="px-6 py-4">{t.students.table.status}</th>
+                    <th className="px-6 py-4">{t.students.table.attendance}</th>
+                  </>
+                )}
                 <th className="px-6 py-4 text-right">{t.students.table.actions}</th>
               </tr>
             </thead>
@@ -892,116 +910,149 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
                           <img className="h-10 w-10 rounded-full object-cover border border-slate-200" src={student.avatar} alt="" />
                         )}
                         <div className="ml-4">
-                          <div className="text-sm font-bold text-slate-900">{student.name}</div>
+                          <div className="text-sm font-bold text-slate-900">
+                            {student.role === 'PADRE'
+                              ? `Familia de ${ninos.filter(n => n.parentIds?.includes(student.id)).map(n => n.name.split(' ')[0]).join(', ')} (${student.name})`
+                              : student.name}
+                          </div>
                           <div className="text-xs text-slate-500">{student.email}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm text-slate-700 font-medium">{student.program}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      {can('manage', 'student') ? (
-                        <select
-                          value={student.status}
-                          onClick={(e) => e.stopPropagation()}
-                          onChange={(e) => {
-                            const newStatus = e.target.value as any;
-                            const oldStatus = student.status;
-                            dispatch({ type: 'UPDATE_STUDENT', payload: { id: student.id, status: newStatus } });
-                            emitEvent({
-                              type: 'STUDENT_STATUS_CHANGED',
-                              payload: {
-                                studentId: student.id,
-                                studentName: student.name,
-                                oldStatus,
-                                newStatus,
-                                changedBy: 'Admin', // In real app, get from auth.user.name
-                              }
-                            });
-                          }}
-                          className={`text-xs font-medium rounded-full px-2 py-0.5 border-0 cursor-pointer focus:ring-2 focus:ring-offset-1 focus:ring-primary-200
-                          ${student.status === 'active' ? 'bg-emerald-100 text-emerald-800' :
-                              student.status === 'on_leave' ? 'bg-amber-100 text-amber-800' :
-                                'bg-slate-100 text-slate-800'}`}
-                        >
-                          <option value="active">{t.students.status.active}</option>
-                          <option value="inactive">{t.students.status.inactive}</option>
-                          <option value="on_leave">{t.students.status.on_leave}</option>
-                        </select>
-                      ) : (
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                        ${student.status === 'active' ? 'bg-emerald-100 text-emerald-800' :
-                            student.status === 'on_leave' ? 'bg-amber-100 text-amber-800' :
-                              'bg-slate-100 text-slate-800'}`}>
-                          {t.students.status[student.status] || student.status}
+                      {activeTab === 'PADRES' ? (
+                        <span className="text-sm text-slate-700 font-medium">
+                          {ninos.filter(n => n.parentIds?.includes(student.id)).map(n => n.name).join(', ')}
                         </span>
+                      ) : (
+                        <span className="text-sm text-slate-700 font-medium">{student.program}</span>
                       )}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        <div className="w-16 bg-slate-200 rounded-full h-1.5 mr-2">
-                          <div
-                            className={`h-1.5 rounded-full ${student.attendanceRate > 80 ? 'bg-emerald-500' : student.attendanceRate > 60 ? 'bg-amber-500' : 'bg-rose-500'}`}
-                            style={{ width: `${student.attendanceRate}%` }}
-                          ></div>
-                        </div>
-                        <span className="text-xs font-medium text-slate-600">{student.attendanceRate}%</span>
-                      </div>
-                    </td>
+                    {activeTab !== 'PADRES' && (
+                      <>
+                        <td className="px-6 py-4">
+                          {can('manage', 'student') ? (
+                            <select
+                              value={student.status}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => {
+                                const newStatus = e.target.value as any;
+                                const oldStatus = student.status;
+                                dispatch({ type: 'UPDATE_STUDENT', payload: { id: student.id, status: newStatus } });
+                                emitEvent({
+                                  type: 'STUDENT_STATUS_CHANGED',
+                                  payload: {
+                                    studentId: student.id,
+                                    studentName: student.name,
+                                    oldStatus,
+                                    newStatus,
+                                    changedBy: 'Admin', // In real app, get from auth.user.name
+                                  }
+                                });
+                              }}
+                              className={`text-xs font-medium rounded-full px-2 py-0.5 border-0 cursor-pointer focus:ring-2 focus:ring-offset-1 focus:ring-primary-200
+                              ${student.status === 'active' ? 'bg-emerald-100 text-emerald-800' :
+                                  student.status === 'on_leave' ? 'bg-amber-100 text-amber-800' :
+                                    'bg-slate-100 text-slate-800'}`}
+                            >
+                              <option value="active">{t.students.status.active}</option>
+                              <option value="inactive">{t.students.status.inactive}</option>
+                              <option value="on_leave">{t.students.status.on_leave}</option>
+                            </select>
+                          ) : (
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
+                            ${student.status === 'active' ? 'bg-emerald-100 text-emerald-800' :
+                                student.status === 'on_leave' ? 'bg-amber-100 text-amber-800' :
+                                  'bg-slate-100 text-slate-800'}`}>
+                              {t.students.status[student.status] || student.status}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center">
+                            <div className="w-16 bg-slate-200 rounded-full h-1.5 mr-2">
+                              <div
+                                className={`h-1.5 rounded-full ${student.attendanceRate > 80 ? 'bg-emerald-500' : student.attendanceRate > 60 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                                style={{ width: `${student.attendanceRate}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-xs font-medium text-slate-600">{student.attendanceRate}%</span>
+                          </div>
+                        </td>
+                      </>
+                    )}
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end space-x-2">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setSelectedStudentForCert(student); }}
-                          className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-                          title="Generate Certificate"
-                        >
-                          <Award size={18} />
-                        </button>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); setSelectedStudentDetail(student); }}
-                          className="p-1.5 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-                        >
-                          <BookOpen size={18} />
-                        </button>
-                        <button className="p-1.5 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                          <MoreHorizontal size={18} />
-                        </button>
+                        {student.role === 'PADRE' && activeTab === 'PADRES' ? (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onViewChange && onViewChange('messages', { targetUserId: student.id }); }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-primary-600 bg-primary-50 hover:bg-primary-100 hover:text-primary-700 rounded-lg transition-colors border border-primary-100 shadow-sm"
+                            title="Enviar Mensaje"
+                          >
+                            <MessageSquare size={14} />
+                            <span className="hidden sm:inline">Mensaje</span>
+                          </button>
+                        ) : (
+                          <>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setSelectedStudentForCert(student); }}
+                              className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                              title="Generate Certificate"
+                            >
+                              <Award size={18} />
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setSelectedStudentDetail(student); }}
+                              className="p-1.5 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                            >
+                              <BookOpen size={18} />
+                            </button>
+                            <button className="p-1.5 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                              <MoreHorizontal size={18} />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
                 ))}
             </tbody>
           </table>
-        </div>
-      </div>
+        </div >
+      </div >
 
       {/* Certificate Modal */}
-      {selectedStudentForCert && (
-        <CertificateModal student={selectedStudentForCert} onClose={() => setSelectedStudentForCert(null)} />
-      )}
+      {
+        selectedStudentForCert && (
+          <CertificateModal student={selectedStudentForCert} onClose={() => setSelectedStudentForCert(null)} />
+        )
+      }
 
       {/* Communications Modal */}
-      {isCommModalOpen && (
-        <CommunicationsModal
-          onClose={() => setIsCommModalOpen(false)}
-          students={students}
-          aulas={aulas}
-          user={user}
-          ninos={ninos}
-          onSend={handleSendCommunication}
-          initialType={initialCommParams?.type}
-          isTypeLocked={initialCommParams?.isLocked}
-          initialRecipientIds={initialCommParams?.recipientIds}
-        />
-      )}
+      {
+        isCommModalOpen && (
+          <CommunicationsModal
+            onClose={() => setIsCommModalOpen(false)}
+            students={students}
+            aulas={aulas}
+            user={user}
+            ninos={ninos}
+            onSend={handleSendCommunication}
+            initialType={initialCommParams?.type}
+            isTypeLocked={initialCommParams?.isLocked}
+            initialRecipientIds={initialCommParams?.recipientIds}
+          />
+        )
+      }
       {/* Add Student Modal */}
-      {isAddModalOpen && (
-        <AddStudentModal
-          onClose={() => setIsAddModalOpen(false)}
-          onAdd={handleAddStudent}
-        />
-      )}
-    </div>
+      {
+        isAddModalOpen && (
+          <AddStudentModal
+            onClose={() => setIsAddModalOpen(false)}
+            onAdd={handleAddStudent}
+          />
+        )
+      }
+    </div >
   );
 };

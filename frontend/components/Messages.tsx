@@ -108,14 +108,17 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
         u.role === 'ESPECIALES'
       );
     } else if (currentUser.role === 'PADRE') {
-      // Parents see: Admins and Docentes of their kids
+      // Parents see: Admins, Docentes of their kids, and other Parents in the same aulas.
       const myKidsAulaIds = state.ninos.filter(n => n.parentIds?.includes(currentUser.id)).map(n => n.aulaId);
       const myKidsTeacherIds = state.aulas.filter(a => myKidsAulaIds.includes(a.id)).flatMap(a => a.teachers);
+      const kidsInSameAulas = state.ninos.filter(n => myKidsAulaIds.includes(n.aulaId));
+      const parentIdsInSameAulas = Array.from(new Set(kidsInSameAulas.flatMap(n => n.parentIds || [])));
 
       filtered = users.filter(u =>
         u.role === 'SUPER_ADMIN' ||
         u.role === 'ADMIN_INSTITUCION' ||
-        (u.role === 'DOCENTE' && myKidsTeacherIds.includes(u.id))
+        (u.role === 'DOCENTE' && myKidsTeacherIds.includes(u.id)) ||
+        (u.role === 'PADRE' && parentIdsInSameAulas.includes(u.id))
       );
     }
 

@@ -75,7 +75,7 @@ const AppContent: React.FC = () => {
           userRole={user!.role}
         />;
       case 'students':
-        return <Students />;
+        return <Students onViewChange={(v, p) => handleViewChange(v, p)} />;
       case 'schedule':
         return <Schedule user={user!} />;
       case 'classroom':
