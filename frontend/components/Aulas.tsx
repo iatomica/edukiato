@@ -2,14 +2,15 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAppState } from '../contexts/AppStateContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Aula, Nino, User } from '../types';
-import { Users, LayoutGrid, List, MessageSquare, Info, ShieldAlert, ChevronRight, User as UserIcon, Settings, Plus, Search, Trash2 } from 'lucide-react';
+import { Users, LayoutGrid, List, MessageSquare, Info, ShieldAlert, ChevronRight, User as UserIcon, Settings, Plus, Search, Trash2, Send } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Modal from './Modal';
 import { usersApi } from '../services/api';
+import { AnimatedAvatar } from './AnimatedAvatar';
 
-export default function Aulas() {
-    const { state } = useAppState();
+export default function Aulas({ onViewChange }: { onViewChange?: (view: any, params?: any) => void }) {
+    const { state, dispatch } = useAppState();
     const { user, token, currentInstitution } = useAuth();
 
     // UI States
@@ -21,6 +22,10 @@ export default function Aulas() {
     const [configAulaId, setConfigAulaId] = useState<string | null>(null);
     const [configTab, setConfigTab] = useState<'DOCENTES' | 'ALUMNOS'>('DOCENTES');
     const [allUsers, setAllUsers] = useState<User[]>([]);
+
+    // Multiple Teacher Assignment States
+    const [teacherAssignConfirm, setTeacherAssignConfirm] = useState<{ aulaId: string, docente: User, action: 'ASSIGN' | 'UNASSIGN' } | null>(null);
+    const [isProcessingTeacher, setIsProcessingTeacher] = useState(false);
 
     const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN_INSTITUCION';
 
@@ -150,6 +155,58 @@ export default function Aulas() {
                         title={`Configuración de Sala`}
                         size="xl"
                     >
+                        {/* Sub-modal flotante para Asignación */}
+                        {teacherAssignConfirm && (
+                            <div className="absolute inset-0 bg-white/70 backdrop-blur-sm z-50 flex items-center justify-center rounded-2xl">
+                                <div className="bg-white border border-slate-200 shadow-2xl p-6 rounded-2xl w-full max-w-sm text-center">
+                                    {isProcessingTeacher ? (
+                                        <div className="flex flex-col items-center py-4">
+                                            <div className="w-10 h-10 border-4 border-slate-200 border-t-primary-600 rounded-full animate-spin mb-4" />
+                                            <p className="text-sm font-bold text-slate-700">Guardando cambios...</p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <ShieldAlert className={`w-12 h-12 mx-auto mb-4 ${teacherAssignConfirm.action === 'ASSIGN' ? 'text-emerald-500' : 'text-rose-500'}`} />
+                                            <h3 className="text-lg font-bold text-slate-900 mb-2">Confirmar Acción</h3>
+                                            <p className="text-sm text-slate-600 mb-6">
+                                                ¿Deseas {teacherAssignConfirm.action === 'ASSIGN' ? 'asignar al docente' : 'remover al docente'} <span className="font-bold">{teacherAssignConfirm.docente.name}</span> de esta sala?
+                                            </p>
+                                            <div className="flex justify-center gap-3">
+                                                <button
+                                                    onClick={() => setTeacherAssignConfirm(null)}
+                                                    className="px-4 py-2 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                                                >
+                                                    Cancelar
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setIsProcessingTeacher(true);
+                                                        setTimeout(() => {
+                                                            const targetAulaC = state.aulas.find(a => a.id === teacherAssignConfirm.aulaId);
+                                                            if (targetAulaC) {
+                                                                let updatedTeachers = [...targetAulaC.teachers];
+                                                                if (teacherAssignConfirm.action === 'ASSIGN') {
+                                                                    updatedTeachers.push(teacherAssignConfirm.docente.id);
+                                                                } else {
+                                                                    updatedTeachers = updatedTeachers.filter(id => id !== teacherAssignConfirm.docente.id);
+                                                                }
+                                                                dispatch({ type: 'UPDATE_AULA', payload: { ...targetAulaC, teachers: updatedTeachers } });
+                                                            }
+                                                            setIsProcessingTeacher(false);
+                                                            setTeacherAssignConfirm(null);
+                                                        }, 1200);
+                                                    }}
+                                                    className={`px-4 py-2 text-sm font-bold text-white rounded-lg shadow-sm transition-colors ${teacherAssignConfirm.action === 'ASSIGN' ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200' : 'bg-rose-600 hover:bg-rose-700 shadow-rose-200'}`}
+                                                >
+                                                    {teacherAssignConfirm.action === 'ASSIGN' ? 'Asignar Docente' : 'Remover Docente'}
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
                         <div className="flex gap-6 min-h-[400px]">
                             {/* Sidebar Menu */}
                             <div className="w-48 flex-shrink-0 border-r border-slate-100 pr-4 space-y-1">
@@ -195,8 +252,15 @@ export default function Aulas() {
                                                                 className="w-5 h-5 text-primary-600 focus:ring-primary-500 border-slate-300 rounded cursor-pointer"
                                                                 checked={isAssigned || false}
                                                                 onChange={() => {
-                                                                    // Mock dispatch handled here for UI purpose
-                                                                    alert(`Implementar AppEvent para asignar/desasignar ${docente.name} al aula ${configAulaId}`);
+                                                                    if (isAssigned) {
+                                                                        if (targetAula && targetAula.teachers.length <= 1) {
+                                                                            alert("No puedes dejar el aula sin docentes.");
+                                                                            return;
+                                                                        }
+                                                                        setTeacherAssignConfirm({ aulaId: configAulaId!, docente, action: 'UNASSIGN' });
+                                                                    } else {
+                                                                        setTeacherAssignConfirm({ aulaId: configAulaId!, docente, action: 'ASSIGN' });
+                                                                    }
                                                                 }}
                                                             />
                                                         </div>
@@ -236,14 +300,18 @@ export default function Aulas() {
                                                         <tr key={nino.id} className="hover:bg-slate-50">
                                                             <td className="px-4 py-3 whitespace-nowrap">
                                                                 <div className="flex items-center gap-3">
-                                                                    <img src={nino.avatar} className="w-8 h-8 rounded-full border border-slate-200" />
+                                                                    <AnimatedAvatar gender={nino.gender} className="w-8 h-8 rounded-full border border-slate-200" />
                                                                     <span className="text-sm font-bold text-slate-800">{nino.name}</span>
                                                                 </div>
                                                             </td>
                                                             <td className="px-4 py-3 whitespace-nowrap">
                                                                 {/* Mock logic to simulate finding parent user */}
                                                                 <div className="flex items-center gap-2">
-                                                                    <div className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded font-mono border border-slate-200">{nino.parentId}</div>
+                                                                    <div className="flex flex-wrap gap-1">
+                                                                        {nino.parentIds?.map(pId => (
+                                                                            <span key={pId} className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded font-mono border border-slate-200">{pId}</span>
+                                                                        ))}
+                                                                    </div>
                                                                     <button onClick={() => alert('Abrir buscador de usuarios rol PADRE para re-vincular')} className="text-xs text-primary-600 font-medium hover:underline">Cambiar</button>
                                                                 </div>
                                                             </td>
@@ -335,7 +403,7 @@ export default function Aulas() {
                             onClick={() => setSelectedNino(nino)}
                             className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-primary-200 transition-all cursor-pointer flex flex-col items-center text-center group"
                         >
-                            <img src={nino.avatar} alt={nino.name} className="w-24 h-24 rounded-full object-cover mb-4 border-4 border-slate-50 group-hover:border-primary-100 transition-colors shadow-sm" />
+                            <AnimatedAvatar gender={nino.gender} className="w-24 h-24 rounded-full object-cover mb-4 border-4 border-slate-50 group-hover:border-primary-100 transition-colors shadow-sm" />
                             <h3 className="font-bold text-slate-800 text-lg group-hover:text-primary-700 transition-colors">{nino.name}</h3>
                             <p className="text-xs text-slate-500 mt-2 flex items-center justify-center gap-1 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
                                 <Info size={14} className="text-slate-400" /> Ver Ficha
@@ -364,9 +432,9 @@ export default function Aulas() {
                         <tbody className="bg-white divide-y divide-slate-100">
                             {aulaNinos.map(nino => (
                                 <tr key={nino.id} className="hover:bg-slate-50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-6 py-4">
                                         <div className="flex items-center">
-                                            <img className="h-10 w-10 rounded-full object-cover border border-slate-200" src={nino.avatar} alt="" />
+                                            <AnimatedAvatar gender={nino.gender} className="h-10 w-10 rounded-full object-cover border border-slate-200" />
                                             <div className="ml-4">
                                                 <div className="text-sm font-bold text-slate-900">{nino.name}</div>
                                             </div>
@@ -413,7 +481,7 @@ export default function Aulas() {
                     <div className="space-y-6 pb-2">
                         {/* Main Info Header */}
                         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 bg-slate-100 p-6 -mx-6 -mt-6 rounded-t-2xl border-b border-slate-200">
-                            <img src={selectedNino.avatar} alt={selectedNino.name} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md mx-auto sm:mx-0" />
+                            <AnimatedAvatar gender={selectedNino.gender} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md mx-auto sm:mx-0" />
                             <div className="text-center sm:text-left flex-1">
                                 <h2 className="text-2xl font-black text-slate-800 tracking-tight">{selectedNino.name}</h2>
                                 <p className="text-slate-500 font-medium mt-1">Asignado a: <span className="text-primary-700 font-bold bg-white px-2 py-0.5 rounded shadow-sm border border-slate-200">{activeAula?.name}</span></p>
@@ -446,26 +514,51 @@ export default function Aulas() {
                             <h3 className="font-black text-slate-800 mb-3 flex items-center gap-2 tracking-tight text-lg">
                                 <UserIcon size={20} className="text-primary-500" /> Familia / Tutores Responsables
                             </h3>
-                            <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white">
-                                <div className="p-5 flex flex-col sm:flex-row items-center justify-between hover:bg-slate-50 transition-colors gap-4">
-                                    <div className="flex items-center gap-4 text-center sm:text-left">
-                                        <div className="w-12 h-12 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-lg shadow-inner border border-primary-200">
-                                            {selectedNino.parentId.charAt(2).toUpperCase() || 'P'}
+                            <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white divide-y divide-slate-100">
+                                {selectedNino.parentIds?.map((pId) => {
+                                    // Normally we would have the User object here. Mocking for now.
+                                    return (
+                                        <div key={pId} className="p-5 flex flex-col sm:flex-row items-center justify-between hover:bg-slate-50 transition-colors gap-4">
+                                            <div className="flex items-center gap-4 text-center sm:text-left">
+                                                <div className="w-12 h-12 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-lg shadow-inner border border-primary-200">
+                                                    {pId.charAt(2).toUpperCase() || 'P'}
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-slate-800 text-base">Familiar Vinculado</p>
+                                                    <p className="text-sm text-slate-500 font-medium">ID Vinculado: <span className="font-mono bg-slate-100 p-1 rounded-md text-xs border border-slate-200">{pId}</span></p>
+                                                </div>
+                                            </div>
+                                            <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-2 mt-3 sm:mt-0">
+                                                <button
+                                                    onClick={() => {
+                                                        if (onViewChange) {
+                                                            onViewChange('messages', { targetUserId: pId });
+                                                        }
+                                                    }}
+                                                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-slate-900 transition-all hover:-translate-y-0.5"
+                                                >
+                                                    <MessageSquare size={16} /> Contactar
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        if (onViewChange) {
+                                                            onViewChange('communications', {
+                                                                commParams: {
+                                                                    type: 'NOTIFICACION_INDIVIDUAL',
+                                                                    isLocked: true,
+                                                                    recipientIds: [pId]
+                                                                }
+                                                            });
+                                                        }
+                                                    }}
+                                                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary-200 hover:bg-primary-700 transition-all hover:-translate-y-0.5"
+                                                >
+                                                    <Send size={16} /> Comunicado
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="font-bold text-slate-800 text-base">Responsable Titular</p>
-                                            <p className="text-sm text-slate-500 font-medium">ID Vinculado: <span className="font-mono bg-slate-100 p-1 rounded-md text-xs border border-slate-200">{selectedNino.parentId}</span></p>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={() => {
-                                            alert(`Redirigiendo a Mensajes Directos con la familia del alumno (ID Usuario Padre: ${selectedNino.parentId})`);
-                                        }}
-                                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-slate-900 transition-all hover:-translate-y-0.5"
-                                    >
-                                        <MessageSquare size={16} /> Contactar
-                                    </button>
-                                </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>

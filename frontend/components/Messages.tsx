@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAppState } from '../contexts/AppStateContext';
 import { usersApi, messagesApi } from '../services/api';
 
-export const Messages: React.FC = () => {
+export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialUserId }) => {
   const { user: currentUser, currentInstitution, token } = useAuth();
   const { state } = useAppState();
 
@@ -21,7 +21,7 @@ export const Messages: React.FC = () => {
   const [conversations, setConversations] = useState<{ contactId: string, lastMessage: any }[]>([]);
 
   // Chat State
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(initialUserId || null);
   const [inputText, setInputText] = useState('');
   const [messagesState, setMessagesState] = useState<Record<string, any[]>>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -90,7 +90,7 @@ export const Messages: React.FC = () => {
     } else if (isDocente) {
       // Docentes see: SuperAdmins, Admins, other Docentes, Especiales OR Parents of kids in their aulas.
       const myAulas = state.aulas.filter(a => a.teachers.includes(currentUser.id)).map(a => a.id);
-      const myKidsParentIds = state.ninos.filter(n => myAulas.includes(n.aulaId)).map(n => n.parentId);
+      const myKidsParentIds = state.ninos.filter(n => myAulas.includes(n.aulaId)).flatMap(n => n.parentIds || []);
 
       filtered = users.filter(u =>
         u.role === 'SUPER_ADMIN' ||
@@ -109,7 +109,7 @@ export const Messages: React.FC = () => {
       );
     } else if (currentUser.role === 'PADRE') {
       // Parents see: Admins and Docentes of their kids
-      const myKidsAulaIds = state.ninos.filter(n => n.parentId === currentUser.id).map(n => n.aulaId);
+      const myKidsAulaIds = state.ninos.filter(n => n.parentIds?.includes(currentUser.id)).map(n => n.aulaId);
       const myKidsTeacherIds = state.aulas.filter(a => myKidsAulaIds.includes(a.id)).flatMap(a => a.teachers);
 
       filtered = users.filter(u =>
@@ -284,7 +284,7 @@ export const Messages: React.FC = () => {
             visibleUsers.length > 0 ? (
               visibleUsers.map(u => {
                 const roleLabel = getRoleLabel(u.role);
-                const myKids = state.ninos.filter(n => n.parentId === u.id);
+                const myKids = state.ninos.filter(n => n.parentIds?.includes(u.id));
                 const displayName = u.role === 'PADRE' && myKids.length > 0
                   ? `Familia de ${myKids.map(k => k.name.split(' ')[0]).join(', ')}`
                   : u.name;
@@ -319,9 +319,8 @@ export const Messages: React.FC = () => {
                 if (!contact) return null;
 
                 const displayName = contact.role === 'PADRE'
-                  ? `Familia de ${state.ninos.filter(n => n.parentId === contact.id).map(k => k.name.split(' ')[0]).join(', ')}`
+                  ? `Familia de ${state.ninos.filter(n => n.parentIds?.includes(contact.id)).map(k => k.name.split(' ')[0]).join(', ')}`
                   : contact.name;
-
                 const isMsgMine = conv.lastMessage.senderId === currentUser?.id;
                 const date = new Date(conv.lastMessage.timestamp);
                 const showDate = format(date, 'd MMM'); // e.g. "4 Ago"
@@ -376,8 +375,8 @@ export const Messages: React.FC = () => {
               <img src={selectedUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}`} className="w-10 h-10 object-cover mr-4 rounded-full border border-slate-200" alt="" />
               <div>
                 <h3 className="font-bold text-slate-800">
-                  {selectedUser.role === 'PADRE' && state.ninos.filter(n => n.parentId === selectedUser.id).length > 0
-                    ? `Familia de ${state.ninos.filter(n => n.parentId === selectedUser.id).map(k => k.name.split(' ')[0]).join(', ')} (${selectedUser.name})`
+                  {selectedUser.role === 'PADRE' && state.ninos.filter(n => n.parentIds?.includes(selectedUser.id)).length > 0
+                    ? `Familia de ${state.ninos.filter(n => n.parentIds?.includes(selectedUser.id)).map(k => k.name.split(' ')[0]).join(', ')} (${selectedUser.name})`
                     : selectedUser.name}
                 </h3>
                 <div className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">

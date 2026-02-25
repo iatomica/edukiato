@@ -7,9 +7,10 @@ import { usersApi } from '../services/api';
 
 export const Usuarios: React.FC = () => {
     const { user: currentUser, currentInstitution, token } = useAuth();
-    const { state } = useAppState();
+    const { state, dispatch } = useAppState();
     const [users, setUsers] = useState<User[]>([]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isAddNinoModalOpen, setIsAddNinoModalOpen] = useState(false);
 
     // User Edit State
     const [editUser, setEditUser] = useState<User | null>(null);
@@ -17,6 +18,12 @@ export const Usuarios: React.FC = () => {
 
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'INSTITUCIONAL' | 'PADRES' | 'ALUMNOS'>('INSTITUCIONAL');
+    const [addRole, setAddRole] = useState<UserRole>('DOCENTE');
+
+    // Nino specific states
+    const [isSavingNino, setIsSavingNino] = useState(false);
+    const [createdNinoConfirmation, setCreatedNinoConfirmation] = useState<Nino | null>(null);
+
     const [searchQuery, setSearchQuery] = useState('');
 
     const isSuperAdmin = currentUser?.role === 'SUPER_ADMIN';
@@ -35,6 +42,49 @@ export const Usuarios: React.FC = () => {
         };
         fetchUsers();
     }, [currentInstitution, token]);
+
+    const handleAddNino = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const name = formData.get('name') as string;
+        const gender = formData.get('gender') as 'MASCULINO' | 'FEMENINO';
+        const birthDate = formData.get('birthDate') as string;
+        const allergiesStr = formData.get('allergies') as string;
+        const allergies = allergiesStr ? allergiesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+        const parentIds = Array.from(formData.getAll('parentIds')) as string[];
+        const aulaId = formData.get('aulaId') as string;
+
+        if (parentIds.length === 0) {
+            alert('Debe seleccionar al menos un familiar o tutor responsable.');
+            return;
+        }
+        if (parentIds.length > 5) {
+            alert('Puede vincular un máximo de 5 familiares directos por alumno.');
+            return;
+        }
+
+        setIsSavingNino(true);
+
+        const newNino: Nino = {
+            id: `nino_${Date.now()}`,
+            institutionId: currentInstitution?.id || 'inst_1',
+            name,
+            gender,
+            birthDate,
+            allergies,
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
+            aulaId,
+            parentIds,
+            attendanceRate: 100
+        };
+
+        // Simulate network API delay
+        setTimeout(() => {
+            dispatch({ type: 'ADD_NINO', payload: newNino });
+            setIsSavingNino(false);
+            setCreatedNinoConfirmation(newNino);
+        }, 1200);
+    };
 
     const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -138,11 +188,11 @@ export const Usuarios: React.FC = () => {
                     <p className="text-slate-500 mt-1">Administra el staff institucional, a las familias y alumnos.</p>
                 </div>
                 <button
-                    onClick={() => setIsAddModalOpen(true)}
+                    onClick={() => activeTab === 'ALUMNOS' ? setIsAddNinoModalOpen(true) : setIsAddModalOpen(true)}
                     className="bg-primary-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-primary-700 transition-colors flex items-center shadow-lg shadow-primary-200"
                 >
                     <UserPlus size={18} className="mr-2" />
-                    Nuevo Usuario
+                    {activeTab === 'ALUMNOS' ? 'Inscribir Alumno' : 'Nuevo Usuario'}
                 </button>
             </div>
 
@@ -197,7 +247,7 @@ export const Usuarios: React.FC = () => {
                         <tbody className="divide-y divide-slate-100">
                             {/* INSTITUCIONAL & PADRES */}
                             {['INSTITUCIONAL', 'PADRES'].includes(activeTab) && filteredUsers.map((u) => {
-                                const myKids = state.ninos.filter(n => n.parentId === u.id);
+                                const myKids = state.ninos.filter(n => n.parentIds?.includes(u.id));
                                 return (
                                     <tr
                                         key={u.id}
@@ -395,6 +445,138 @@ export const Usuarios: React.FC = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Add Nino Modal */}
+            {isAddNinoModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden animate-scale-in max-h-[90vh] flex flex-col">
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-16 bg-primary-100/50 rounded-full transform translate-x-8 -translate-y-8"></div>
+                            <h3 className="text-xl font-bold text-slate-800 flex items-center relative z-10">
+                                <GraduationCap size={20} className="mr-2 text-primary-600" />
+                                {createdNinoConfirmation ? '¡Inscripción Exitosa!' : 'Inscribir Alumno'}
+                            </h3>
+                            {(!isSavingNino) && (
+                                <button onClick={() => { setIsAddNinoModalOpen(false); setCreatedNinoConfirmation(null); }} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors relative z-10">
+                                    <X size={20} />
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Loading State */}
+                        {isSavingNino && (
+                            <div className="p-12 flex flex-col items-center justify-center space-y-4">
+                                <div className="animate-spin w-12 h-12 border-4 border-slate-100 border-t-primary-600 rounded-full"></div>
+                                <p className="text-slate-500 font-medium">Guardando perfil del alumno y vinculando tutores...</p>
+                            </div>
+                        )}
+
+                        {/* Confirmation State */}
+                        {!isSavingNino && createdNinoConfirmation && (
+                            <div className="p-8 flex flex-col items-center justify-center text-center space-y-6">
+                                <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-2 shadow-sm">
+                                    <Shield size={40} />
+                                </div>
+                                <div>
+                                    <h4 className="text-2xl font-black text-slate-800 tracking-tight">{createdNinoConfirmation.name}</h4>
+                                    <p className="text-slate-500 font-medium mt-1">El alumno ha sido inscripto correctamente en la plataforma.</p>
+                                </div>
+
+                                <div className="bg-slate-50 border border-slate-200 w-full rounded-2xl p-5 text-left mb-2">
+                                    <h5 className="font-bold text-slate-700 mb-3 text-sm uppercase tracking-wider">Resumen de Asignación</h5>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                                            <span className="text-slate-500 text-sm">Aula / Sala Módulo:</span>
+                                            <span className="font-bold text-primary-700 bg-primary-50 px-3 py-1 rounded-lg border border-primary-100">
+                                                {state.aulas.find(a => a.id === createdNinoConfirmation.aulaId)?.name || createdNinoConfirmation.aulaId}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-slate-500 text-sm">Tutores Vinculados:</span>
+                                            <span className="font-bold text-slate-700">
+                                                {createdNinoConfirmation.parentIds.length} Familiares
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={() => { setIsAddNinoModalOpen(false); setCreatedNinoConfirmation(null); }}
+                                    className="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl shadow-lg hover:bg-slate-800 transition-all hover:-translate-y-0.5"
+                                >
+                                    Entendido, continuar
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Creation Form State */}
+                        {!isSavingNino && !createdNinoConfirmation && (
+                            <form onSubmit={handleAddNino} className="p-6 overflow-y-auto flex-1 bg-white">
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="col-span-2">
+                                        <label className="block text-sm font-bold text-slate-700 mb-1">Nombre y Apellido <span className="text-red-500">*</span></label>
+                                        <input type="text" name="name" required className="w-full text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 p-3 outline-none" placeholder="Ej. Mateo Gómez" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-1">Género <span className="text-red-500">*</span></label>
+                                        <select name="gender" required className="w-full text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 p-3 outline-none bg-white">
+                                            <option value="">Seleccione</option>
+                                            <option value="MASCULINO">Niño (M)</option>
+                                            <option value="FEMENINO">Niña (F)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-1">Fecha de Nacimiento <span className="text-red-500">*</span></label>
+                                        <input type="date" name="birthDate" required className="w-full text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 p-3 outline-none text-slate-600" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-slate-700 mb-1">Asignar Sala / Aula <span className="text-red-500">*</span></label>
+                                        <select name="aulaId" required className="w-full text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 p-3 outline-none bg-white">
+                                            <option value="">Seleccione un aula</option>
+                                            {state.aulas.map(a => (
+                                                <option key={a.id} value={a.id}>{a.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-1">Alergias Conocidas (Opcional)</label>
+                                    <p className="text-xs text-slate-500 mb-2">Ingresa las alergias separadas por coma (ej: Maní, Polen)</p>
+                                    <input type="text" name="allergies" className="w-full text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 p-3 outline-none" placeholder="Ej. Chocolate, Penicilina..." />
+                                </div>
+
+                                <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                                    <label className="block text-sm font-bold text-slate-800 mb-1">Vincular Familiares / Tutores <span className="text-red-500">*</span></label>
+                                    <p className="text-[11px] text-slate-500 mb-3 leading-tight">Manten presionado CTRL (o CMD) para seleccionar hasta 5 familiares responsables registrados en el directorio de padres.</p>
+                                    <select
+                                        name="parentIds"
+                                        multiple
+                                        required
+                                        className="w-full text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary-100 focus:border-primary-400 p-2 outline-none h-32 bg-white"
+                                    >
+                                        {users.filter(u => u.role === 'PADRE').map(u => (
+                                            <option key={u.id} value={u.id} className="p-2 border-b border-slate-50 flex items-center gap-2">
+                                                {u.name} ({u.email})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
+                                    <button type="button" onClick={() => setIsAddNinoModalOpen(false)} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700 transition-colors">Cancelar</button>
+                                    <button type="submit" className="px-6 py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-200">
+                                        Finalizar Inscripción
+                                    </button>
+                                </div>
+                            </form>
+                        )}
                     </div>
                 </div>
             )}

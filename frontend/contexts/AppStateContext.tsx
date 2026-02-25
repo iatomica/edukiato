@@ -50,6 +50,7 @@ type AppAction =
     | { type: 'UPDATE_COURSE'; payload: Course }
     | { type: 'SUSPEND_COURSE'; payload: { courseId: string } }
     | { type: 'ADD_STUDENT'; payload: Student }
+    | { type: 'ADD_NINO'; payload: Nino }
     | { type: 'UPDATE_STUDENT'; payload: Partial<Student> & { id: string } }
     | { type: 'ADD_EVENT'; payload: CalendarEvent }
     | { type: 'UPDATE_EVENT'; payload: Partial<CalendarEvent> & { id: string } }
@@ -63,6 +64,7 @@ type AppAction =
     | { type: 'UPDATE_CONVERSATION'; payload: Partial<Conversation> & { id: string } }
     | { type: 'LOG_ACTIVITY'; payload: ActivityEntry }
     | { type: 'ENROLL_STUDENT'; payload: { courseId: string; studentId: string } }
+    | { type: 'UPDATE_AULA'; payload: Partial<Aula> & { id: string } }
     | { type: 'COMPLETE_ONBOARDING_STEP'; payload: string }
     | { type: 'DISMISS_ONBOARDING' };
 
@@ -102,6 +104,17 @@ function appReducer(state: AppState, action: AppAction): AppState {
                 ),
             };
 
+        case 'UPDATE_AULA': {
+            const updatedAulas = state.aulas.map(a =>
+                a.id === action.payload.id ? { ...a, ...action.payload } : a
+            );
+            try { localStorage.setItem('MOCK_AULAS', JSON.stringify(updatedAulas)); } catch (e) { }
+            return {
+                ...state,
+                aulas: updatedAulas,
+            };
+        }
+
         case 'SUSPEND_COURSE':
             return {
                 ...state,
@@ -114,6 +127,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
         case 'ADD_STUDENT':
             return { ...state, students: [...state.students, action.payload] };
+
+        case 'ADD_NINO': {
+            const newNinos = [...state.ninos, action.payload];
+            try { localStorage.setItem('MOCK_NINOS', JSON.stringify(newNinos)); } catch (e) { }
+            return { ...state, ninos: newNinos };
+        }
 
         case 'UPDATE_STUDENT':
             return {
@@ -238,11 +257,13 @@ export const AppStateProvider: React.FC<{ children: ReactNode }> = ({ children }
                     // Parse local storage dynamically to get the latest (to prevent soft-logout staleness)
                     const storedComms = localStorage.getItem('MOCK_COMMUNICATIONS');
                     const storedNotifs = localStorage.getItem('MOCK_NOTIFICATIONS');
+                    const storedNinos = localStorage.getItem('MOCK_NINOS');
+                    const storedAulas = localStorage.getItem('MOCK_AULAS');
 
                     let baseData: Partial<AppState> = {
                         courses: MOCK_COURSES,
-                        aulas: MOCK_AULAS,
-                        ninos: MOCK_NINOS,
+                        aulas: storedAulas ? JSON.parse(storedAulas) : MOCK_AULAS,
+                        ninos: storedNinos ? JSON.parse(storedNinos) : MOCK_NINOS,
                         students: MOCK_STUDENTS,
                         events: MOCK_EVENTS,
                         feed: MOCK_FEED,

@@ -299,11 +299,13 @@ export interface Nino {
   id: string;
   institutionId: string;
   name: string;
+  gender?: 'MASCULINO' | 'FEMENINO';
   birthDate?: string;
   medicalInfo?: string;
+  allergies?: string[];
   avatar: string;
   aulaId: string;         // Link to the Aula
-  parentId: string;       // Link to the User Padres
+  parentIds: string[];    // Link to up to 5 User Padres
   attendanceRate?: number;
 }
 

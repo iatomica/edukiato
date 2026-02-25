@@ -1,27 +1,48 @@
 
 import React, { useState, useMemo } from 'react';
 import { Search, Mail, MoreHorizontal, Download, Award, X, Printer, ArrowLeft, Send, Paperclip, Filter, User, Users, Calendar, BookOpen, MessageSquare, Plus, GraduationCap } from 'lucide-react';
-import { Student, Communication, CommunicationType, UserRole } from '../types';
+import { Student, Communication, CommunicationType, UserRole, Aula, Nino } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTenantData } from '../hooks/useTenantData';
 import { usePermissions } from '../contexts/PermissionsContext';
 import { useAuth } from '../contexts/AuthContext';
 import { format } from 'date-fns';
 import { usersApi } from '../services/api';
+import { AnimatedAvatar } from './AnimatedAvatar';
 
 // ── SUB-COMPONENTS ───────────────────────────────────────────
 
-const CommunicationsModal = ({ onClose, students, aulas, user, ninos, onSend }: { onClose: () => void, students: Student[], aulas: Aula[], user: any, ninos: Nino[], onSend: (data: any) => void }) => {
+const CommunicationsModal = ({
+  onClose,
+  students,
+  aulas,
+  user,
+  ninos,
+  onSend,
+  initialType,
+  isTypeLocked,
+  initialRecipientIds
+}: {
+  onClose: () => void,
+  students: Student[],
+  aulas: Aula[],
+  user: any,
+  ninos: Nino[],
+  onSend: (data: any) => void,
+  initialType?: CommunicationType,
+  isTypeLocked?: boolean,
+  initialRecipientIds?: string[]
+}) => {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
 
   const isAdmin = user?.role === 'ADMIN_INSTITUCION' || user?.role === 'SUPER_ADMIN';
-  const initialCommType: CommunicationType = isAdmin ? 'ANUNCIO_GENERAL' : 'ANUNCIO_SALA';
-  const [commType, setCommType] = useState<CommunicationType>(initialCommType);
+  const fallbackCommType: CommunicationType = isAdmin ? 'ANUNCIO_GENERAL' : 'ANUNCIO_SALA';
+  const [commType, setCommType] = useState<CommunicationType>(initialType || fallbackCommType);
 
   // Destinatarios states
   const [selectedCourse, setSelectedCourse] = useState('');
-  const [selectedRecipients, setSelectedRecipients] = useState<string[]>([]);
+  const [selectedRecipients, setSelectedRecipients] = useState<string[]>(initialRecipientIds || []);
   const [searchPadre, setSearchPadre] = useState('');
 
   // Filter Aulas for Dropdown
@@ -45,10 +66,10 @@ const CommunicationsModal = ({ onClose, students, aulas, user, ninos, onSend }: 
     if (user?.role === 'DOCENTE') {
       const teacherAulas = availableAulas.map(a => a.id);
       const teacherNinos = ninos.filter(n => teacherAulas.includes(n.aulaId));
-      const teacherParentsIds = teacherNinos.map(n => n.parentId);
-
+      const teacherParentsIds = teacherNinos.flatMap(n => n.parentIds || []);
+      const parentUserIds = Array.from(new Set(teacherParentsIds));
       return baseUsers.filter(s => {
-        if (s.role === 'PADRE') return teacherParentsIds.includes(s.id);
+        if (s.role === 'PADRE') return parentUserIds.includes(s.id);
         if (s.role === 'DOCENTE' || s.role === 'ADMIN_INSTITUCION') return true;
         return false;
       });
@@ -129,13 +150,14 @@ const CommunicationsModal = ({ onClose, students, aulas, user, ninos, onSend }: 
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Tipo de Comunicado</label>
               <select
                 value={commType}
+                disabled={isTypeLocked}
                 onChange={(e) => {
                   setCommType(e.target.value as CommunicationType);
                   // Reset previous selections when changing type
                   setSelectedRecipients([]);
                   setSelectedCourse('');
                 }}
-                className="w-full text-sm border-slate-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 bg-slate-50 py-2.5 px-3"
+                className={`w-full text-sm border-slate-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 py-2.5 px-3 ${isTypeLocked ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'bg-slate-50'}`}
               >
                 {isAdmin && <option value="ANUNCIO_GENERAL">📢 Anuncio general (Todo el jardín)</option>}
                 <option value="ANUNCIO_SALA">🏫 Anuncio por sala / curso</option>
@@ -381,7 +403,7 @@ const StudentDetail = ({ student, onClose, communications, aulas, ninos }: { stu
       if (student.role === 'ADMIN_INSTITUCION' || student.role === 'SUPER_ADMIN') return true;
 
       if (student.role === 'PADRE') {
-        return ninos.some(n => n.aulaId === c.courseId && n.parentId === student.id);
+        return ninos.some(n => n.aulaId === c.courseId && n.parentIds?.includes(student.id));
       }
       if (student.role === 'DOCENTE' || student.role === 'ESPECIALES') {
         const aula = aulas.find(a => a.id === c.courseId);
@@ -513,7 +535,7 @@ const StudentDetail = ({ student, onClose, communications, aulas, ninos }: { stu
 
 // ── MAIN COMPONENT ───────────────────────────────────────────
 
-export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK' }> = ({ initialViewMode = 'LIST' }) => {
+export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initialCommParams?: any }> = ({ initialViewMode = 'LIST', initialCommParams }) => {
   const [selectedStudentForCert, setSelectedStudentForCert] = useState<Student | null>(null);
   const [selectedStudentDetail, setSelectedStudentDetail] = useState<Student | null>(null);
   const [isCommModalOpen, setIsCommModalOpen] = useState(false);
@@ -525,6 +547,65 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK' }> = ({ 
   const { students, courses, communications, aulas, ninos, dispatch, emitEvent } = useTenantData();
   const { can } = usePermissions();
   const { user, currentInstitution, token } = useAuth();
+
+  const isAdmin = user?.role === 'ADMIN_INSTITUCION' || user?.role === 'SUPER_ADMIN';
+
+  const visibleTableStudents = useMemo(() => {
+    let baseUsers = students.filter(s => s.role !== 'SUPER_ADMIN');
+
+    // Mapear los niños como si fuesen 'ESTUDIANTE' (tipo Student) y mezclarlos en la base de datos visual
+    const mappedNinosAsStudents: Student[] = ninos.map(n => {
+      // Intentar encontrar qué aula tiene asignada para mostrarla en su "programa"
+      const assignedAula = aulas.find(a => a.id === n.aulaId);
+      return {
+        id: `s_mapped_${n.id}`,
+        institutionId: n.institutionId,
+        name: n.name,
+        email: `${n.parentIds?.length || 0} Tutores vinculados`, // Usa el email como descriptivo
+        program: assignedAula ? assignedAula.name : 'Sin Aula',
+        role: 'ESTUDIANTE',
+        status: 'active',
+        attendanceRate: n.attendanceRate || 100,
+        avatar: n.avatar,
+        gender: n.gender
+      };
+    });
+
+    // Combinarlo con los usuarios registrados genuinamente
+    baseUsers = [...baseUsers, ...mappedNinosAsStudents];
+    // Deduplicar (por nombre) en caso que por tests el mismo Niño tenga una Cuenta Local + Perfil.
+    baseUsers = baseUsers.filter((value, index, self) =>
+      index === self.findIndex((t) => (
+        t.name === value.name && t.role === value.role
+      ))
+    );
+
+    if (isAdmin) {
+      return baseUsers;
+    }
+
+    if (user?.role === 'DOCENTE') {
+      const teacherAulas = aulas.filter(a => a.teachers.includes(user.id)).map(a => a.id);
+      const teacherNinos = ninos.filter(n => teacherAulas.includes(n.aulaId));
+      const teacherParentsIds = teacherNinos.flatMap(n => n.parentIds || []);
+      const parentUserIds = Array.from(new Set(teacherParentsIds));
+
+      return baseUsers.filter(s => {
+        if (s.role === 'PADRE') return parentUserIds.includes(s.id);
+        if (s.role === 'ESTUDIANTE') return teacherNinos.some(n => n.name === s.name);
+        return false;
+      });
+    }
+
+    return [];
+  }, [students, isAdmin, user, aulas, ninos]);
+
+  React.useEffect(() => {
+    if (initialCommParams) {
+      if (initialViewMode === 'NOTEBOOK') setViewMode('NOTEBOOK');
+      setIsCommModalOpen(true);
+    }
+  }, [initialCommParams, initialViewMode]);
 
   // Verify permissions via role to show correct initial view
   const isStudentOrParent = user?.role === 'ESTUDIANTE'; // Add PARENT logic if needed
@@ -648,6 +729,7 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK' }> = ({ 
   );
 
   // If selecting a student, show detail view
+  {/* Student Detail Modal */ }
   if (selectedStudentDetail) {
     return (
       <StudentDetail
@@ -673,7 +755,7 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK' }> = ({ 
 
       if (c.courseId) {
         if (user?.role === 'PADRE') {
-          return ninos.some(n => n.aulaId === c.courseId && n.parentId === user?.id);
+          return ninos.some(n => n.aulaId === c.courseId && n.parentIds?.includes(user?.id));
         }
         if (user?.role === 'DOCENTE' || user?.role === 'ESPECIALES') {
           const aula = aulas.find(a => a.id === c.courseId);
@@ -794,7 +876,7 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK' }> = ({ 
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {students
+              {visibleTableStudents
                 .filter(s => s.role === (activeTab === 'PADRES' ? 'PADRE' : 'ESTUDIANTE'))
                 .map((student) => (
                   <tr
@@ -804,7 +886,11 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK' }> = ({ 
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center">
-                        <img className="h-10 w-10 rounded-full object-cover border border-slate-200" src={student.avatar} alt="" />
+                        {student.role === 'ESTUDIANTE' ? (
+                          <AnimatedAvatar gender={student.gender as any} className="h-10 w-10 rounded-full object-cover border border-slate-200" />
+                        ) : (
+                          <img className="h-10 w-10 rounded-full object-cover border border-slate-200" src={student.avatar} alt="" />
+                        )}
                         <div className="ml-4">
                           <div className="text-sm font-bold text-slate-900">{student.name}</div>
                           <div className="text-xs text-slate-500">{student.email}</div>
@@ -904,6 +990,9 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK' }> = ({ 
           user={user}
           ninos={ninos}
           onSend={handleSendCommunication}
+          initialType={initialCommParams?.type}
+          isTypeLocked={initialCommParams?.isLocked}
+          initialRecipientIds={initialCommParams?.recipientIds}
         />
       )}
       {/* Add Student Modal */}

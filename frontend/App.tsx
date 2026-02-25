@@ -27,6 +27,26 @@ const AppContent: React.FC = () => {
   const { user, isAuthenticated, currentInstitution, isLoading, logout } = useAuth();
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+  const [targetUserId, setTargetUserId] = useState<string | null>(null);
+  const [commParams, setCommParams] = useState<any>(null);
+
+  const handleViewChange = (view: View, params?: any) => {
+    setCurrentView(view);
+
+    // Messages handling
+    if (view === 'messages' && params?.targetUserId) {
+      setTargetUserId(params.targetUserId);
+    } else {
+      setTargetUserId(null);
+    }
+
+    // Communications handling
+    if (view === 'communications' && params?.commParams) {
+      setCommParams(params.commParams);
+    } else {
+      setCommParams(null);
+    }
+  };
 
   const handleCourseSelect = (courseId: string) => {
     setSelectedCourseId(courseId);
@@ -42,15 +62,15 @@ const AppContent: React.FC = () => {
   const renderView = () => {
     switch (currentView) {
       case 'dashboard':
-        return <Dashboard onViewChange={(view) => {
+        return <Dashboard onViewChange={(view, params) => {
           if (view === 'classroom') {
             setSelectedCourseId('c_jazz_01');
           }
-          setCurrentView(view);
+          handleViewChange(view, params);
         }} user={user!} />;
       case 'courses':
         return <Courses
-          onViewChange={setCurrentView}
+          onViewChange={(v) => handleViewChange(v)}
           onCourseSelect={handleCourseSelect}
           userRole={user!.role}
         />;
@@ -65,17 +85,17 @@ const AppContent: React.FC = () => {
           onBack={() => setCurrentView('courses')}
         />;
       case 'messages':
-        return <Messages />;
+        return <Messages initialUserId={targetUserId} />;
       case 'communications':
-        return <Students initialViewMode="NOTEBOOK" />;
+        return <Students initialViewMode="NOTEBOOK" initialCommParams={commParams} />;
       case 'usuarios':
         return <Usuarios />;
       case 'institutions':
         return <Institutions />;
       case 'aulas':
-        return <Aulas />;
+        return <Aulas onViewChange={(v, p) => handleViewChange(v, p)} />;
       default:
-        return <Dashboard onViewChange={setCurrentView} user={user!} />;
+        return <Dashboard onViewChange={(v) => handleViewChange(v)} user={user!} />;
     }
   };
 

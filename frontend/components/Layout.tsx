@@ -63,7 +63,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
       }
 
       if (user.role === 'PADRE') {
-        return ninos.some(nino => nino.aulaId === aula.id && nino.parentId === user.id);
+        const hasChildInClass = ninos.some(child => child.aulaId === n.courseId && child.parentIds?.includes(user.id));
+        return hasChildInClass;
       }
 
       return false; // Other roles shouldn't see it if it's strictly for this room

@@ -33,10 +33,10 @@ export const MOCK_AULAS: Aula[] = [
 ];
 
 export const MOCK_NINOS: Nino[] = [
-  { id: 'n1', institutionId: INST_VINCULOS, name: 'Martín Pérez', aulaId: 'aula_vuelo', parentId: 'p_perez', avatar: 'https://randomuser.me/api/portraits/lego/1.jpg', birthDate: '2021-04-15', medicalInfo: 'Alérgico al maní y picaduras de abeja.', attendanceRate: 98 },
-  { id: 'n2', institutionId: INST_VINCULOS, name: 'Lucía Gómez', aulaId: 'aula_cielo', parentId: 'p_gomez', avatar: 'https://randomuser.me/api/portraits/lego/2.jpg', birthDate: '2022-08-02', medicalInfo: 'Ninguna alergia conocida.', attendanceRate: 92 },
-  { id: 'n3', institutionId: INST_VINCULOS, name: 'Tomás Díaz', aulaId: 'aula_libertad', parentId: 'p_diaz', avatar: 'https://randomuser.me/api/portraits/lego/3.jpg', birthDate: '2023-01-20', medicalInfo: 'Asma leve, usar inhalador si es necesario.', attendanceRate: 85 },
-  { id: 'n4', institutionId: INST_VINCULOS, name: 'Emma Pérez', aulaId: 'aula_anidar', parentId: 'p_perez', avatar: 'https://randomuser.me/api/portraits/lego/4.jpg', birthDate: '2024-05-10', medicalInfo: 'Intolerancia a la lactosa.', attendanceRate: 95 },
+  { id: 'n1', institutionId: INST_VINCULOS, name: 'Martín Pérez', aulaId: 'aula_vuelo', parentIds: ['p_perez'], avatar: 'https://randomuser.me/api/portraits/lego/1.jpg', birthDate: '2021-04-15', medicalInfo: 'Alérgico al maní y picaduras de abeja.', allergies: ['Maní', 'Picaduras de Abeja'], attendanceRate: 98 },
+  { id: 'n2', institutionId: INST_VINCULOS, name: 'Lucía Gómez', aulaId: 'aula_cielo', parentIds: ['p_gomez'], avatar: 'https://randomuser.me/api/portraits/lego/2.jpg', birthDate: '2022-08-02', medicalInfo: 'Ninguna alergia conocida.', allergies: [], attendanceRate: 92 },
+  { id: 'n3', institutionId: INST_VINCULOS, name: 'Tomás Díaz', aulaId: 'aula_libertad', parentIds: ['p_diaz'], avatar: 'https://randomuser.me/api/portraits/lego/3.jpg', birthDate: '2023-01-20', medicalInfo: 'Asma leve, usar inhalador si es necesario.', allergies: ['Asma'], attendanceRate: 85 },
+  { id: 'n4', institutionId: INST_VINCULOS, name: 'Emma Pérez', aulaId: 'aula_anidar', parentIds: ['p_perez'], avatar: 'https://randomuser.me/api/portraits/lego/4.jpg', birthDate: '2024-05-10', medicalInfo: 'Intolerancia a la lactosa.', allergies: ['Lactosa'], attendanceRate: 95 },
 ];
 
 export const MOCK_STUDENTS: Student[] = [
