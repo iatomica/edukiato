@@ -140,17 +140,13 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
           <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-4 mb-2">{t.nav.menu}</div>
           <NavItem view="dashboard" icon={Home} label={t.nav.dashboard} />
 
-          {can('read', 'course') && !can('create', 'course') && (
-            <NavItem view="classroom" icon={BookOpen} label={t.nav.myClasses} />
-          )}
 
-          {can('read', 'aula') && (
+
+          {user.role !== 'PADRE' && can('read', 'aula') && (
             <NavItem view="aulas" icon={Users} label="Aulas y Salas" />
           )}
           <NavItem view="students" icon={GraduationCap} label={t.nav.students} />
-          {can('create', 'course') && (
-            <NavItem view="courses" icon={BookOpen} label={t.nav.courses} />
-          )}
+
 
 
 

@@ -9,20 +9,13 @@
  *   inst-002 → Escuela de Música Moderna        (modern music focus)
  */
 
-import { Course, Student, CalendarEvent, FeedItem, Conversation, Message, Notification, Payment, Communication, UserRole, Aula, Nino } from '../types';
+import { Course, Student, CalendarEvent, FeedItem, Conversation, Message, Notification, Communication, UserRole, Aula, Nino } from '../types';
 
 // ── Institution IDs ──────────────────────────────────────────
 
 export const INST_VINCULOS = 'inst-vinculos';
 
-export const MOCK_COURSES: Course[] = [
-  { id: 'c_sala_45d', institutionId: INST_VINCULOS, courseType: 'REGULAR', title: 'Sala (45 días a 2 años)', instructor: 'Fiorela Sotelo', schedule: 'Lun a Vie 08:00', enrolled: 12, capacity: 15, image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=800', tags: ['Maternal'], nextSession: 'Lunes, 08:00', description: 'Atención integral y estimulación temprana.' },
-  { id: 'c_anidar', institutionId: INST_VINCULOS, courseType: 'REGULAR', title: 'Sala Anidar (2 años)', instructor: 'Antonela Michelena', schedule: 'Lun a Vie 08:00', enrolled: 14, capacity: 20, image: 'https://images.unsplash.com/photo-1531804226530-70f8004aa44e?auto=format&fit=crop&q=80&w=800', tags: ['Desarrollo', 'Juego'], nextSession: 'Lunes, 08:00', description: 'Desarrollo de autonomía y sociabilización.' },
-  { id: 'c_libertad', institutionId: INST_VINCULOS, courseType: 'REGULAR', title: 'Sala Libertad (3 años)', instructor: 'Romina Engel', schedule: 'Lun a Vie 08:00', enrolled: 18, capacity: 20, image: 'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=800', tags: ['Creatividad'], nextSession: 'Lunes, 08:00', description: 'Expresión artística y juegos grupales.' },
-  { id: 'c_cielo', institutionId: INST_VINCULOS, courseType: 'REGULAR', title: 'Sala Cielo (4 años)', instructor: 'Romina Alvarenga', schedule: 'Lun a Vie 08:00', enrolled: 20, capacity: 25, image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=800', tags: ['Preescolar'], nextSession: 'Lunes, 08:00', description: 'Iniciación a las letras y números mediante el juego.' },
-  { id: 'c_vuelo', institutionId: INST_VINCULOS, courseType: 'REGULAR', title: 'Sala Vuelo (5 años)', instructor: 'Stefania Bah', schedule: 'Lun a Vie 08:00', enrolled: 22, capacity: 25, image: 'https://images.unsplash.com/photo-1485546246426-74dc88dec4d9?auto=format&fit=crop&q=80&w=800', tags: ['Jardín'], nextSession: 'Lunes, 08:00', description: 'Preparación integral para la escuela primaria.' },
-  { id: 'c_pickler', institutionId: INST_VINCULOS, courseType: 'SEMINAR', title: 'Cursos (Seila y Romina Pickler metodologia)', instructor: 'Seila Ayala y Romina Ayala', schedule: 'A tu propio ritmo', enrolled: 50, capacity: 100, image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=800', tags: ['Metodología', 'Capacitación'], nextSession: 'Virtual', description: 'Contenido: PDFs, videos y enlaces a YouTube. No más que eso. Formación intensiva en metodología.' },
-];
+export const MOCK_COURSES: Course[] = [];
 
 export const MOCK_AULAS: Aula[] = [
   { id: 'aula_45d', institutionId: INST_VINCULOS, name: 'Sala (45 días a 2 años)', capacity: 15, teachers: ['u_teach_0'], assistants: [], color: 'bg-rose-100 text-rose-700 border-rose-200' }, // Fiorela

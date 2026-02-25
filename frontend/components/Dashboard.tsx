@@ -24,18 +24,14 @@ const data = [
 ];
 
 export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
-  const { courses, feed, students, events } = useTenantData();
-  const nextClass = courses[0];
+  const { aulas, feed, students, events } = useTenantData();
+  const nextClass = aulas[0];
   const { t } = useLanguage();
-
-  // In a real app, course IDs come from the user's real relationships
-  const myCourses = (user as any).enrolledCourseIds || [];
 
   const personalizedFeed = feed.filter(item => {
     if (item.scope === 'INSTITUTION') return true;
     if (user.role === 'ADMIN_INSTITUCION' || user.role === 'SUPER_ADMIN') return true;
-    if (user.role === 'DOCENTE') return courses.some(c => c.id === item.courseId && c.instructor === user.name);
-    return item.courseId && myCourses.includes(item.courseId);
+    return true; // Simplified feed visibility for now since courses are removed
   }).slice(0, 10);
 
   const AdminStats = () => (
@@ -95,8 +91,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
           </div>
         </div>
         <div className="mt-4">
-          <h3 className="text-3xl font-bold text-slate-800">{myCourses.length}</h3>
-          <p className="text-slate-500 font-medium">{t.dashboard.stats.enrolledCourses}</p>
+          <h3 className="text-3xl font-bold text-slate-800">{aulas.length}</h3>
+          <p className="text-slate-500 font-medium">Aulas Asignadas</p>
         </div>
       </div>
 
@@ -217,14 +213,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
                   {user.role === 'ESTUDIANTE' ? t.dashboard.upNext : t.dashboard.nextSession}
                 </span>
               </div>
-              <h3 className="text-2xl font-bold mb-1">{nextClass ? nextClass.title : 'No classes'}</h3>
-              <p className="text-slate-400">{nextClass ? nextClass.instructor : ''}</p>
+              <h3 className="text-2xl font-bold mb-1">{nextClass ? nextClass.name : 'Sin aulas'}</h3>
+              <p className="text-slate-400">{nextClass ? 'Ver detalles' : ''}</p>
             </div>
 
             <div className="space-y-4 mt-8">
               <div className="flex justify-between items-center text-sm border-b border-white/10 pb-3">
                 <span className="text-slate-400">{t.dashboard.time}</span>
-                <span className="font-medium">{nextClass ? nextClass.nextSession : '--'}</span>
+                <span className="font-medium">--</span>
               </div>
               <div className="flex justify-between items-center text-sm border-b border-white/10 pb-3">
                 <span className="text-slate-400">{t.dashboard.room}</span>
@@ -233,7 +229,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
             </div>
 
             <button
-              onClick={() => onViewChange(user.role === 'ESTUDIANTE' ? 'classroom' : 'courses')}
+              onClick={() => onViewChange('aulas')}
               className="mt-6 w-full bg-white text-slate-900 py-3 rounded-xl font-semibold text-sm hover:bg-slate-100 transition-colors flex items-center justify-center group"
             >
               {t.dashboard.goToClass}

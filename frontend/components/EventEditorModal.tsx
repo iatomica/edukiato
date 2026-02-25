@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CalendarEvent, User, Course, Aula } from '../types';
+import { CalendarEvent, User, Aula } from '../types';
 import { X, Clock, MapPin, Tag } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { RichTextEditor } from './RichTextEditor';
@@ -10,7 +10,6 @@ interface EventEditorModalProps {
     onSave: (eventData: Partial<CalendarEvent>) => void;
     initialData?: CalendarEvent | null;
     currentUser: User;
-    courses: Course[];
     aulas: Aula[];
 }
 
@@ -20,7 +19,6 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
     onSave,
     initialData,
     currentUser,
-    courses,
     aulas
 }) => {
     const { t } = useLanguage();
@@ -54,7 +52,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
     });
 
     const [type, setType] = useState<'class' | 'workshop' | 'event'>(initialData?.type || 'event');
-    const [scope, setScope] = useState<'ALL' | 'COURSE' | 'AULA' | 'INDIVIDUAL'>(initialData?.sharedWith?.scope || 'ALL');
+    const [scope, setScope] = useState<'ALL' | 'AULA' | 'INDIVIDUAL'>(initialData?.sharedWith?.scope || 'ALL');
     const [targetIds, setTargetIds] = useState<string[]>(initialData?.sharedWith?.targetIds || []);
 
     const userAulas = currentUser.role === 'DOCENTE' || currentUser.role === 'PADRE'
@@ -197,36 +195,10 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                                     {currentUser.role !== 'ESTUDIANTE' && (
                                         <option value="AULA">Aulas / Salas Específicas</option>
                                     )}
-                                    {currentUser.role !== 'ESTUDIANTE' && (
-                                        <option value="COURSE">Cursos Específicos</option>
-                                    )}
                                 </select>
                             </div>
                         </div>
 
-                        {/* Course Selector if needed */}
-                        {scope === 'COURSE' && (
-                            <div className="animate-fade-in">
-                                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Selecciona los Cursos</label>
-                                <div className="flex flex-wrap gap-2 p-4 bg-slate-50/50 border border-slate-200 rounded-xl max-h-32 overflow-y-auto">
-                                    {courses.map(course => (
-                                        <label key={course.id} className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:border-slate-300 cursor-pointer w-full sm:w-auto transition-colors">
-                                            <input
-                                                type="checkbox"
-                                                checked={targetIds.includes(course.id)}
-                                                onChange={(e) => {
-                                                    if (e.target.checked) setTargetIds([...targetIds, course.id]);
-                                                    else setTargetIds(targetIds.filter(id => id !== course.id));
-                                                }}
-                                                className="rounded text-primary-600 focus:ring-primary-500 w-4 h-4"
-                                            />
-                                            <span className="text-sm font-medium text-slate-700">{course.title}</span>
-                                        </label>
-                                    ))}
-                                    {courses.length === 0 && <span className="text-sm text-slate-500">No hay cursos disponibles.</span>}
-                                </div>
-                            </div>
-                        )}
 
                         {/* Aula Selector */}
                         {scope === 'AULA' && (
