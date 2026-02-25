@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CalendarEvent, User, Course } from '../types';
+import { CalendarEvent, User, Course, Aula } from '../types';
 import { X, Clock, MapPin, Tag } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { RichTextEditor } from './RichTextEditor';
@@ -11,6 +11,7 @@ interface EventEditorModalProps {
     initialData?: CalendarEvent | null;
     currentUser: User;
     courses: Course[];
+    aulas: Aula[];
 }
 
 export const EventEditorModal: React.FC<EventEditorModalProps> = ({
@@ -19,7 +20,8 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
     onSave,
     initialData,
     currentUser,
-    courses
+    courses,
+    aulas
 }) => {
     const { t } = useLanguage();
 
@@ -52,8 +54,12 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
     });
 
     const [type, setType] = useState<'class' | 'workshop' | 'event'>(initialData?.type || 'event');
-    const [scope, setScope] = useState<'ALL' | 'COURSE' | 'INDIVIDUAL'>(initialData?.sharedWith?.scope || 'ALL');
+    const [scope, setScope] = useState<'ALL' | 'COURSE' | 'AULA' | 'INDIVIDUAL'>(initialData?.sharedWith?.scope || 'ALL');
     const [targetIds, setTargetIds] = useState<string[]>(initialData?.sharedWith?.targetIds || []);
+
+    const userAulas = currentUser.role === 'DOCENTE' || currentUser.role === 'PADRE'
+        ? aulas.filter(a => a.teachers?.includes(currentUser.id))
+        : aulas;
 
     if (!isOpen) return null;
 
@@ -189,6 +195,9 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                                 >
                                     <option value="ALL">Todo el Instituto</option>
                                     {currentUser.role !== 'ESTUDIANTE' && (
+                                        <option value="AULA">Aulas / Salas Específicas</option>
+                                    )}
+                                    {currentUser.role !== 'ESTUDIANTE' && (
                                         <option value="COURSE">Cursos Específicos</option>
                                     )}
                                 </select>
@@ -215,6 +224,30 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                                         </label>
                                     ))}
                                     {courses.length === 0 && <span className="text-sm text-slate-500">No hay cursos disponibles.</span>}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Aula Selector */}
+                        {scope === 'AULA' && (
+                            <div className="animate-fade-in">
+                                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Selecciona las Aulas / Salas</label>
+                                <div className="flex flex-wrap gap-2 p-4 bg-slate-50/50 border border-slate-200 rounded-xl max-h-32 overflow-y-auto">
+                                    {userAulas.map(aula => (
+                                        <label key={aula.id} className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:border-slate-300 cursor-pointer w-full sm:w-auto transition-colors">
+                                            <input
+                                                type="checkbox"
+                                                checked={targetIds.includes(aula.id)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) setTargetIds([...targetIds, aula.id]);
+                                                    else setTargetIds(targetIds.filter(id => id !== aula.id));
+                                                }}
+                                                className="rounded text-primary-600 focus:ring-primary-500 w-4 h-4"
+                                            />
+                                            <span className="text-sm font-medium text-slate-700">{aula.name}</span>
+                                        </label>
+                                    ))}
+                                    {userAulas.length === 0 && <span className="text-sm text-slate-500">No hay aulas disponibles para seleccionar.</span>}
                                 </div>
                             </div>
                         )}

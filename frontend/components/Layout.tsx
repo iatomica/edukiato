@@ -172,15 +172,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
         </nav>
 
         <div className="p-4 border-t border-slate-100">
-          {/* Language Switcher */}
-          <button
-            id="tour-lang-switch"
-            onClick={toggleLanguage}
-            className="w-full flex items-center space-x-3 px-4 py-2 text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-xl transition-colors mb-2"
-          >
-            <Globe size={18} />
-            <span className="text-sm font-medium">Idioma: {language.toUpperCase()}</span>
-          </button>
+
 
           <button className="w-full flex items-center space-x-3 px-4 py-2 text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-xl transition-colors">
             <Settings size={20} />

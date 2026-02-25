@@ -142,22 +142,31 @@ function appReducer(state: AppState, action: AppAction): AppState {
                 ),
             };
 
-        case 'ADD_EVENT':
-            return { ...state, events: [...state.events, action.payload] };
+        case 'ADD_EVENT': {
+            const newEventsList = [...state.events, action.payload];
+            try { localStorage.setItem('MOCK_EVENTS', JSON.stringify(newEventsList)); } catch (e) { }
+            return { ...state, events: newEventsList };
+        }
 
-        case 'UPDATE_EVENT':
+        case 'UPDATE_EVENT': {
+            const updatedEvents = state.events.map(e =>
+                e.id === action.payload.id ? { ...e, ...action.payload } as CalendarEvent : e
+            );
+            try { localStorage.setItem('MOCK_EVENTS', JSON.stringify(updatedEvents)); } catch (e) { }
             return {
                 ...state,
-                events: state.events.map(e =>
-                    e.id === action.payload.id ? { ...e, ...action.payload } as CalendarEvent : e
-                ),
+                events: updatedEvents,
             };
+        }
 
-        case 'DELETE_EVENT':
+        case 'DELETE_EVENT': {
+            const reducedEvents = state.events.filter(e => e.id !== action.payload.id);
+            try { localStorage.setItem('MOCK_EVENTS', JSON.stringify(reducedEvents)); } catch (e) { }
             return {
                 ...state,
-                events: state.events.filter(e => e.id !== action.payload.id),
+                events: reducedEvents,
             };
+        }
 
         case 'REMOVE_EVENTS_FOR_COURSE':
             return {
@@ -260,12 +269,18 @@ export const AppStateProvider: React.FC<{ children: ReactNode }> = ({ children }
                     const storedNinos = localStorage.getItem('MOCK_NINOS');
                     const storedAulas = localStorage.getItem('MOCK_AULAS');
 
+                    const storedEvents = localStorage.getItem('MOCK_EVENTS');
+
                     let baseData: Partial<AppState> = {
                         courses: MOCK_COURSES,
                         aulas: storedAulas ? JSON.parse(storedAulas) : MOCK_AULAS,
                         ninos: storedNinos ? JSON.parse(storedNinos) : MOCK_NINOS,
                         students: MOCK_STUDENTS,
-                        events: MOCK_EVENTS,
+                        events: storedEvents ? JSON.parse(storedEvents).map((e: any) => ({
+                            ...e,
+                            start: new Date(e.start),
+                            end: new Date(e.end)
+                        })) : MOCK_EVENTS,
                         feed: MOCK_FEED,
                         payments: MOCK_PAYMENTS,
                         notifications: storedNotifs ? JSON.parse(storedNotifs) : MOCK_NOTIFICATIONS,

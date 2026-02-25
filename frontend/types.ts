@@ -330,7 +330,7 @@ export interface CalendarEvent {
   description?: string;
   creatorId?: string;
   sharedWith?: {
-    scope: 'ALL' | 'COURSE' | 'INDIVIDUAL';
+    scope: 'ALL' | 'COURSE' | 'AULA' | 'INDIVIDUAL';
     targetIds?: string[];
   };
 }

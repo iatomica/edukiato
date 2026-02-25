@@ -13,7 +13,7 @@ interface ScheduleProps {
 
 export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
   const { t } = useLanguage();
-  const { events, students, courses, emitEvent, dispatch, institutionId } = useTenantData();
+  const { events, students, courses, aulas, ninos, emitEvent, dispatch, institutionId } = useTenantData();
   const today = new Date();
   const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 5 }).map((_, i) => addDays(startOfCurrentWeek, i));
@@ -98,9 +98,31 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
     if (e.creatorId === user.id) return true;
     if (!e.sharedWith || e.sharedWith.scope === 'ALL') return true;
 
-    // Very simplified course logic for MVP: Show if it's shared to COURSE
-    if (e.sharedWith.scope === 'COURSE') {
-      return true;
+    if (e.sharedWith.scope === 'COURSE' && e.sharedWith.targetIds) {
+      if (user.role === 'DOCENTE') {
+        const isTeacherOfCourse = courses.some(c => e.sharedWith!.targetIds!.includes(c.id) && c.instructor === user.name);
+        if (isTeacherOfCourse) return true;
+      }
+      if (user.role === 'ESTUDIANTE') {
+        const studentRecord = students.find(s => s.email === user.email || s.name === user.name);
+        if (studentRecord) {
+          const isEnrolled = courses.some(c => e.sharedWith!.targetIds!.includes(c.id) && c.title === studentRecord.program);
+          if (isEnrolled) return true;
+        }
+      }
+      return false;
+    }
+
+    if (e.sharedWith.scope === 'AULA' && e.sharedWith.targetIds) {
+      if (user.role === 'DOCENTE') {
+        const isTeacherOfAula = aulas.some(a => e.sharedWith!.targetIds!.includes(a.id) && a.teachers?.includes(user.id));
+        if (isTeacherOfAula) return true;
+      }
+      if (user.role === 'PADRE') {
+        const isParentOfAula = ninos.some(n => e.sharedWith!.targetIds!.includes(n.aulaId) && n.parentIds?.includes(user.id));
+        if (isParentOfAula) return true;
+      }
+      return false;
     }
 
     return false;
@@ -392,6 +414,7 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
           initialData={editingEvent}
           currentUser={user}
           courses={courses}
+          aulas={aulas}
         />
       )}
     </div>
