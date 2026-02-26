@@ -188,12 +188,6 @@ export const translations = {
           position: 'bottom'
         },
         {
-          target: 'tour-dash-upnext',
-          title: 'Tu Próxima Clase',
-          content: 'No pierdas tiempo buscando. Aquí siempre verás dónde debes estar a continuación.',
-          position: 'left'
-        },
-        {
           target: 'tour-notifs',
           title: 'Notificaciones',
           content: 'Mantente al día con anuncios, calificaciones y mensajes aquí arriba.',
@@ -482,12 +476,6 @@ export const translations = {
           title: 'Quick Metrics',
           content: 'A glance at current status: active students, classes today, and pending alerts.',
           position: 'bottom'
-        },
-        {
-          target: 'tour-dash-upnext',
-          title: 'Your Next Class',
-          content: 'Don\'t waste time searching. Always see where you need to be next right here.',
-          position: 'left'
         },
         {
           target: 'tour-notifs',

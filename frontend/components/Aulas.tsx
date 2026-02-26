@@ -220,7 +220,7 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                     onClick={() => setConfigTab('ALUMNOS')}
                                     className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${configTab === 'ALUMNOS' ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-slate-50'}`}
                                 >
-                                    Alumnos y Familias
+                                    Alumnos
                                 </button>
                             </div>
 
@@ -291,8 +291,8 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                 <thead className="bg-slate-50">
                                                     <tr>
                                                         <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Alumno</th>
-                                                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Familiar Vinculado (ID)</th>
-                                                        <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase">Acción</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Familiar</th>
+                                                        <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase">Acciones</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="bg-white divide-y divide-slate-100">
@@ -305,20 +305,39 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                                 </div>
                                                             </td>
                                                             <td className="px-4 py-3 whitespace-nowrap">
-                                                                {/* Mock logic to simulate finding parent user */}
                                                                 <div className="flex items-center gap-2">
                                                                     <div className="flex flex-wrap gap-1">
-                                                                        {nino.parentIds?.map(pId => (
-                                                                            <span key={pId} className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded font-mono border border-slate-200">{pId}</span>
-                                                                        ))}
+                                                                        {nino.parentIds?.map(pId => {
+                                                                            const parentUser = allUsers.find(u => u.id === pId);
+                                                                            return (
+                                                                                <span key={pId} className="text-sm bg-slate-100 text-slate-700 px-2 py-1 rounded font-medium border border-slate-200" title={`ID: ${pId}`}>
+                                                                                    {parentUser ? parentUser.name : `ID: ${pId}`}
+                                                                                </span>
+                                                                            );
+                                                                        })}
                                                                     </div>
-                                                                    <button onClick={() => alert('Abrir buscador de usuarios rol PADRE para re-vincular')} className="text-xs text-primary-600 font-medium hover:underline">Cambiar</button>
+                                                                    <button onClick={() => alert('Abrir buscador de usuarios rol PADRE para re-vincular')} className="text-xs text-primary-600 font-medium hover:underline ml-2">Asignar</button>
                                                                 </div>
                                                             </td>
                                                             <td className="px-4 py-3 whitespace-nowrap text-right">
-                                                                <button className="text-red-500 hover:text-red-700 p-1 bg-red-50 rounded-md">
-                                                                    <Trash2 size={16} />
-                                                                </button>
+                                                                <div className="flex justify-end gap-2">
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setConfigAulaId(null);
+                                                                            setTimeout(() => setSelectedNino(nino), 50); // Small delay to avoid overlay conflicts
+                                                                        }}
+                                                                        className="text-primary-600 hover:text-primary-800 p-1.5 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors"
+                                                                        title="Ver Perfil"
+                                                                    >
+                                                                        <Info size={16} />
+                                                                    </button>
+                                                                    <button
+                                                                        className="text-slate-400 hover:text-rose-600 p-1.5 bg-slate-50 hover:bg-rose-50 rounded-lg transition-colors"
+                                                                        title="Desvincular Alumno"
+                                                                    >
+                                                                        <Trash2 size={16} />
+                                                                    </button>
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                     ))}

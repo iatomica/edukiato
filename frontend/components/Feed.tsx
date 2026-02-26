@@ -39,40 +39,6 @@ export const Feed: React.FC<FeedProps> = ({ items, className }) => {
 
     return (
         <div className={`space-y-6 ${className}`}>
-            {/* Filters */}
-            <div className="flex flex-wrap gap-2 items-center justify-between">
-                <div className="flex gap-2">
-                    <button
-                        onClick={() => setFilterType('ALL')}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${filterType === 'ALL' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-                    >
-                        Todos
-                    </button>
-                    <button
-                        onClick={() => setFilterType('ANNOUNCEMENT')}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${filterType === 'ANNOUNCEMENT' ? 'bg-emerald-600 text-white' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'}`}
-                    >
-                        Anuncios
-                    </button>
-                    <button
-                        onClick={() => setFilterType('ASSIGNMENT')}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${filterType === 'ASSIGNMENT' ? 'bg-orange-600 text-white' : 'bg-orange-50 text-orange-700 hover:bg-orange-100'}`}
-                    >
-                        Tareas
-                    </button>
-                </div>
-
-                <div className="flex gap-2">
-                    <button
-                        onClick={() => setFilterScope(filterScope === 'INSTITUTION' ? 'ALL' : 'INSTITUTION')}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center ${filterScope === 'INSTITUTION' ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-700 hover:bg-purple-100'}`}
-                    >
-                        <Megaphone size={14} className="mr-1.5" />
-                        Institucional
-                    </button>
-                </div>
-            </div>
-
             {/* Timeline */}
             <div className="relative border-l-2 border-slate-100 ml-3 space-y-8">
                 {filteredItems.map((item) => (
@@ -111,7 +77,10 @@ export const Feed: React.FC<FeedProps> = ({ items, className }) => {
                             </div>
 
                             <h3 className="text-lg font-bold text-slate-800 mb-1">{item.title}</h3>
-                            <p className="text-slate-600 text-sm leading-relaxed mb-4">{item.description}</p>
+                            <div
+                                className="text-slate-600 text-sm leading-relaxed mb-4 prose prose-sm max-w-none prose-slate"
+                                dangerouslySetInnerHTML={{ __html: item.description || '' }}
+                            />
 
                             <div className="flex items-center justify-between pt-4 border-t border-slate-50">
                                 <div className="flex items-center">
