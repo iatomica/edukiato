@@ -9,7 +9,7 @@
  *   inst-002 → Escuela de Música Moderna        (modern music focus)
  */
 
-import { Course, Student, CalendarEvent, FeedItem, Conversation, Message, Notification, Communication, UserRole, Aula, Nino } from '../types';
+import { Course, Student, CalendarEvent, FeedItem, Conversation, Message, Notification, Communication, UserRole, Aula, Nino, Payment } from '../types';
 
 // ── Institution IDs ──────────────────────────────────────────
 

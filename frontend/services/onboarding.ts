@@ -3,6 +3,8 @@ import { UserRole, OnboardingStep } from '../types';
 
 export const ONBOARDING_STEPS: Record<UserRole, OnboardingStep[]> = {
     SUPER_ADMIN: [], // Not needed for now
+    PADRE: [],
+    ESPECIALES: [],
 
     ADMIN_INSTITUCION: [
         {

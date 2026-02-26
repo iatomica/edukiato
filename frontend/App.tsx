@@ -62,7 +62,7 @@ const AppContent: React.FC = () => {
   const renderView = () => {
     switch (currentView) {
       case 'dashboard':
-        return <Dashboard onViewChange={(view, params) => {
+        return <Dashboard onViewChange={(view: View, params?: any) => {
           if (view === 'classroom') {
             setSelectedCourseId('c_jazz_01');
           }
@@ -93,7 +93,7 @@ const AppContent: React.FC = () => {
       case 'institutions':
         return <Institutions />;
       case 'aulas':
-        return <Aulas onViewChange={(v, p) => handleViewChange(v, p)} />;
+        return <Aulas onViewChange={(v: View, p?: any) => handleViewChange(v, p)} />;
       default:
         return <Dashboard onViewChange={(v) => handleViewChange(v)} user={user!} />;
     }

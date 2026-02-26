@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { format } from 'date-fns';
 import { usersApi } from '../services/api';
 import { AnimatedAvatar } from './AnimatedAvatar';
+import AcademicReportsTab from './AcademicReportsTab';
 
 // ── SUB-COMPONENTS ───────────────────────────────────────────
 
@@ -509,18 +510,7 @@ const StudentDetail = ({ student, onClose, communications, aulas, ninos }: { stu
         )}
 
         {activeTab === 'ACADEMIC' && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-              <h3 className="font-bold text-slate-800 mb-4">Resumen de Asistencia</h3>
-              <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden mb-2">
-                <div className="h-full bg-emerald-500 transition-all duration-1000" style={{ width: `${student.attendanceRate}%` }}></div>
-              </div>
-              <div className="flex justify-between text-sm text-slate-600">
-                <span>Asistencia Global</span>
-                <span className="font-bold">{student.attendanceRate}%</span>
-              </div>
-            </div>
-          </div>
+          <AcademicReportsTab studentId={student.id} />
         )}
 
         {activeTab === 'COMMUNICATIONS' && (
@@ -905,7 +895,7 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
                     <td className="px-6 py-4">
                       <div className="flex items-center">
                         {student.role === 'ESTUDIANTE' ? (
-                          <AnimatedAvatar gender={student.gender as any} className="h-10 w-10 rounded-full object-cover border border-slate-200" />
+                          <AnimatedAvatar gender={(student as any).gender} className="h-10 w-10 rounded-full object-cover border border-slate-200" />
                         ) : (
                           <img className="h-10 w-10 rounded-full object-cover border border-slate-200" src={student.avatar} alt="" />
                         )}

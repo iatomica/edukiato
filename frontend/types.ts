@@ -335,6 +335,15 @@ export interface CalendarEvent {
   };
 }
 
+export interface AcademicReport {
+  id: string;
+  studentId: string;
+  uploaderId: string;
+  title: string;
+  content: string;
+  createdAt: string;
+}
+
 export interface FeedItem {
   id: string;
   institutionId: string;
@@ -422,4 +431,16 @@ export interface OnboardingStep {
 export interface OnboardingProgress {
   completedSteps: string[];
   isDismissed: boolean;
+}
+
+export interface Payment {
+  id: string;
+  institutionId: string;
+  studentId: string;
+  amount: number;
+  date: Date;
+  dueDate?: Date;
+  paidDate?: Date;
+  status: 'PENDING' | 'COMPLETED' | 'OVERDUE' | 'PAID' | 'UNPAID';
+  description: string;
 }

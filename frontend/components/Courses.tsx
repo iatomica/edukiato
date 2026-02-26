@@ -312,7 +312,7 @@ export const Courses: React.FC<CoursesProps> = ({ onViewChange, onCourseSelect, 
                   disabled={isLoading}
                   className="px-6 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-200"
                 >
-                  {isLoading ? t.courses.createModal.creating : t.courses.createModal.create}
+                  {isLoading ? t.courses.createModal.create : t.courses.createModal.create}
                 </button>
               </div>
             </form>

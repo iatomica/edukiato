@@ -8,7 +8,7 @@
  * preparing for real multi-tenant API calls.
  */
 
-import { User, UserRole, UserInstitution, Course, Message } from '../types';
+import { User, UserRole, UserInstitution, Course, Message, AcademicReport } from '../types';
 import { MOCK_COURSES, MOCK_PAYMENTS, INST_VINCULOS, MOCK_AULAS, MOCK_NINOS, MOCK_MESSAGES } from './mockData';
 
 // ── Config ────────────────────────────────────────────────────
@@ -506,5 +506,68 @@ export const messagesApi = {
         return conversations.sort((a, b) =>
             new Date(b.lastMessage.timestamp).getTime() - new Date(a.lastMessage.timestamp).getTime()
         );
+    }
+};
+
+// ── Reports API ───────────────────────────────────────────────
+
+const storedReports = typeof window !== 'undefined' ? localStorage.getItem('MOCK_REPORTS') : null;
+let MOCK_REPORTS: AcademicReport[] = storedReports ? JSON.parse(storedReports) : [];
+
+export const reportsApi = {
+    create: async (studentId: string, title: string, content: string, token: string): Promise<{ message: string, report: AcademicReport }> => {
+        try {
+            const response = await fetch(`${API_BASE}/reports/student/${studentId}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title, content })
+            });
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Error creando informe');
+            }
+            return response.json();
+        } catch (error: any) {
+            console.warn('Backend unavailable, using mock data for reports...', error.message);
+            // Fallback to Mock / LocalStorage
+            let uploaderId = 'u_dir'; // default fallback
+            try {
+                const parts = token.split('-');
+                if (parts.length > 2) uploaderId = parts[2];
+            } catch (e) { }
+
+            const newReport: AcademicReport = {
+                id: `mock-report-${Date.now()}`,
+                studentId,
+                uploaderId,
+                title,
+                content,
+                createdAt: new Date().toISOString()
+            };
+            MOCK_REPORTS.push(newReport);
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('MOCK_REPORTS', JSON.stringify(MOCK_REPORTS));
+            }
+            return { message: 'Informe guardado (Mock)', report: newReport };
+        }
+    },
+    getByStudent: async (studentId: string, token: string): Promise<AcademicReport[]> => {
+        try {
+            const response = await fetch(`${API_BASE}/reports/student/${studentId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) throw new Error('Error al cargar informes');
+            return response.json();
+        } catch (error: any) {
+            console.warn('Backend unavailable, using mock reports...', error.message);
+            return MOCK_REPORTS
+                .filter(r => r.studentId === studentId)
+                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        }
     }
 };

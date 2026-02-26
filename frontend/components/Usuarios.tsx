@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, UserRole } from '../types';
+import { User, UserRole, Nino } from '../types';
 import { Search, Plus, UserPlus, X, Mail, Shield, Users as UsersIcon, GraduationCap, Edit, Key } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAppState } from '../contexts/AppStateContext';

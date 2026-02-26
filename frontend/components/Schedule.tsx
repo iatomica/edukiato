@@ -123,7 +123,7 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
       });
       emitEvent({
         type: 'SYSTEM_NOTIFICATION' as any,
-        payload: { message: 'Evento actualizado exitosamente.', type: 'SYSTEM' }
+        payload: { message: 'Evento actualizado exitosamente.', type: 'SYSTEM' } as any
       });
     } else {
       const newEvent = {
@@ -135,7 +135,7 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
       dispatch({ type: 'ADD_EVENT', payload: newEvent });
       emitEvent({
         type: 'SYSTEM_NOTIFICATION' as any,
-        payload: { message: 'Evento creado exitosamente.', type: 'SYSTEM' }
+        payload: { message: 'Evento creado exitosamente.', type: 'SYSTEM' } as any
       });
     }
   };
@@ -146,7 +146,7 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
       setViewingEvent(null);
       emitEvent({
         type: 'SYSTEM_NOTIFICATION' as any,
-        payload: { message: 'Evento eliminado comunmente.', type: 'SYSTEM' }
+        payload: { message: 'Evento eliminado comunmente.', type: 'SYSTEM' } as any
       });
     }
   };

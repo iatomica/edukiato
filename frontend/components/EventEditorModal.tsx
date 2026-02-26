@@ -52,7 +52,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
     });
 
     const [type, setType] = useState<'class' | 'workshop' | 'event'>(initialData?.type || 'event');
-    const [scope, setScope] = useState<'ALL' | 'AULA' | 'INDIVIDUAL'>(initialData?.sharedWith?.scope || 'ALL');
+    const [scope, setScope] = useState<'ALL' | 'COURSE' | 'AULA' | 'INDIVIDUAL'>(initialData?.sharedWith?.scope || 'ALL');
     const [targetIds, setTargetIds] = useState<string[]>(initialData?.sharedWith?.targetIds || []);
 
     const userAulas = currentUser.role === 'DOCENTE' || currentUser.role === 'PADRE'

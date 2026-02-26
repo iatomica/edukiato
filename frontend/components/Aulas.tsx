@@ -1,22 +1,26 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAppState } from '../contexts/AppStateContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useTenantData } from '../hooks/useTenantData';
 import { Aula, Nino, User } from '../types';
-import { Users, LayoutGrid, List, MessageSquare, Info, ShieldAlert, ChevronRight, User as UserIcon, Settings, Plus, Search, Trash2, Send } from 'lucide-react';
+import { Users, LayoutGrid, List, MessageSquare, Info, ShieldAlert, ChevronRight, User as UserIcon, Settings, Plus, Search, Trash2, Send, BookOpen, Mail, Award, Paperclip, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Modal from './Modal';
 import { usersApi } from '../services/api';
 import { AnimatedAvatar } from './AnimatedAvatar';
+import AcademicReportsTab from './AcademicReportsTab';
 
 export default function Aulas({ onViewChange }: { onViewChange?: (view: any, params?: any) => void }) {
     const { state, dispatch } = useAppState();
     const { user, token, currentInstitution } = useAuth();
+    const { communications } = useTenantData();
 
     // UI States
     const [selectedAulaId, setSelectedAulaId] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<'CARD' | 'LIST'>('CARD');
     const [selectedNino, setSelectedNino] = useState<Nino | null>(null);
+    const [activeDetailTab, setActiveDetailTab] = useState<'INFO' | 'ACADEMIC' | 'COMMUNICATIONS'>('INFO');
 
     // Config Modal States
     const [configAulaId, setConfigAulaId] = useState<string | null>(null);
@@ -54,6 +58,16 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
         if (!activeAula) return [];
         return state.ninos.filter(n => n.aulaId === activeAula.id);
     }, [state.ninos, activeAula]);
+
+    const studentComms = useMemo(() => {
+        if (!selectedNino) return [];
+        return communications.filter(c => {
+            if (c.type === 'ANUNCIO_GENERAL') return true;
+            if (c.recipientId && selectedNino.parentIds?.includes(c.recipientId)) return true;
+            if (c.courseId === selectedNino.aulaId) return true;
+            return false;
+        });
+    }, [communications, selectedNino]);
 
     // No access
     if (accessibleAulas.length === 0) {
@@ -316,7 +330,6 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                                             );
                                                                         })}
                                                                     </div>
-                                                                    <button onClick={() => alert('Abrir buscador de usuarios rol PADRE para re-vincular')} className="text-xs text-primary-600 font-medium hover:underline ml-2">Asignar</button>
                                                                 </div>
                                                             </td>
                                                             <td className="px-4 py-3 whitespace-nowrap text-right">
@@ -324,18 +337,13 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                                     <button
                                                                         onClick={() => {
                                                                             setConfigAulaId(null);
-                                                                            setTimeout(() => setSelectedNino(nino), 50); // Small delay to avoid overlay conflicts
+                                                                            setSelectedAulaId(nino.aulaId); // Viajar a la pantalla 2
+                                                                            setTimeout(() => setSelectedNino(nino), 50); // Abrir modal alojado allí
                                                                         }}
                                                                         className="text-primary-600 hover:text-primary-800 p-1.5 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors"
                                                                         title="Ver Perfil"
                                                                     >
-                                                                        <Info size={16} />
-                                                                    </button>
-                                                                    <button
-                                                                        className="text-slate-400 hover:text-rose-600 p-1.5 bg-slate-50 hover:bg-rose-50 rounded-lg transition-colors"
-                                                                        title="Desvincular Alumno"
-                                                                    >
-                                                                        <Trash2 size={16} />
+                                                                        <BookOpen size={16} />
                                                                     </button>
                                                                 </div>
                                                             </td>
@@ -492,93 +500,170 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
             {/* Nino Detail Modal */}
             <Modal
                 isOpen={!!selectedNino}
-                onClose={() => setSelectedNino(null)}
-                title="Ficha Técnica Individual"
+                onClose={() => {
+                    setSelectedNino(null);
+                    setActiveDetailTab('INFO');
+                }}
+                title={activeDetailTab === 'INFO' ? "" : "Perfil de Alumno"} // Hide default title for the banner
                 size="lg"
             >
                 {selectedNino && (
-                    <div className="space-y-6 pb-2">
-                        {/* Main Info Header */}
-                        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 bg-slate-100 p-6 -mx-6 -mt-6 rounded-t-2xl border-b border-slate-200">
-                            <AnimatedAvatar gender={selectedNino.gender} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md mx-auto sm:mx-0" />
-                            <div className="text-center sm:text-left flex-1">
-                                <h2 className="text-2xl font-black text-slate-800 tracking-tight">{selectedNino.name}</h2>
-                                <p className="text-slate-500 font-medium mt-1">Asignado a: <span className="text-primary-700 font-bold bg-white px-2 py-0.5 rounded shadow-sm border border-slate-200">{activeAula?.name}</span></p>
-                                <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-2 text-sm">
-                                    <div className="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-slate-700 shadow-sm">
-                                        <span className="font-bold text-slate-400 mr-2 uppercase text-xs">Nacimiento</span>
-                                        {selectedNino.birthDate ? format(new Date(selectedNino.birthDate), 'dd/MM/yyyy') : 'N/A'}
-                                    </div>
-                                    <div className="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-slate-700 shadow-sm flex items-center gap-2">
-                                        <span className={`w-2 h-2 rounded-full ${selectedNino.attendanceRate && selectedNino.attendanceRate > 90 ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
-                                        <span className="font-bold text-slate-400 mr-1 uppercase text-xs">Asistencia</span>
-                                        {selectedNino.attendanceRate}%
+                    <div className="flex flex-col h-full bg-slate-50 rounded-2xl overflow-hidden -m-6 animate-fade-in relative z-10 border border-slate-200 shadow-xl">
+                        {/* Header Banner */}
+                        <div className="bg-slate-900 text-white p-6 md:p-8 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-32 bg-primary-500/10 rounded-full transform translate-x-10 -translate-y-10 blur-3xl"></div>
+                            <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
+                                <AnimatedAvatar gender={selectedNino.gender} className="w-24 h-24 rounded-full border-4 border-white/20 shadow-xl" />
+                                <div className="flex-1">
+                                    <h2 className="text-3xl font-black">{selectedNino.name}</h2>
+                                    <p className="text-slate-300 font-medium mt-1 mb-3">Asignado a: <span className="font-bold">{activeAula?.name}</span></p>
+                                    <div className="flex space-x-2 justify-center sm:justify-start">
+                                        <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase bg-white/20 text-white`}>
+                                            Estudiante
+                                        </span>
+                                        <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${selectedNino.attendanceRate && selectedNino.attendanceRate < 80 ? 'bg-amber-500' : 'bg-emerald-500'}`}>
+                                            Activo
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Medical Info */}
-                        <div className="bg-rose-50 border border-rose-100 rounded-xl p-5 shadow-sm">
-                            <h3 className="text-rose-800 font-black mb-2 flex items-center gap-2 tracking-tight">
-                                <ShieldAlert size={18} /> Historial Médico y Alergias
-                            </h3>
-                            <p className="text-rose-700 text-sm leading-relaxed font-medium">
-                                {selectedNino.medicalInfo || 'No se registraron condiciones médicas particulares o alergias.'}
-                            </p>
+                        {/* Tabs */}
+                        <div className="flex border-b border-slate-200 bg-white sticky top-0 z-20 shadow-sm">
+                            {[
+                                { id: 'INFO', label: 'Info & Contacto', icon: UserIcon },
+                                { id: 'ACADEMIC', label: 'Académico', icon: Award },
+                                { id: 'COMMUNICATIONS', label: 'Comunicados', icon: BookOpen },
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveDetailTab(tab.id as any)}
+                                    className={`flex-1 flex items-center justify-center py-4 text-sm font-bold border-b-2 transition-colors
+                                      ${activeDetailTab === tab.id ? 'border-primary-600 text-primary-700 bg-primary-50/50' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+                                >
+                                    <tab.icon size={18} className="mr-2" />
+                                    <span className="hidden sm:inline">{tab.label}</span>
+                                </button>
+                            ))}
                         </div>
 
-                        {/* Familiares / Tutores Info */}
-                        <div>
-                            <h3 className="font-black text-slate-800 mb-3 flex items-center gap-2 tracking-tight text-lg">
-                                <UserIcon size={20} className="text-primary-500" /> Familia / Tutores Responsables
-                            </h3>
-                            <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white divide-y divide-slate-100">
-                                {selectedNino.parentIds?.map((pId) => {
-                                    // Normally we would have the User object here. Mocking for now.
-                                    return (
-                                        <div key={pId} className="p-5 flex flex-col sm:flex-row items-center justify-between hover:bg-slate-50 transition-colors gap-4">
-                                            <div className="flex items-center gap-4 text-center sm:text-left">
-                                                <div className="w-12 h-12 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-lg shadow-inner border border-primary-200">
-                                                    {pId.charAt(2).toUpperCase() || 'P'}
+                        {/* Tabs Content */}
+                        <div className="p-6 md:p-8 flex-1 overflow-y-auto space-y-6 max-h-[60vh] custom-scrollbar">
+                            {activeDetailTab === 'INFO' && (
+                                <div className="space-y-6 animate-fade-in">
+                                    {/* Medical Info */}
+                                    <div className="bg-rose-50 border border-rose-100 rounded-xl p-5 shadow-sm">
+                                        <h3 className="text-rose-800 font-black mb-2 flex items-center gap-2 tracking-tight">
+                                            <ShieldAlert size={18} /> Historial Médico y Alergias
+                                        </h3>
+                                        <p className="text-rose-700 text-sm leading-relaxed font-medium">
+                                            {selectedNino.medicalInfo || 'No se registraron condiciones médicas particulares o alergias.'}
+                                        </p>
+                                    </div>
+
+                                    {/* Familiares / Tutores Info */}
+                                    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                                        <h3 className="font-black text-slate-800 p-5 border-b border-slate-100 flex items-center gap-2 tracking-tight text-lg bg-slate-50">
+                                            <Users size={20} className="text-primary-500" /> Familia / Tutores Responsables
+                                        </h3>
+                                        <div className="divide-y divide-slate-100">
+                                            {selectedNino.parentIds?.map((pId) => {
+                                                const parentUser = allUsers.find(u => u.id === pId);
+                                                return (
+                                                    <div key={pId} className="p-5 flex flex-col sm:flex-row items-center justify-between hover:bg-slate-50 transition-colors gap-4">
+                                                        <div className="flex items-center gap-4 text-center sm:text-left w-full sm:w-auto">
+                                                            <div className="w-12 h-12 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-lg shadow-inner border border-primary-200 shrink-0">
+                                                                {parentUser ? parentUser.name.charAt(0).toUpperCase() : pId.charAt(2).toUpperCase()}
+                                                            </div>
+                                                            <div className="min-w-0">
+                                                                <p className="font-bold text-slate-800 text-base truncate">{parentUser ? parentUser.name : 'Familiar Vinculado'}</p>
+                                                                <p className="text-sm text-slate-500 font-medium truncate">ID: <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-xs border border-slate-200">{pId}</span></p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-2 mt-2 sm:mt-0 shrink-0">
+                                                            <button
+                                                                onClick={() => {
+                                                                    if (onViewChange) {
+                                                                        onViewChange('messages', { targetUserId: pId });
+                                                                    }
+                                                                }}
+                                                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-slate-900 transition-all hover:-translate-y-0.5"
+                                                            >
+                                                                <MessageSquare size={16} /> Contactar
+                                                            </button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    if (onViewChange) {
+                                                                        onViewChange('communications', {
+                                                                            commParams: {
+                                                                                type: 'NOTIFICACION_INDIVIDUAL',
+                                                                                isLocked: true,
+                                                                                recipientIds: [pId]
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }}
+                                                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary-200 hover:bg-primary-700 transition-all hover:-translate-y-0.5"
+                                                            >
+                                                                <Send size={16} /> Comunicado
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                            {(!selectedNino.parentIds || selectedNino.parentIds.length === 0) && (
+                                                <div className="p-8 text-center text-slate-500 font-medium">
+                                                    No hay familiares vinculados a este alumno.
                                                 </div>
-                                                <div>
-                                                    <p className="font-bold text-slate-800 text-base">Familiar Vinculado</p>
-                                                    <p className="text-sm text-slate-500 font-medium">ID Vinculado: <span className="font-mono bg-slate-100 p-1 rounded-md text-xs border border-slate-200">{pId}</span></p>
-                                                </div>
-                                            </div>
-                                            <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-2 mt-3 sm:mt-0">
-                                                <button
-                                                    onClick={() => {
-                                                        if (onViewChange) {
-                                                            onViewChange('messages', { targetUserId: pId });
-                                                        }
-                                                    }}
-                                                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-slate-900 transition-all hover:-translate-y-0.5"
-                                                >
-                                                    <MessageSquare size={16} /> Contactar
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        if (onViewChange) {
-                                                            onViewChange('communications', {
-                                                                commParams: {
-                                                                    type: 'NOTIFICACION_INDIVIDUAL',
-                                                                    isLocked: true,
-                                                                    recipientIds: [pId]
-                                                                }
-                                                            });
-                                                        }
-                                                    }}
-                                                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary-200 hover:bg-primary-700 transition-all hover:-translate-y-0.5"
-                                                >
-                                                    <Send size={16} /> Comunicado
-                                                </button>
-                                            </div>
+                                            )}
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeDetailTab === 'ACADEMIC' && (
+                                <AcademicReportsTab studentId={selectedNino.id} />
+                            )}
+
+                            {activeDetailTab === 'COMMUNICATIONS' && (
+                                <div className="space-y-4 animate-fade-in">
+                                    {studentComms.length === 0 ? (
+                                        <div className="text-center py-16 text-slate-400 bg-white rounded-2xl border border-slate-200 border-dashed">
+                                            <BookOpen size={48} className="mx-auto mb-4 opacity-30" />
+                                            <p className="font-medium text-lg">Cuaderno de comunicaciones vacío.</p>
+                                            <p className="text-sm mt-1">Este alumno no ha recibido ninguna notificación individual o general aún.</p>
+                                        </div>
+                                    ) : (
+                                        studentComms.map(comm => (
+                                            <div key={comm.id} className={`bg-white p-6 rounded-2xl border ${comm.isRead ? 'border-slate-200' : 'border-primary-200 shadow-md'} transition-all hover:shadow-lg`}>
+                                                <div className="flex justify-between items-start mb-3">
+                                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                                        <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide inline-block
+                                                          ${comm.type === 'NOTIFICACION_INDIVIDUAL' ? 'bg-rose-100 text-rose-700' :
+                                                                comm.type === 'ANUNCIO_SALA' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
+                                                            {comm.type === 'ANUNCIO_GENERAL' ? 'ANUNCIO GENERAL' : comm.type === 'ANUNCIO_SALA' ? 'ANUNCIO POR SALA' : 'NOTIFICACIÓN INDIVIDUAL'}
+                                                        </span>
+                                                        <span className="text-xs text-slate-500 font-medium flex items-center gap-1"><Calendar size={12} /> {format(new Date(comm.createdAt), 'dd MMM yyyy, HH:mm', { locale: es })}</span>
+                                                    </div>
+                                                    {!comm.isRead && <span className="w-2.5 h-2.5 bg-primary-500 rounded-full shadow-sm"></span>}
+                                                </div>
+                                                <h4 className="font-black text-slate-800 text-lg mb-2">{comm.title}</h4>
+                                                <div
+                                                    className="text-slate-600 text-sm leading-relaxed mb-4 prose prose-sm max-w-none prose-slate"
+                                                    dangerouslySetInnerHTML={{ __html: comm.content || '' }}
+                                                />
+                                                <div className="flex justify-between items-center pt-4 border-t border-slate-100 mt-4">
+                                                    <div className="flex items-center text-xs text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                                                        <UserIcon size={14} className="mr-1.5 text-slate-400" />
+                                                        Enviado por: <span className="font-bold ml-1 text-slate-700">{comm.senderName}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

@@ -123,9 +123,9 @@ export const InstitutionPicker: React.FC = () => {
                                             {inst.institutionName}
                                         </p>
                                         <p className="text-sm text-slate-400 capitalize">
-                                            {inst.role === 'ADMIN' ? '🛡️ Administrador' :
-                                                inst.role === 'TEACHER' ? '📚 Docente' :
-                                                    inst.role === 'STUDENT' ? '🎓 Estudiante' : inst.role}
+                                            {inst.role === 'ADMIN_INSTITUCION' || inst.role === 'SUPER_ADMIN' ? '🛡️ Administrador' :
+                                                inst.role === 'DOCENTE' ? '📚 Docente' :
+                                                    inst.role === 'ESTUDIANTE' ? '🎓 Estudiante' : inst.role}
                                         </p>
                                     </div>
                                     <ChevronRight size={20} className="text-slate-300 group-hover:text-primary-500 transition-colors" />
