@@ -51,9 +51,13 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
         return `${hours}:${mins}`;
     });
 
+    const isAdmin = currentUser.role === 'ADMIN_INSTITUCION' || currentUser.role === 'SUPER_ADMIN';
     const [type, setType] = useState<'class' | 'workshop' | 'event'>(initialData?.type || 'event');
-    const [scope, setScope] = useState<'ALL' | 'COURSE' | 'AULA' | 'INDIVIDUAL'>(initialData?.sharedWith?.scope || 'ALL');
+    const [scope, setScope] = useState<'ALL' | 'COURSE' | 'AULA' | 'INDIVIDUAL'>(initialData?.sharedWith?.scope || (isAdmin ? 'ALL' : 'AULA'));
     const [targetIds, setTargetIds] = useState<string[]>(initialData?.sharedWith?.targetIds || []);
+
+    // Form validation check
+    const isFormValid = title.trim() !== '' && description.trim() !== '' && (scope === 'ALL' || targetIds.length > 0);
 
     const userAulas = currentUser.role === 'DOCENTE' || currentUser.role === 'PADRE'
         ? aulas.filter(a => a.teachers?.includes(currentUser.id))
@@ -63,6 +67,8 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!isFormValid) return;
 
         // Choose color based on type
         const colorMap = {
@@ -179,24 +185,24 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                                 </select>
                             </div>
 
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                                    Audiencia
-                                </label>
-                                <select
-                                    value={scope}
-                                    onChange={(e) => {
-                                        setScope(e.target.value as any);
-                                        setTargetIds([]);
-                                    }}
-                                    className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-200 focus:border-slate-400 outline-none transition-all text-slate-700 font-medium appearance-none"
-                                >
-                                    <option value="ALL">Todo el Instituto</option>
-                                    {currentUser.role !== 'ESTUDIANTE' && (
+                            {isAdmin && (
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                                        Audiencia
+                                    </label>
+                                    <select
+                                        value={scope}
+                                        onChange={(e) => {
+                                            setScope(e.target.value as any);
+                                            setTargetIds([]);
+                                        }}
+                                        className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-200 focus:border-slate-400 outline-none transition-all text-slate-700 font-medium appearance-none"
+                                    >
+                                        <option value="ALL">Todo el Instituto</option>
                                         <option value="AULA">Aulas / Salas Específicas</option>
-                                    )}
-                                </select>
-                            </div>
+                                    </select>
+                                </div>
+                            )}
                         </div>
 
 
@@ -246,9 +252,10 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                     <button
                         type="submit"
                         form="event-form"
-                        className="px-8 py-2.5 rounded-xl font-bold bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/10 transition-all"
+                        disabled={!isFormValid}
+                        className={`px-8 py-2.5 rounded-xl font-bold text-white shadow-lg transition-all ${isFormValid ? 'bg-slate-900 hover:bg-slate-800 shadow-slate-900/10' : 'bg-slate-400 cursor-not-allowed opacity-50'}`}
                     >
-                        {initialData ? 'Guardar Cambios' : 'Crear Evento'}
+                        Guardar Evento
                     </button>
                 </div>
             </div>

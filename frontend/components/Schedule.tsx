@@ -139,8 +139,8 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
       });
     }
   };
-  // Bypass role restrictions for now so the user can test the UI freely.
-  const canCreate = true;
+  // Restrict calendar creation entirely for Students and Parents
+  const canCreate = user.role !== 'PADRE' && user.role !== 'ESTUDIANTE';
 
   const handleGridClick = (e: React.MouseEvent<HTMLDivElement>, day: Date) => {
     if (!canCreate) return;
