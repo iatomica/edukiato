@@ -190,7 +190,7 @@ export const Usuarios: React.FC = () => {
                 {activeTab !== 'PADRES' && (
                     <button
                         onClick={() => activeTab === 'ALUMNOS' ? setIsAddNinoModalOpen(true) : setIsAddModalOpen(true)}
-                        className="bg-primary-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-primary-700 transition-colors flex items-center shadow-lg shadow-primary-200"
+                        className="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-slate-800 transition-all flex items-center shadow-lg shadow-slate-900/10"
                     >
                         <UserPlus size={18} className="mr-2" />
                         {activeTab === 'ALUMNOS' ? 'Inscribir Alumno' : 'Nuevo Usuario'}

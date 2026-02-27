@@ -16,34 +16,29 @@
           },
           colors: {
             primary: {
-              50: 'hsl(var(--primary-h) var(--primary-s) 95%)',
-              100: 'hsl(var(--primary-h) var(--primary-s) 90%)',
-              200: 'hsl(var(--primary-h) var(--primary-s) 80%)',
-              300: 'hsl(var(--primary-h) var(--primary-s) 70%)',
-              400: 'hsl(var(--primary-h) var(--primary-s) 60%)',
-              500: 'hsl(var(--primary-h) var(--primary-s) 50%)',
-              600: 'hsl(var(--primary-h) var(--primary-s) 40%)',
-              700: 'hsl(var(--primary-h) var(--primary-s) 30%)',
-              800: 'hsl(var(--primary-h) var(--primary-s) 20%)',
-              900: 'hsl(var(--primary-h) var(--primary-s) 10%)',
+              50: 'hsl(var(--primary-h), var(--primary-s), 95%)',
+              100: 'hsl(var(--primary-h), var(--primary-s), 90%)',
+              200: 'hsl(var(--primary-h), var(--primary-s), 80%)',
+              300: 'hsl(var(--primary-h), var(--primary-s), 70%)',
+              400: 'hsl(var(--primary-h), var(--primary-s), 60%)',
+              500: 'hsl(var(--primary-h), var(--primary-s), 50%)',
+              600: 'hsl(var(--primary-h), var(--primary-s), 40%)',
+              700: 'hsl(var(--primary-h), var(--primary-s), 30%)',
+              800: 'hsl(var(--primary-h), var(--primary-s), 20%)',
+              900: 'hsl(var(--primary-h), var(--primary-s), 10%)',
             },
             secondary: {
-              DEFAULT: 'hsl(var(--secondary-h) var(--secondary-s) 50%)',
-              50: 'hsl(var(--secondary-h) var(--secondary-s) 95%)',
-              100: 'hsl(var(--secondary-h) var(--secondary-s) 90%)',
-              500: 'hsl(var(--secondary-h) var(--secondary-s) 50%)',
-              900: 'hsl(var(--secondary-h) var(--secondary-s) 10%)',
+              DEFAULT: 'hsl(var(--secondary-h), var(--secondary-s), 50%)',
+              50: 'hsl(var(--secondary-h), var(--secondary-s), 95%)',
+              100: 'hsl(var(--secondary-h), var(--secondary-s), 90%)',
+              500: 'hsl(var(--secondary-h), var(--secondary-s), 50%)',
+              900: 'hsl(var(--secondary-h), var(--secondary-s), 10%)',
             },
             surface: '#ffffff',
             background: '#f8fafc',
           }
         },
-      },
-      plugins: [
-        tailwind.plugin(function ({ addBase }) {
-          // Keep default simple plugins
-        }),
-      ]
+      }
     }
   </script>
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
