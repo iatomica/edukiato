@@ -2,12 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Home, BookOpen, Users, Calendar, Settings, LogOut, Menu, Bell, MessageSquare, Globe, Info, Building2, ChevronDown, FileText, GraduationCap } from 'lucide-react';
 import { View, User } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useTour } from '../contexts/TourContext';
 import { usePermissions } from '../contexts/PermissionsContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTenantData } from '../hooks/useTenantData';
-import { TourGuide } from './TourGuide';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -22,7 +20,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
   const { t, language, setLanguage } = useLanguage();
-  const { startTour, hasSeenTour, isOpen } = useTour();
   const { can } = usePermissions();
   const { theme } = useTheme();
   const { clearInstitution } = useAuth();
@@ -101,7 +98,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
 
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
-      <TourGuide />
 
       {/* Mobile Header */}
       <div className="md:hidden bg-white border-b border-slate-200 p-4 flex justify-between items-center sticky top-0 z-20">
@@ -203,14 +199,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
       <main className="flex-1 flex flex-col h-[calc(100vh-65px)] md:h-screen">
         {/* Desktop Top Bar (Notifications) */}
         <div className="hidden md:flex justify-end items-center px-8 py-4 bg-background space-x-4">
-          {/* Info / Walkthrough Trigger */}
-          <button
-            onClick={() => startTour(currentView)}
-            className="p-2 text-slate-400 hover:text-primary-600 hover:bg-white hover:shadow-sm rounded-full transition-all"
-            title="Ver Guía de esta Pantalla"
-          >
-            <Info size={20} />
-          </button>
 
           <div className="relative" ref={notifRef}>
             <button

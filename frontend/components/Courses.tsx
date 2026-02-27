@@ -63,8 +63,6 @@ export const Courses: React.FC<CoursesProps> = ({ onViewChange, onCourseSelect, 
 
       emitEvent({ type: 'COURSE_CREATED', payload: newCourse });
 
-      // Onboarding: Mark 'create_course' as complete
-      dispatch({ type: 'COMPLETE_ONBOARDING_STEP', payload: 'create_course' });
 
       setIsCreateOpen(false);
 

@@ -113,12 +113,7 @@ export const Classroom: React.FC<ClassroomProps> = ({ courseId, user, onBack }) 
   const { courses, feed: tenantFeed, institutionId, emitEvent, dispatch } = useTenantData();
   const course = courses.find(c => c.id === courseId) || courses[0];
 
-  // Onboarding: Mark 'explore_courses' as complete for students visiting this view
-  useEffect(() => {
-    if (user.role === 'ESTUDIANTE') {
-      dispatch({ type: 'COMPLETE_ONBOARDING_STEP', payload: 'explore_courses' });
-    }
-  }, [user.role, dispatch]);
+
 
   // Feed filtered by course — reads live from AppState
   const feed = tenantFeed.filter(f => f.courseId === (course?.id ?? ''));
@@ -164,10 +159,7 @@ export const Classroom: React.FC<ClassroomProps> = ({ courseId, user, onBack }) 
     // Trigger cross-module side-effects (notification, calendar for assignments)
     emitEvent({ type: 'CONTENT_PUBLISHED', payload: newItem });
 
-    // Onboarding: Mark 'publish_content' as complete for teachers
-    if (user.role === 'DOCENTE') {
-      dispatch({ type: 'COMPLETE_ONBOARDING_STEP', payload: 'publish_content' });
-    }
+
 
     setIsAddOpen(false);
 

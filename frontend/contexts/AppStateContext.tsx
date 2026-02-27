@@ -9,7 +9,7 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect, ReactNode } from 'react';
 import {
     Course, Student, CalendarEvent, FeedItem,
-    Payment, Notification, Conversation, OnboardingProgress, Communication, Aula, Nino,
+    Payment, Notification, Conversation, Communication, Aula, Nino,
 } from '../types';
 import { useAuth } from './AuthContext';
 import { AppEvent, eventBus } from '../services/eventBus';
@@ -32,7 +32,6 @@ export interface AppState {
     communications: Communication[];
     /** Recent system events log for Dashboard activity feed */
     activityLog: ActivityEntry[];
-    onboarding: OnboardingProgress;
 }
 
 export interface ActivityEntry {
@@ -64,9 +63,7 @@ type AppAction =
     | { type: 'UPDATE_CONVERSATION'; payload: Partial<Conversation> & { id: string } }
     | { type: 'LOG_ACTIVITY'; payload: ActivityEntry }
     | { type: 'ENROLL_STUDENT'; payload: { courseId: string; studentId: string } }
-    | { type: 'UPDATE_AULA'; payload: Partial<Aula> & { id: string } }
-    | { type: 'COMPLETE_ONBOARDING_STEP'; payload: string }
-    | { type: 'DISMISS_ONBOARDING' };
+    | { type: 'UPDATE_AULA'; payload: Partial<Aula> & { id: string } };
 
 // ── Reducer ──────────────────────────────────────────────────
 
@@ -79,22 +76,6 @@ function appReducer(state: AppState, action: AppAction): AppState {
             return { ...state, courses: [...state.courses, action.payload] };
 
         // ... existing cases ...
-
-        case 'COMPLETE_ONBOARDING_STEP':
-            if (state.onboarding.completedSteps.includes(action.payload)) return state;
-            return {
-                ...state,
-                onboarding: {
-                    ...state.onboarding,
-                    completedSteps: [...state.onboarding.completedSteps, action.payload],
-                },
-            };
-
-        case 'DISMISS_ONBOARDING':
-            return {
-                ...state,
-                onboarding: { ...state.onboarding, isDismissed: true },
-            };
 
         case 'UPDATE_COURSE':
             return {
@@ -238,7 +219,6 @@ const initialState: AppState = {
     conversations: [],
     communications: [],
     activityLog: [],
-    onboarding: { completedSteps: [], isDismissed: false },
 };
 
 // ── Context ──────────────────────────────────────────────────

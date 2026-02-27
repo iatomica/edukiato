@@ -26,13 +26,6 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
 
-  useEffect(() => {
-    if (user.role === 'ESTUDIANTE') {
-      dispatch({ type: 'COMPLETE_ONBOARDING_STEP', payload: 'check_schedule' });
-    } else if (user.role === 'DOCENTE') {
-      dispatch({ type: 'COMPLETE_ONBOARDING_STEP', payload: 'view_schedule' });
-    }
-  }, [user.role, dispatch]);
 
   const handleAttendance = (studentId: string, status: string) => {
     setAttendance(prev => ({ ...prev, [studentId]: status }));
@@ -51,10 +44,6 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
         records,
       },
     });
-
-    if (user.role === 'DOCENTE') {
-      dispatch({ type: 'COMPLETE_ONBOARDING_STEP', payload: 'take_attendance' });
-    }
 
     setAttendanceEvent(null);
     setAttendance({});

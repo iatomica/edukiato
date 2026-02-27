@@ -14,7 +14,6 @@ import { Institutions } from './components/Institutions';
 import Aulas from './components/Aulas';
 import { View } from './types';
 import { LanguageProvider } from './contexts/LanguageContext';
-import { TourProvider } from './contexts/TourContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { PermissionsProvider } from './contexts/PermissionsContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -135,9 +134,7 @@ const App: React.FC = () => {
         <PermissionsProvider>
           <ThemeProvider>
             <AppStateProvider>
-              <TourProvider>
-                <AppContent />
-              </TourProvider>
+              <AppContent />
             </AppStateProvider>
           </ThemeProvider>
         </PermissionsProvider>

@@ -6,7 +6,6 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTenantData } from '../hooks/useTenantData';
 import { Feed } from './Feed';
-import { OnboardingWidget } from './OnboardingWidget';
 import { FeedItem } from '../types';
 
 interface DashboardProps {
@@ -104,8 +103,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
           </div>
         </div>
 
-        {/* Onboarding Widget */}
-        <OnboardingWidget role={user.role} onViewChange={onViewChange} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content Area */}

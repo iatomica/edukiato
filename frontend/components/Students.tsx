@@ -548,7 +548,7 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
       // Intentar encontrar qué aula tiene asignada para mostrarla en su "programa"
       const assignedAula = aulas.find(a => a.id === n.aulaId);
       return {
-        id: `s_mapped_${n.id}`,
+        id: n.id,
         institutionId: n.institutionId,
         name: n.name,
         email: `${n.parentIds?.length || 0} Tutores vinculados`, // Usa el email como descriptivo
@@ -797,13 +797,7 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
         <div className="flex space-x-3">
           {can('manage', 'student') && (
             <>
-              <button
-                onClick={() => setIsAddModalOpen(true)}
-                className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 text-sm font-medium shadow-lg shadow-primary-200 transition-all hover:scale-105"
-              >
-                <Plus size={16} className="mr-2" />
-                Agregar Estudiante
-              </button>
+              {/* Botón Agregar Estudiante eliminado por solicitud */}
               <button
                 onClick={() => setIsCommModalOpen(true)}
                 className="flex items-center px-4 py-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800 text-sm font-medium shadow-lg shadow-slate-200 transition-all hover:scale-105"
@@ -874,12 +868,7 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
               <tr>
                 <th className="px-6 py-4">{activeTab === 'PADRES' ? 'Familiar' : t.students.table.student}</th>
                 <th className="px-6 py-4">{activeTab === 'PADRES' ? 'Alumnos' : t.students.table.program}</th>
-                {activeTab !== 'PADRES' && (
-                  <>
-                    <th className="px-6 py-4">{t.students.table.status}</th>
-                    <th className="px-6 py-4">{t.students.table.attendance}</th>
-                  </>
-                )}
+                {/* Columnas Estado y Asistencia eliminadas en tab Alumnos */}
                 <th className="px-6 py-4 text-right">{t.students.table.actions}</th>
               </tr>
             </thead>
@@ -918,59 +907,7 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
                         <span className="text-sm text-slate-700 font-medium">{student.program}</span>
                       )}
                     </td>
-                    {activeTab !== 'PADRES' && (
-                      <>
-                        <td className="px-6 py-4">
-                          {can('manage', 'student') ? (
-                            <select
-                              value={student.status}
-                              onClick={(e) => e.stopPropagation()}
-                              onChange={(e) => {
-                                const newStatus = e.target.value as any;
-                                const oldStatus = student.status;
-                                dispatch({ type: 'UPDATE_STUDENT', payload: { id: student.id, status: newStatus } });
-                                emitEvent({
-                                  type: 'STUDENT_STATUS_CHANGED',
-                                  payload: {
-                                    studentId: student.id,
-                                    studentName: student.name,
-                                    oldStatus,
-                                    newStatus,
-                                    changedBy: 'Admin', // In real app, get from auth.user.name
-                                  }
-                                });
-                              }}
-                              className={`text-xs font-medium rounded-full px-2 py-0.5 border-0 cursor-pointer focus:ring-2 focus:ring-offset-1 focus:ring-primary-200
-                              ${student.status === 'active' ? 'bg-emerald-100 text-emerald-800' :
-                                  student.status === 'on_leave' ? 'bg-amber-100 text-amber-800' :
-                                    'bg-slate-100 text-slate-800'}`}
-                            >
-                              <option value="active">{t.students.status.active}</option>
-                              <option value="inactive">{t.students.status.inactive}</option>
-                              <option value="on_leave">{t.students.status.on_leave}</option>
-                            </select>
-                          ) : (
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                            ${student.status === 'active' ? 'bg-emerald-100 text-emerald-800' :
-                                student.status === 'on_leave' ? 'bg-amber-100 text-amber-800' :
-                                  'bg-slate-100 text-slate-800'}`}>
-                              {t.students.status[student.status] || student.status}
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center">
-                            <div className="w-16 bg-slate-200 rounded-full h-1.5 mr-2">
-                              <div
-                                className={`h-1.5 rounded-full ${student.attendanceRate > 80 ? 'bg-emerald-500' : student.attendanceRate > 60 ? 'bg-amber-500' : 'bg-rose-500'}`}
-                                style={{ width: `${student.attendanceRate}%` }}
-                              ></div>
-                            </div>
-                            <span className="text-xs font-medium text-slate-600">{student.attendanceRate}%</span>
-                          </div>
-                        </td>
-                      </>
-                    )}
+                    {/* Celdas Estado y Asistencia eliminadas de tab Alumnos */}
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end space-x-2">
                         {student.role === 'PADRE' && activeTab === 'PADRES' ? (
@@ -985,20 +922,10 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
                         ) : (
                           <>
                             <button
-                              onClick={(e) => { e.stopPropagation(); setSelectedStudentForCert(student); }}
-                              className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-                              title="Generate Certificate"
-                            >
-                              <Award size={18} />
-                            </button>
-                            <button
                               onClick={(e) => { e.stopPropagation(); setSelectedStudentDetail(student); }}
                               className="p-1.5 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
                             >
                               <BookOpen size={18} />
-                            </button>
-                            <button className="p-1.5 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                              <MoreHorizontal size={18} />
                             </button>
                           </>
                         )}

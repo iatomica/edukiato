@@ -418,20 +418,7 @@ export interface Notification {
 
 export type View = 'dashboard' | 'courses' | 'students' | 'schedule' | 'classroom' | 'messages' | 'communications' | 'usuarios' | 'institutions' | 'aulas';
 
-// ── Onboarding ──────────────────────────────────────────────
 
-export interface OnboardingStep {
-  id: string;
-  title: string;
-  description: string;
-  targetView: View;
-  actionLabel: string;
-}
-
-export interface OnboardingProgress {
-  completedSteps: string[];
-  isDismissed: boolean;
-}
 
 export interface Payment {
   id: string;
