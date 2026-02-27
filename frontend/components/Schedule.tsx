@@ -261,6 +261,49 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
                 {weekDays.map((day, colIndex) => {
                   const dayEvents = visibleEvents.filter(e => isSameDay(e.start, day));
 
+                  // Google Calendar Overlapping Logic
+                  const sortedEvents = [...dayEvents].sort((a, b) => a.start.getTime() - b.start.getTime() || b.end.getTime() - a.end.getTime());
+                  const positionedEvents: { event: CalendarEvent, style: React.CSSProperties }[] = [];
+                  let currentCluster: CalendarEvent[] = [];
+                  let clusterEnd = 0;
+
+                  const processCluster = (cluster: CalendarEvent[]) => {
+                    const columns: number[] = [];
+                    cluster.forEach(ev => {
+                      let colIdx = 0;
+                      while (columns[colIdx] && columns[colIdx] > ev.start.getTime()) {
+                        colIdx++;
+                      }
+                      columns[colIdx] = ev.end.getTime();
+                      (ev as any)._colIdx = colIdx;
+                    });
+                    const numCols = columns.length;
+                    cluster.forEach(ev => {
+                      const colIdx = (ev as any)._colIdx;
+                      positionedEvents.push({
+                        event: ev,
+                        style: {
+                          ...getEventStyle(ev.start, ev.end),
+                          left: `calc(${(colIdx / numCols) * 100}% + 2px)`,
+                          width: `calc(${100 / numCols}% - 4px)`,
+                          zIndex: 10 + colIdx
+                        }
+                      });
+                    });
+                  };
+
+                  sortedEvents.forEach(event => {
+                    if (event.start.getTime() >= clusterEnd) {
+                      if (currentCluster.length > 0) processCluster(currentCluster);
+                      currentCluster = [event];
+                      clusterEnd = event.end.getTime();
+                    } else {
+                      currentCluster.push(event);
+                      clusterEnd = Math.max(clusterEnd, event.end.getTime());
+                    }
+                  });
+                  if (currentCluster.length > 0) processCluster(currentCluster);
+
                   return (
                     <div
                       key={colIndex}
@@ -270,12 +313,12 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
                       {canCreate && (
                         <div className="absolute inset-x-0 inset-y-0 opacity-0 group-hover:opacity-10 pointer-events-none bg-primary-600"></div>
                       )}
-                      {dayEvents.map(event => (
+                      {positionedEvents.map(({ event, style }) => (
                         <div
                           key={event.id}
                           onClick={(e) => { e.stopPropagation(); setViewingEvent(event); }}
-                          className={`absolute left-1 right-1 p-2 rounded-lg border-l-4 cursor-pointer hover:shadow-md transition-shadow overflow-hidden ${event.color}`}
-                          style={getEventStyle(event.start, event.end)}
+                          className={`absolute p-2 rounded-lg border-l-4 cursor-pointer hover:shadow-md transition-shadow overflow-hidden ${event.color}`}
+                          style={style}
                         >
                           <p className="text-[10px] leading-tight font-bold mb-0.5 opacity-80">
                             {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
