@@ -44,20 +44,29 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
     const [startTime, setStartTime] = useState(formatForTimeInput(initialStartDate));
     const [endTime, setEndTime] = useState(formatForTimeInput(initialEndDate));
 
-    // Generate 15-min intervals
-    const timeOptions = Array.from({ length: 24 * 4 }).map((_, i) => {
-        const hours = Math.floor(i / 4).toString().padStart(2, '0');
-        const mins = ((i % 4) * 15).toString().padStart(2, '0');
-        return `${hours}:${mins}`;
-    });
+    // Limit selection from 08:00 to 20:00
+    const timeOptions: string[] = [];
+    for (let h = 8; h <= 20; h++) {
+        for (let m = 0; m < 60; m += 15) {
+            if (h === 20 && m > 0) continue; // Termina clavado a las 20:00
+            timeOptions.push(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`);
+        }
+    }
 
     const isAdmin = currentUser.role === 'ADMIN_INSTITUCION' || currentUser.role === 'SUPER_ADMIN';
     const [type, setType] = useState<'class' | 'workshop' | 'event'>(initialData?.type || 'event');
     const [scope, setScope] = useState<'ALL' | 'COURSE' | 'AULA' | 'INDIVIDUAL'>(initialData?.sharedWith?.scope || (isAdmin ? 'ALL' : 'AULA'));
     const [targetIds, setTargetIds] = useState<string[]>(initialData?.sharedWith?.targetIds || []);
 
+    // Time validation mathematically
+    const parseMins = (timeStr: string) => {
+        const [h, m] = timeStr.split(':').map(Number);
+        return h * 60 + m;
+    };
+    const isTimeValid = parseMins(endTime) > parseMins(startTime);
+
     // Form validation check
-    const isFormValid = title.trim() !== '' && description.trim() !== '' && (scope === 'ALL' || targetIds.length > 0);
+    const isFormValid = title.trim() !== '' && description.trim() !== '' && (scope === 'ALL' || targetIds.length > 0) && isTimeValid;
 
     const userAulas = currentUser.role === 'DOCENTE' || currentUser.role === 'PADRE'
         ? aulas.filter(a => a.teachers?.includes(currentUser.id))
@@ -163,7 +172,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                                     onChange={(e) => setEndTime(e.target.value)}
                                     className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-200 focus:border-slate-400 outline-none transition-all text-slate-700 font-medium appearance-none"
                                 >
-                                    {timeOptions.map(t => <option key={t} value={t}>{t}</option>)}
+                                    {timeOptions.filter(t => parseMins(t) > parseMins(startTime)).map(t => <option key={t} value={t}>{t}</option>)}
                                 </select>
                             </div>
                         </div>

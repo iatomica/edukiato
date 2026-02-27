@@ -73,7 +73,7 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
   };
 
   // Helper arrays
-  const hours = Array.from({ length: 14 }).map((_, i) => i + 8); // 8 AM to 9 PM
+  const hours = Array.from({ length: 13 }).map((_, i) => i + 8); // 8 AM to 8 PM
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
