@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { User, UserRole, Nino } from '../types';
-import { Search, Plus, UserPlus, X, Mail, Shield, Users as UsersIcon, GraduationCap, Edit, Key, Book } from 'lucide-react';
+import { Search, Plus, UserPlus, X, Mail, Shield, Users as UsersIcon, GraduationCap, Edit, Key, Book, User as UserIconLine, ShieldAlert, BookOpen, Award, MessageSquare } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useAppState } from '../contexts/AppStateContext';
 import { usersApi } from '../services/api';
+import Modal from './Modal';
+import { AnimatedAvatar } from './AnimatedAvatar';
 
 export const Usuarios: React.FC = () => {
     const { user: currentUser, currentInstitution, token } = useAuth();
@@ -15,6 +17,11 @@ export const Usuarios: React.FC = () => {
     // User Edit State
     const [editUser, setEditUser] = useState<User | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+    // Alumno Edit/Profile State
+    const [editNino, setEditNino] = useState<Nino | null>(null);
+    const [selectedNinoProfile, setSelectedNinoProfile] = useState<Nino | null>(null);
+    const [activeDetailTab, setActiveDetailTab] = useState<'INFO' | 'ACADEMIC' | 'COMMUNICATIONS'>('INFO');
 
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'INSTITUCIONAL' | 'PADRES' | 'ALUMNOS'>('INSTITUCIONAL');
@@ -84,6 +91,46 @@ export const Usuarios: React.FC = () => {
             setIsSavingNino(false);
             setCreatedNinoConfirmation(newNino);
         }, 1200);
+    };
+
+    const handleEditNino = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!editNino) return;
+
+        const formData = new FormData(e.currentTarget);
+        const name = formData.get('name') as string;
+        const gender = formData.get('gender') as 'MASCULINO' | 'FEMENINO';
+        const birthDate = formData.get('birthDate') as string;
+        const allergiesStr = formData.get('allergies') as string;
+        const allergies = allergiesStr ? allergiesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+        const parentIds = Array.from(formData.getAll('parentIds')) as string[];
+        const aulaId = formData.get('aulaId') as string;
+
+        if (parentIds.length === 0) {
+            alert('Debe seleccionar al menos un familiar o tutor responsable.');
+            return;
+        }
+
+        setIsSavingNino(true);
+
+        const updatedNino: Nino = {
+            ...editNino,
+            name,
+            gender,
+            birthDate,
+            allergies,
+            aulaId,
+            parentIds,
+        };
+
+        // Simulate network API delay
+        setTimeout(() => {
+            dispatch({ type: 'UPDATE_NINO' as any, payload: updatedNino as any }); // Types need to support UPDATE_NINO globally, mock for now
+            // Update local state by forcing a mock until context is wired
+            state.ninos = state.ninos.map(n => n.id === updatedNino.id ? updatedNino : n);
+            setIsSavingNino(false);
+            setEditNino(null);
+        }, 800);
     };
 
     const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -323,9 +370,22 @@ export const Usuarios: React.FC = () => {
                                             {aula?.name || 'Sin Sala'}
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <button className="text-slate-400 p-2 rounded-full hover:bg-slate-100 hover:text-primary-600 transition-colors">
-                                                <Book size={18} />
-                                            </button>
+                                            <div className="flex items-center justify-end gap-2">
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setEditNino(n); }}
+                                                    className="text-slate-400 p-2 rounded-full hover:bg-slate-100 hover:text-primary-600 transition-colors"
+                                                    title="Editar Estudiante"
+                                                >
+                                                    <Edit size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setSelectedNinoProfile(n); }}
+                                                    className="text-slate-400 p-2 rounded-full hover:bg-slate-100 hover:text-primary-600 transition-colors"
+                                                    title="Ver Ficha Académica"
+                                                >
+                                                    <UserIconLine size={18} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 );
@@ -450,6 +510,128 @@ export const Usuarios: React.FC = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Nino Modal */}
+            {editNino && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-scale-in flex flex-col max-h-[90vh]">
+                        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
+                            <h2 className="text-xl font-bold flex items-center text-slate-800 tracking-tight">
+                                <GraduationCap className="mr-3 text-primary-500" /> Editar Estudiante
+                            </h2>
+                            <button onClick={() => { setEditNino(null); }} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200 transition-colors relative z-10">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+                            <form id="edit-nino-form" onSubmit={handleEditNino} className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-700">Nombre Completo <span className="text-rose-500">*</span></label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            defaultValue={editNino.name}
+                                            required
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 transition-all outline-none font-medium"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-700">Género <span className="text-rose-500">*</span></label>
+                                        <select
+                                            name="gender"
+                                            defaultValue={editNino.gender}
+                                            required
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 transition-all outline-none font-medium appearance-none"
+                                        >
+                                            <option value="MASCULINO">Masculino</option>
+                                            <option value="FEMENINO">Femenino</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-700">Fecha de Nacimiento <span className="text-rose-500">*</span></label>
+                                        <input
+                                            type="date"
+                                            name="birthDate"
+                                            defaultValue={editNino.birthDate}
+                                            required
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 transition-all outline-none font-medium text-slate-600"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-700">Alergias / Consideraciones Médicas</label>
+                                        <input
+                                            type="text"
+                                            name="allergies"
+                                            defaultValue={editNino.allergies?.join(', ')}
+                                            placeholder="Maní, Penicilina (Separado por comas)"
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 transition-all outline-none text-sm placeholder:text-slate-400"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2 md:col-span-2">
+                                        <label className="text-sm font-bold text-slate-700">Sala / Aula Asignada <span className="text-rose-500">*</span></label>
+                                        <select
+                                            name="aulaId"
+                                            defaultValue={editNino.aulaId}
+                                            required
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 transition-all outline-none font-medium text-slate-700 appearance-none"
+                                        >
+                                            <option value="" disabled>Seleccionar Aula...</option>
+                                            {state.aulas.map(a => (
+                                                <option key={a.id} value={a.id}>{a.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-3 md:col-span-2">
+                                        <div className="flex justify-between items-end">
+                                            <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                                <UsersIcon size={16} className="text-slate-400" />
+                                                Grupo Familiar Vinculado <span className="text-rose-500">*</span>
+                                            </label>
+                                            <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200">Máx 5 familiares</span>
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar bg-white p-3 border border-slate-200 rounded-xl">
+                                            {users.filter(u => u.role === 'PADRE').map(padre => (
+                                                <label key={padre.id} className="flex items-center space-x-3 p-3 rounded-lg border border-slate-100 hover:bg-slate-50 hover:border-slate-200 cursor-pointer transition-colors group">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="parentIds"
+                                                        value={padre.id}
+                                                        defaultChecked={editNino.parentIds?.includes(padre.id)}
+                                                        className="w-4 h-4 text-primary-600 rounded border-slate-300 focus:ring-primary-600 focus:ring-opacity-25 transition-colors cursor-pointer"
+                                                    />
+                                                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900 truncate">
+                                                        {padre.name}
+                                                    </span>
+                                                </label>
+                                            ))}
+                                            {users.filter(u => u.role === 'PADRE').length === 0 && (
+                                                <div className="col-span-1 sm:col-span-2 p-4 text-center text-sm text-slate-500 flex flex-col items-center">
+                                                    <ShieldAlert size={20} className="text-rose-400 mb-2" />
+                                                    No hay usuarios con perfil "Familia/Madre/Padre" registrados en el sistema. Debe crear el usuario del familiar primero.
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end space-x-3 shrink-0">
+                            <button type="button" onClick={() => setEditNino(null)} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700 transition-colors">Cancelar</button>
+                            <button
+                                type="submit"
+                                form="edit-nino-form"
+                                disabled={isSavingNino}
+                                className={`px-6 py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-200 flex items-center ${isSavingNino ? 'opacity-70 cursor-wait' : ''}`}
+                            >
+                                {isSavingNino ? 'Guardando...' : 'Guardar Cambios'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -585,6 +767,115 @@ export const Usuarios: React.FC = () => {
                     </div>
                 </div>
             )}
+            {/* Profile (Ficha) Nino Modal */}
+            <Modal
+                isOpen={!!selectedNinoProfile}
+                onClose={() => {
+                    setSelectedNinoProfile(null);
+                    setActiveDetailTab('INFO');
+                }}
+                title={activeDetailTab === 'INFO' ? "" : "Perfil de Alumno"}
+                size="lg"
+            >
+                {selectedNinoProfile && (
+                    <div className="flex flex-col h-full bg-slate-50 rounded-2xl overflow-hidden -m-6 animate-fade-in relative z-10 border border-slate-200 shadow-xl">
+                        {/* Header Banner */}
+                        <div className="bg-slate-900 text-white p-6 md:p-8 relative overflow-hidden shrink-0">
+                            <div className="absolute top-0 right-0 p-32 bg-primary-500/10 rounded-full transform translate-x-10 -translate-y-10 blur-3xl"></div>
+                            <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
+                                <AnimatedAvatar gender={selectedNinoProfile.gender} className="w-24 h-24 rounded-full border-4 border-white/20 shadow-xl" />
+                                <div className="flex-1">
+                                    <h2 className="text-3xl font-black">{selectedNinoProfile.name}</h2>
+                                    <p className="text-slate-300 font-medium mt-1 mb-3">Asignado a: <span className="font-bold">{state.aulas.find(a => a.id === selectedNinoProfile.aulaId)?.name || 'Sin Sala'}</span></p>
+                                    <div className="flex space-x-2 justify-center sm:justify-start">
+                                        <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase bg-white/20 text-white`}>Estudiante</span>
+                                        <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${selectedNinoProfile.attendanceRate && selectedNinoProfile.attendanceRate < 80 ? 'bg-amber-500' : 'bg-emerald-500'}`}>Activo</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Tabs */}
+                        <div className="flex border-b border-slate-200 bg-white sticky top-0 z-20 shadow-sm shrink-0">
+                            {[
+                                { id: 'INFO', label: 'Info & Contacto', icon: UserIconLine },
+                                { id: 'ACADEMIC', label: 'Académico', icon: Award },
+                                { id: 'COMMUNICATIONS', label: 'Comunicados', icon: BookOpen },
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveDetailTab(tab.id as any)}
+                                    className={`flex-1 flex items-center justify-center py-4 text-sm font-bold border-b-2 transition-colors ${activeDetailTab === tab.id ? 'border-primary-600 text-primary-700 bg-primary-50/50' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+                                >
+                                    <tab.icon size={18} className="mr-2" />
+                                    <span className="hidden sm:inline">{tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Tabs Content */}
+                        <div className="p-6 md:p-8 flex-1 overflow-y-auto space-y-6 max-h-[60vh] custom-scrollbar bg-slate-50">
+                            {activeDetailTab === 'INFO' && (
+                                <div className="space-y-6 animate-fade-in">
+                                    <div className="bg-rose-50 border border-rose-100 rounded-xl p-5 shadow-sm">
+                                        <h3 className="text-rose-800 font-black mb-2 flex items-center gap-2 tracking-tight">
+                                            <ShieldAlert size={18} /> Historial Médico y Alergias
+                                        </h3>
+                                        <p className="text-rose-700 text-sm leading-relaxed font-medium">
+                                            {selectedNinoProfile.allergies?.join(', ') || 'No se registraron condiciones médicas particulares o alergias.'}
+                                        </p>
+                                    </div>
+                                    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                                        <h3 className="font-black text-slate-800 p-5 border-b border-slate-100 flex items-center gap-2 tracking-tight text-lg bg-slate-50">
+                                            <UsersIcon size={20} className="text-primary-500" /> Familia / Tutores Responsables
+                                        </h3>
+                                        <div className="divide-y divide-slate-100">
+                                            {selectedNinoProfile.parentIds?.map((pId) => {
+                                                const parentUser = users.find(u => u.id === pId);
+                                                return (
+                                                    <div key={pId} className="p-5 flex flex-col sm:flex-row items-center justify-between hover:bg-slate-50 transition-colors gap-4">
+                                                        <div className="flex items-center gap-4 text-center sm:text-left w-full sm:w-auto">
+                                                            <div className="w-12 h-12 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-lg shadow-inner border border-primary-200 shrink-0">
+                                                                {parentUser ? parentUser.name.charAt(0).toUpperCase() : pId.charAt(2).toUpperCase()}
+                                                            </div>
+                                                            <div className="min-w-0">
+                                                                <p className="font-bold text-slate-800 text-base truncate">{parentUser ? parentUser.name : 'Familiar Vinculado'}</p>
+                                                                <p className="text-sm text-slate-500 font-medium truncate">ID: <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-xs border border-slate-200">{pId}</span></p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-2 mt-2 sm:mt-0 shrink-0">
+                                                            <button onClick={() => alert('Mensajería no soportada en esta vista aún.')} className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-slate-900 transition-all hover:-translate-y-0.5">
+                                                                <MessageSquare size={16} /> Contactar
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                            {(!selectedNinoProfile.parentIds || selectedNinoProfile.parentIds.length === 0) && (
+                                                <div className="p-6 text-center text-slate-500 italic">No hay familiares vinculados.</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            {activeDetailTab === 'ACADEMIC' && (
+                                <div className="animate-fade-in p-8 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-white">
+                                    <Award size={48} className="mx-auto text-slate-300 mb-4" />
+                                    <h3 className="text-lg font-bold text-slate-700 mb-1">Módulo Académico</h3>
+                                    <p className="text-slate-500 max-w-sm mx-auto">La emisión de notas e informes está disponible a través de la pestaña Académico dentro del Aula específica del estudiante.</p>
+                                </div>
+                            )}
+                            {activeDetailTab === 'COMMUNICATIONS' && (
+                                <div className="animate-fade-in p-8 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-white">
+                                    <BookOpen size={48} className="mx-auto text-slate-300 mb-4" />
+                                    <h3 className="text-lg font-bold text-slate-700 mb-1">Cuaderno de Comunicados</h3>
+                                    <p className="text-slate-500 max-w-sm mx-auto">El historial de mensajes enviados a esta familia se mostrará aquí próximamente.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </Modal>
         </div>
     );
 };
