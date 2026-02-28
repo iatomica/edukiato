@@ -807,14 +807,6 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
               </button>
             </>
           )}
-
-          <button
-            id="tour-students-export"
-            className="hidden md:flex items-center px-4 py-2 text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-medium"
-          >
-            <Download size={16} className="mr-2" />
-            {t.students.export}
-          </button>
         </div>
       </div>
 

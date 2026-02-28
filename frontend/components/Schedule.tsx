@@ -64,11 +64,15 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
     const startMinute = start.getMinutes();
     const durationMinutes = (end.getTime() - start.getTime()) / 60000;
 
-    const topOffset = (startHour - 8) * 60 + startMinute;
-    // Minimum valid height and top 
+    const totalMinutesDay = 13 * 60; // 8 AM to 8 PM (13 hours)
+    const minutesFrom8AM = (startHour - 8) * 60 + startMinute;
+
+    const topPercent = (minutesFrom8AM / totalMinutesDay) * 100;
+    const heightPercent = (durationMinutes / totalMinutesDay) * 100;
+
     return {
-      top: `${Math.max(0, topOffset)}px`,
-      height: `${Math.max(20, durationMinutes)}px` // at least 20px so it's clickable
+      top: `${Math.max(0, topPercent)}%`,
+      height: `${Math.max(2, heightPercent)}%` // at least 2% so it's clickable
     };
   };
 
@@ -148,8 +152,11 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const y = e.clientY - rect.top;
 
-    // Grid starts at 8AM, every 60px is 1 hour
-    const totalMinutes = y; // Since 1px = 1 min
+    // Grid spans 13 hours (8 AM to 8 PM) over the total height
+    const percentageY = y / rect.height;
+    const totalMinutesDay = 13 * 60;
+    const totalMinutes = percentageY * totalMinutesDay;
+
     const hoursFrom8AM = Math.floor(totalMinutes / 60);
     const startHour = 8 + Math.max(0, hoursFrom8AM);
 
@@ -225,12 +232,12 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto flex">
+          <div className="flex-1 overflow-hidden flex h-full">
             {/* Time Column Sidebar */}
-            <div className="w-16 shrink-0 bg-white border-r border-slate-200 flex flex-col pt-2 relative z-10" style={{ height: `${hours.length * 60}px` }}>
+            <div className="w-16 shrink-0 bg-white border-r border-slate-200 flex flex-col pt-2 relative z-10 h-full">
               {hours.map((hour) => (
-                <div key={hour} className="h-[60px] relative">
-                  <span className="absolute -top-3 right-2 text-xs font-semibold text-slate-400">
+                <div key={hour} className="flex-1 relative">
+                  <span className="absolute top-0 right-2 text-[10px] md:text-xs font-semibold text-slate-400 -translate-y-1/2">
                     {hour.toString().padStart(2, '0')}:00
                   </span>
                 </div>
@@ -238,12 +245,12 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
             </div>
 
             {/* Grid Container */}
-            <div className="flex-1 relative bg-white" style={{ height: `${hours.length * 60}px` }}>
+            <div className="flex-1 relative bg-white h-full flex flex-col">
 
               {/* Horizontal Hour Lines Background */}
-              <div className="absolute inset-x-0 inset-y-0 pointer-events-none">
+              <div className="absolute inset-x-0 inset-y-0 pointer-events-none flex flex-col">
                 {hours.map((hour) => (
-                  <div key={hour} className="h-[60px] border-b border-slate-100"></div>
+                  <div key={hour} className="flex-1 border-b border-slate-100"></div>
                 ))}
               </div>
 
@@ -251,13 +258,13 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
               {isSameDay(today, new Date()) && getHours(currentTime) >= 8 && getHours(currentTime) <= 21 && (
                 <div
                   className="absolute inset-x-0 border-t-2 border-rose-500 z-20 pointer-events-none opacity-80"
-                  style={{ top: `${(getHours(currentTime) - 8) * 60 + currentTime.getMinutes()}px` }}
+                  style={{ top: `${(((getHours(currentTime) - 8) * 60 + currentTime.getMinutes()) / (13 * 60)) * 100}%` }}
                 >
                   <div className="w-2 h-2 rounded-full bg-rose-500 absolute -top-[5px] -left-1"></div>
                 </div>
               )}
 
-              <div className="grid grid-cols-5 h-full relative z-10">
+              <div className="flex-1 grid grid-cols-5 relative z-10">
                 {weekDays.map((day, colIndex) => {
                   const dayEvents = visibleEvents.filter(e => isSameDay(e.start, day));
 

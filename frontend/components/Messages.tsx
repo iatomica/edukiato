@@ -243,10 +243,10 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
   };
 
   return (
-    <div className="flex h-[calc(100vh-140px)] bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+    <div className="flex h-[calc(100vh-140px)] sm:h-[calc(100vh-140px)] bg-white border border-slate-200 rounded-none sm:rounded-2xl shadow-sm overflow-hidden relative">
       {/* Sidebar Directory List */}
-      <div className="w-80 border-r border-slate-200 flex flex-col bg-slate-50/50">
-        <div className="p-4 border-b border-slate-200">
+      <div className={`w-full md:w-80 border-r border-slate-200 flex flex-col bg-slate-50/50 absolute md:relative inset-0 z-20 md:z-auto transition-transform ${selectedUserId ? '-translate-x-full md:translate-x-0 hidden md:flex' : 'translate-x-0 flex'}`}>
+        <div className="p-4 border-b border-slate-200 bg-white md:bg-transparent">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-slate-900">Mensajes</h2>
           </div>
@@ -371,20 +371,29 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
 
       {/* Chat Area */}
       {selectedUser ? (
-        <div className="flex-1 flex flex-col bg-white">
+        <div className={`flex-1 flex col bg-white ${selectedUserId ? 'w-full flex-col' : 'hidden md:flex flex-col'}`}>
           {/* Chat Header */}
-          <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white z-10">
+          <div className="px-4 md:px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white z-10 sticky top-0">
             <div className="flex items-center">
-              <img src={selectedUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}`} className="w-10 h-10 object-cover mr-4 rounded-full border border-slate-200" alt="" />
-              <div>
-                <h3 className="font-bold text-slate-800">
+              {/* Mobile Back Button */}
+              <button
+                onClick={() => setSelectedUserId(null)}
+                className="md:hidden mr-3 p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors"
+                title="Volver a lista de chats"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-left"><path d="m15 18-6-6 6-6" /></svg>
+              </button>
+
+              <img src={selectedUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}`} className="w-10 h-10 object-cover mr-3 md:mr-4 rounded-full border border-slate-200" alt="" />
+              <div className="min-w-0">
+                <h3 className="font-bold text-slate-800 truncate">
                   {selectedUser.role === 'PADRE' && state.ninos.filter(n => n.parentIds?.includes(selectedUser.id)).length > 0
                     ? `Familia de ${state.ninos.filter(n => n.parentIds?.includes(selectedUser.id)).map(k => k.name.split(' ')[0]).join(', ')} (${selectedUser.name})`
                     : selectedUser.name}
                 </h3>
-                <div className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
-                  <span className={`px-1.5 rounded font-medium ${getRoleBadgeColor(selectedUser.role)}`}>{getRoleLabel(selectedUser.role)}</span>
-                  <span className="flex items-center"><Mail size={10} className="mr-1" /> {selectedUser.email}</span>
+                <div className="text-[10px] md:text-xs text-slate-500 flex items-center gap-1.5 md:gap-2 mt-0.5 whitespace-nowrap overflow-x-auto custom-scrollbar pb-0.5">
+                  <span className={`px-1.5 py-0.5 rounded font-medium ${getRoleBadgeColor(selectedUser.role)}`}>{getRoleLabel(selectedUser.role)}</span>
+                  <span className="flex items-center"><Mail size={10} className="mr-1 hidden sm:inline" /> <span className="truncate max-w-[120px] sm:max-w-max">{selectedUser.email}</span></span>
                 </div>
               </div>
             </div>
@@ -477,7 +486,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
               <button
                 type="submit"
                 disabled={!inputText.trim() && !selectedFile}
-                className="p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="p-2 md:p-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0"
               >
                 <Send size={18} />
               </button>
@@ -485,7 +494,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col items-center justify-center text-slate-400 bg-slate-50/30">
+        <div className="hidden md:flex flex-1 flex-col items-center justify-center text-slate-400 bg-slate-50/30 w-full">
           <div className="w-20 h-20 bg-white shadow-sm border border-slate-100 rounded-full flex items-center justify-center mb-6">
             <UsersIcon size={32} className="text-slate-300" />
           </div>
