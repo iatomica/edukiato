@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Home, BookOpen, Users, Calendar, Settings, LogOut, Menu, Bell, MessageSquare, Globe, Info, Building2, ChevronDown, FileText, GraduationCap, X } from 'lucide-react';
+import { Home, BookOpen, Users, Calendar, Settings, LogOut, Menu, Bell, MessageSquare, Globe, Info, Building2, ChevronDown, FileText, GraduationCap, X, Send } from 'lucide-react';
 import { View, User } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
 import { usePermissions } from '../contexts/PermissionsContext';
@@ -102,12 +102,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
 
       {/* Mobile Header */}
-      <div className="md:hidden bg-white border-b border-slate-200 p-4 flex justify-between items-center sticky top-0 z-20">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">{theme.institutionName.charAt(0)}</div>
-          <span className="font-bold text-slate-800 text-lg">{theme.institutionName}</span>
+      <div className="md:hidden bg-white border-b border-slate-200 p-4 flex justify-between items-center sticky top-0 z-20 gap-4">
+        <div className="flex items-center space-x-2 min-w-0 flex-1">
+          <div className="w-8 h-8 shrink-0 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">{theme.institutionName.charAt(0)}</div>
+          <span className="font-bold text-slate-800 text-lg truncate leading-tight">{theme.institutionName}</span>
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 shrink-0">
           <button className="relative p-2 text-slate-600" onClick={() => setIsNotifOpen(!isNotifOpen)}>
             <Bell size={24} />
             {unreadCount > 0 && <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>}
@@ -131,11 +131,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
           </button>
         )}
 
-        <div className={`p-6 md:p-8 flex items-center w-full relative ${isDesktopCollapsed ? 'justify-center' : 'space-x-3'}`}>
-          <div className="w-9 h-9 min-w-[36px] bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex flex-shrink-0 items-center justify-center text-white text-xl shadow-lg shadow-primary-200">
-            🛫
+        <div className={`p-6 md:p-8 flex items-center w-full relative min-w-0 ${isDesktopCollapsed ? 'justify-center' : 'space-x-3'}`}>
+          <div className="w-9 h-9 min-w-[36px] bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex flex-shrink-0 items-center justify-center text-white shadow-lg shadow-primary-200">
+            <Send size={18} className="translate-x-[-1px] translate-y-[1px]" />
           </div>
-          <span className={`font-bold text-slate-800 text-xl tracking-tight transition-all duration-300 whitespace-nowrap ${isDesktopCollapsed ? 'w-0 opacity-0 overflow-hidden' : 'w-auto opacity-100'}`}>{theme.institutionName}</span>
+          <span title={theme.institutionName} className={`font-bold text-slate-800 text-lg tracking-tight transition-all duration-300 ${isDesktopCollapsed ? 'w-0 opacity-0 overflow-hidden' : 'flex-1 opacity-100 truncate'}`}>{theme.institutionName}</span>
 
           <button
             onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
