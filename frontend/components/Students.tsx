@@ -389,7 +389,7 @@ const NotebookView = ({ communications }: { communications: Communication[] }) =
   );
 };
 
-const StudentDetail = ({ student, onClose, communications, aulas, ninos }: { student: Student, onClose: () => void, communications: Communication[], aulas: Aula[], ninos: Nino[] }) => {
+const StudentDetail = ({ student, onClose, communications, aulas, ninos, allUsers, onViewChange, onOpenComm }: { student: Student, onClose: () => void, communications: Communication[], aulas: Aula[], ninos: Nino[], allUsers: User[], onViewChange?: (view: any, params?: any) => void, onOpenComm?: (recipientId: string) => void }) => {
   const [activeTab, setActiveTab] = useState<'INFO' | 'ACADEMIC' | 'COMMUNICATIONS'>('INFO');
 
   // Filter comms for this student
@@ -466,44 +466,60 @@ const StudentDetail = ({ student, onClose, communications, aulas, ninos }: { stu
       {/* Content */}
       <div className="p-8 flex-1 overflow-y-auto bg-slate-50/50">
         {activeTab === 'INFO' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in">
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-              <h3 className="font-bold text-slate-800 mb-4 flex items-center">
-                <User size={18} className="mr-2 text-primary-500" /> Datos Personales
+          <div className="animate-fade-in space-y-6">
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+              <h3 className="font-black text-slate-800 p-5 border-b border-slate-100 flex items-center gap-2 tracking-tight text-lg bg-slate-50">
+                <Users size={20} className="text-primary-500" /> Familia / Tutores Responsables
               </h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-3 gap-2 text-sm">
-                  <span className="text-slate-500">Fecha Nacimiento</span>
-                  <span className="col-span-2 font-medium text-slate-800">12 Feb 2005</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2 text-sm">
-                  <span className="text-slate-500">Teléfono</span>
-                  <span className="col-span-2 font-medium text-slate-800">+1 234 567 890</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2 text-sm">
-                  <span className="text-slate-500">Dirección</span>
-                  <span className="col-span-2 font-medium text-slate-800">123 Calle Principal, Ciudad</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-              <h3 className="font-bold text-slate-800 mb-4 flex items-center">
-                <Users size={18} className="mr-2 text-primary-500" /> Información de Padres / Contacto
-              </h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-3 gap-2 text-sm">
-                  <span className="text-slate-500">Padre/Tutor</span>
-                  <span className="col-span-2 font-medium text-slate-800">Carlos Chen</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2 text-sm">
-                  <span className="text-slate-500">Email Contacto</span>
-                  <span className="col-span-2 font-medium text-slate-800">carlos.c@example.com</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2 text-sm">
-                  <span className="text-slate-500">Teléfono Emergencia</span>
-                  <span className="col-span-2 font-medium text-slate-800">+1 555 000 000</span>
-                </div>
+              <div className="divide-y divide-slate-100">
+                {(() => {
+                  const actualNino = ninos.find(n => n.id === student.id);
+                  if (!actualNino || !actualNino.parentIds || actualNino.parentIds.length === 0) {
+                    return (
+                      <div className="p-8 text-center text-slate-500 font-medium">
+                        No hay familiares vinculados a este alumno.
+                      </div>
+                    );
+                  }
+                  return actualNino.parentIds.map((pId) => {
+                    const parentUser = allUsers.find(u => u.id === pId);
+                    return (
+                      <div key={pId} className="p-5 flex flex-col sm:flex-row items-center justify-between hover:bg-slate-50 transition-colors gap-4">
+                        <div className="flex items-center gap-4 text-center sm:text-left w-full sm:w-auto">
+                          <div className="w-12 h-12 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-lg shadow-inner border border-primary-200 shrink-0">
+                            {parentUser ? parentUser.name.charAt(0).toUpperCase() : pId.charAt(2).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-800 text-base truncate">{parentUser ? parentUser.name : 'Familiar Vinculado'}</p>
+                            <p className="text-sm text-slate-500 font-medium truncate">ID: <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-xs border border-slate-200">{pId}</span></p>
+                          </div>
+                        </div>
+                        <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-2 mt-2 sm:mt-0 shrink-0">
+                          <button
+                            onClick={() => {
+                              if (onViewChange) {
+                                onViewChange('messages', { targetUserId: pId });
+                              }
+                            }}
+                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-slate-900 transition-all hover:-translate-y-0.5"
+                          >
+                            <MessageSquare size={16} /> Contactar
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (onOpenComm) {
+                                onOpenComm(pId);
+                              }
+                            }}
+                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-black transition-all hover:-translate-y-0.5"
+                          >
+                            <Send size={16} /> Comunicado
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
               </div>
             </div>
           </div>
@@ -529,6 +545,7 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
   const [selectedStudentForCert, setSelectedStudentForCert] = useState<Student | null>(null);
   const [selectedStudentDetail, setSelectedStudentDetail] = useState<Student | null>(null);
   const [isCommModalOpen, setIsCommModalOpen] = useState(false);
+  const [commModalParams, setCommModalParams] = useState<any>(initialCommParams || null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'LIST' | 'NOTEBOOK'>(initialViewMode);
   const { user, currentInstitution, token } = useAuth();
@@ -740,6 +757,16 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
         communications={communications}
         aulas={aulas}
         ninos={ninos}
+        allUsers={students}
+        onViewChange={onViewChange}
+        onOpenComm={(recipientId) => {
+          setCommModalParams({
+            type: 'NOTIFICACION_INDIVIDUAL',
+            isLocked: true,
+            recipientIds: [recipientId]
+          });
+          setIsCommModalOpen(true);
+        }}
       />
     );
   }
@@ -947,9 +974,9 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
             user={user}
             ninos={ninos}
             onSend={handleSendCommunication}
-            initialType={initialCommParams?.type}
-            isTypeLocked={initialCommParams?.isLocked}
-            initialRecipientIds={initialCommParams?.recipientIds}
+            initialType={commModalParams?.type}
+            isTypeLocked={commModalParams?.isLocked}
+            initialRecipientIds={commModalParams?.recipientIds}
           />
         )
       }

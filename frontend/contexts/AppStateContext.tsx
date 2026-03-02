@@ -63,7 +63,9 @@ type AppAction =
     | { type: 'UPDATE_CONVERSATION'; payload: Partial<Conversation> & { id: string } }
     | { type: 'LOG_ACTIVITY'; payload: ActivityEntry }
     | { type: 'ENROLL_STUDENT'; payload: { courseId: string; studentId: string } }
-    | { type: 'UPDATE_AULA'; payload: Partial<Aula> & { id: string } };
+    | { type: 'ADD_AULA'; payload: Aula }
+    | { type: 'UPDATE_AULA'; payload: Partial<Aula> & { id: string } }
+    | { type: 'DELETE_AULA'; payload: { id: string } };
 
 // ── Reducer ──────────────────────────────────────────────────
 
@@ -85,6 +87,15 @@ function appReducer(state: AppState, action: AppAction): AppState {
                 ),
             };
 
+        case 'ADD_AULA': {
+            const newAulasList = [...state.aulas, action.payload];
+            try { localStorage.setItem('MOCK_AULAS', JSON.stringify(newAulasList)); } catch (e) { }
+            return {
+                ...state,
+                aulas: newAulasList,
+            };
+        }
+
         case 'UPDATE_AULA': {
             const updatedAulas = state.aulas.map(a =>
                 a.id === action.payload.id ? { ...a, ...action.payload } : a
@@ -93,6 +104,24 @@ function appReducer(state: AppState, action: AppAction): AppState {
             return {
                 ...state,
                 aulas: updatedAulas,
+            };
+        }
+
+        case 'DELETE_AULA': {
+            const reducedAulas = state.aulas.filter(a => a.id !== action.payload.id);
+            const updatedNinos = state.ninos.map(n =>
+                n.aulaId === action.payload.id ? { ...n, aulaId: '' } : n
+            );
+
+            try {
+                localStorage.setItem('MOCK_AULAS', JSON.stringify(reducedAulas));
+                localStorage.setItem('MOCK_NINOS', JSON.stringify(updatedNinos));
+            } catch (e) { }
+
+            return {
+                ...state,
+                aulas: reducedAulas,
+                ninos: updatedNinos
             };
         }
 

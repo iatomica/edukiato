@@ -36,6 +36,10 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
     const [teacherAssignConfirm, setTeacherAssignConfirm] = useState<{ aulaId: string, docente: User, action: 'ASSIGN' | 'UNASSIGN' } | null>(null);
     const [isProcessingTeacher, setIsProcessingTeacher] = useState(false);
 
+    // Add/Delete Aula States
+    const [isAddAulaModalOpen, setIsAddAulaModalOpen] = useState(false);
+    const [deleteAulaConfirm, setDeleteAulaConfirm] = useState<string | null>(null);
+
     const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN_INSTITUCION';
 
     useEffect(() => {
@@ -47,14 +51,28 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
     // Filter Aulas based on user role
     const accessibleAulas = useMemo(() => {
         if (!user) return [];
+        let baseAulas: Aula[] = [];
         if (isAdmin) {
-            return state.aulas;
+            baseAulas = state.aulas;
+        } else if (user.role === 'DOCENTE') {
+            baseAulas = state.aulas.filter(a => a.teachers.includes(user.id));
         }
-        if (user.role === 'DOCENTE') {
-            return state.aulas.filter(a => a.teachers.includes(user.id));
+
+        const unassignedCount = state.ninos.filter(n => !n.aulaId || n.aulaId === '').length;
+        if (isAdmin && unassignedCount > 0) {
+            return [...baseAulas, {
+                id: 'unassigned',
+                institutionId: currentInstitution?.id || '',
+                name: '⚠️ Alumnos Sin Asignar',
+                capacity: 0,
+                teachers: [],
+                assistants: [],
+                color: 'bg-slate-100 text-slate-700 border-slate-300'
+            }];
         }
-        return [];
-    }, [state.aulas, user, isAdmin]);
+
+        return baseAulas;
+    }, [state.aulas, user, isAdmin, state.ninos, currentInstitution]);
 
     // View: specific Aula Detail
     const activeAula = useMemo(() => accessibleAulas.find(a => a.id === selectedAulaId), [accessibleAulas, selectedAulaId]);
@@ -110,9 +128,20 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
     if (!selectedAulaId) {
         return (
             <div className="space-y-6">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Dashboard de Aulas</h1>
-                    <p className="text-slate-500 text-sm mt-1">Selecciona una de tus salas asignadas para ver el listado de alumnos.</p>
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900">Dashboard de Aulas</h1>
+                        <p className="text-slate-500 text-sm mt-1">Selecciona una de tus salas asignadas para ver el listado de alumnos.</p>
+                    </div>
+                    {isAdmin && (
+                        <button
+                            onClick={() => setIsAddAulaModalOpen(true)}
+                            className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-bold shadow-sm transition-colors"
+                        >
+                            <Plus size={18} />
+                            Agregar Aula
+                        </button>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -128,7 +157,6 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="pr-8">
                                             <h3 className="text-xl font-bold text-slate-800 leading-tight">{aula.name}</h3>
-                                            <p className="text-sm text-slate-500 mt-1">{aula.capacity} lugares totales</p>
                                         </div>
                                         {isAdmin ? (
                                             <button
@@ -149,18 +177,7 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                         )}
                                     </div>
 
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="flex -space-x-3">
-                                            {aula.teachers.map((tId, idx) => (
-                                                <div key={tId} className={`w-10 h-10 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-sm font-bold text-slate-600 shadow-sm z-[${10 - idx}]`} title={tId}>
-                                                    D{idx + 1}
-                                                </div>
-                                            ))}
-                                            {aula.teachers.length === 0 && (
-                                                <div className="text-xs text-rose-500 font-medium bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-100">Sin Docentes</div>
-                                            )}
-                                        </div>
-                                    </div>
+
 
                                     <div className="mt-auto pt-5 border-t border-slate-100 flex items-center justify-between">
                                         <div className={`px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2 ${aula.color || 'bg-slate-100 text-slate-600'}`}>
@@ -172,6 +189,11 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                 e.stopPropagation();
                                                 if (isAdmin) {
                                                     setConfigAulaId(aula.id);
+                                                    if (aula.id === 'unassigned') {
+                                                        setConfigTab('ALUMNOS');
+                                                    } else {
+                                                        setConfigTab('DETALLES');
+                                                    }
                                                 } else {
                                                     setSelectedAulaId(aula.id);
                                                 }
@@ -250,18 +272,22 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                         <div className="flex gap-6 min-h-[400px]">
                             {/* Sidebar Menu */}
                             <div className="w-48 flex-shrink-0 border-r border-slate-100 pr-4 space-y-1">
-                                <button
-                                    onClick={() => setConfigTab('DETALLES')}
-                                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${configTab === 'DETALLES' ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-slate-50'}`}
-                                >
-                                    Detalles
-                                </button>
-                                <button
-                                    onClick={() => setConfigTab('DOCENTES')}
-                                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${configTab === 'DOCENTES' ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-slate-50'}`}
-                                >
-                                    Docentes Asignados
-                                </button>
+                                {configAulaId !== 'unassigned' && (
+                                    <>
+                                        <button
+                                            onClick={() => setConfigTab('DETALLES')}
+                                            className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${configTab === 'DETALLES' ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-slate-50'}`}
+                                        >
+                                            Detalles
+                                        </button>
+                                        <button
+                                            onClick={() => setConfigTab('DOCENTES')}
+                                            className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${configTab === 'DOCENTES' ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-slate-50'}`}
+                                        >
+                                            Docentes Asignados
+                                        </button>
+                                    </>
+                                )}
                                 <button
                                     onClick={() => setConfigTab('ALUMNOS')}
                                     className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${configTab === 'ALUMNOS' ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-slate-50'}`}
@@ -313,6 +339,20 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                     <option value="bg-violet-100 text-violet-700 border-violet-200">Violeta</option>
                                                     <option value="bg-indigo-100 text-indigo-700 border-indigo-200">Índigo / Morado</option>
                                                 </select>
+                                            </div>
+
+                                            <div className="pt-6 border-t border-slate-200 mt-6">
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => { e.preventDefault(); setDeleteAulaConfirm(configAulaId); }}
+                                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl text-sm font-bold transition-colors border border-rose-100"
+                                                >
+                                                    <Trash2 size={16} />
+                                                    Eliminar Aula
+                                                </button>
+                                                <p className="text-xs text-slate-500 mt-2 text-center">
+                                                    Atención: Los alumnos inscritos quedarán sin sala asignada.
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -382,7 +422,7 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                     </tr>
                                                 </thead>
                                                 <tbody className="bg-white divide-y divide-slate-100">
-                                                    {state.ninos.filter(n => n.aulaId === configAulaId).map(nino => (
+                                                    {state.ninos.filter(n => n.aulaId === configAulaId || (configAulaId === 'unassigned' && (!n.aulaId || n.aulaId === ''))).map(nino => (
                                                         <tr key={nino.id} className="hover:bg-slate-50">
                                                             <td className="px-4 py-3 whitespace-nowrap">
                                                                 <div className="flex items-center gap-3">
@@ -436,6 +476,62 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                     </Modal>
                 )}
 
+                {/* --- ADD AULA MODAL --- */}
+                <AddAulaModal
+                    isOpen={isAddAulaModalOpen}
+                    onClose={() => setIsAddAulaModalOpen(false)}
+                    onAdd={(newAula: Partial<Aula>) => {
+                        if (!currentInstitution) return;
+                        const aula: Aula = {
+                            id: `aula_${Date.now()}`,
+                            institutionId: currentInstitution.id,
+                            name: newAula.name || 'Nueva Sala',
+                            capacity: 25,
+                            teachers: newAula.teachers || [],
+                            assistants: [],
+                            color: newAula.color || 'bg-slate-100 text-slate-700 border-slate-200'
+                        };
+                        dispatch({ type: 'ADD_AULA', payload: aula });
+                        setIsAddAulaModalOpen(false);
+                    }}
+                    allUsers={state.students as any}
+                />
+
+                {/* --- DELETE AULA CONFIRMATION MODAL --- */}
+                {deleteAulaConfirm && (
+                    <div style={{ zIndex: 9999 }} className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+                        <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center animate-scale-in">
+                            <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Trash2 size={32} className="text-rose-600" />
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900 mb-2">Eliminar Sala</h3>
+                            <p className="text-sm text-slate-600 mb-6">
+                                ¿Estás seguro de que deseas eliminar permanentemente esta sala? Esta acción no reasignará a los alumnos a otra aula automáticamente.
+                            </p>
+                            <div className="flex gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setDeleteAulaConfirm(null)}
+                                    className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        dispatch({ type: 'DELETE_AULA', payload: { id: deleteAulaConfirm } });
+                                        setDeleteAulaConfirm(null);
+                                        setConfigAulaId(null);
+                                    }}
+                                    className="flex-1 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl transition-colors shadow-sm shadow-rose-200"
+                                >
+                                    Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
             </div>
         );
     }
@@ -476,22 +572,6 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                 </div>
             </div>
 
-            {/* Aula Info summary */}
-            <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex items-center justify-between">
-                <div className="flex items-center gap-4 text-sm text-slate-600">
-                    <span className="flex items-center gap-1 font-medium"><Users size={16} className="text-primary-500" /> {aulaNinos.length} inscritos / {activeAula?.capacity} máxima</span>
-                </div>
-                <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-slate-500 hidden sm:block">Docentes a cargo:</span>
-                    <div className="flex -space-x-2">
-                        {activeAula?.teachers.map((tId, idx) => (
-                            <div key={tId} className={`w-8 h-8 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600 z-[${10 - idx}] shadow-sm tooltip`} title={tId}>
-                                D{idx + 1}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
 
             {/* Content View */}
             {viewMode === 'CARD' ? (
@@ -624,16 +704,6 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                         <div className="p-6 md:p-8 flex-1 overflow-y-auto space-y-6 max-h-[60vh] custom-scrollbar">
                             {activeDetailTab === 'INFO' && (
                                 <div className="space-y-6 animate-fade-in">
-                                    {/* Medical Info */}
-                                    <div className="bg-rose-50 border border-rose-100 rounded-xl p-5 shadow-sm">
-                                        <h3 className="text-rose-800 font-black mb-2 flex items-center gap-2 tracking-tight">
-                                            <ShieldAlert size={18} /> Historial Médico y Alergias
-                                        </h3>
-                                        <p className="text-rose-700 text-sm leading-relaxed font-medium">
-                                            {selectedNino.medicalInfo || 'No se registraron condiciones médicas particulares o alergias.'}
-                                        </p>
-                                    </div>
-
                                     {/* Familiares / Tutores Info */}
                                     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                                         <h3 className="font-black text-slate-800 p-5 border-b border-slate-100 flex items-center gap-2 tracking-tight text-lg bg-slate-50">
@@ -779,6 +849,162 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                 />
             )}
 
+
+
         </div>
+    );
+}
+
+// Subcomponente de Crear Aula
+function AddAulaModal({ isOpen, onClose, onAdd, allUsers }: { isOpen: boolean, onClose: () => void, onAdd: (aula: Partial<Aula>) => void, allUsers: User[] }) {
+    const [name, setName] = useState('');
+    const [color, setColor] = useState('bg-slate-100 text-slate-700 border-slate-200');
+    const [teachers, setTeachers] = useState<string[]>([]);
+    const [activeTab, setActiveTab] = useState<'DETALLES' | 'DOCENTES'>('DETALLES');
+
+    // Reset when opened
+    useEffect(() => {
+        if (isOpen) {
+            setName('');
+            setColor('bg-slate-100 text-slate-700 border-slate-200');
+            setTeachers([]);
+            setActiveTab('DETALLES');
+        }
+    }, [isOpen]);
+
+    if (!isOpen) return null;
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title="Crear Nueva Sala" size="xl">
+            <div className="flex flex-col md:flex-row gap-6 relative z-[1000] -mx-2 h-full min-h-[400px]">
+
+                {/* Sidebar Navigation */}
+                <div className="md:w-64 flex-shrink-0 space-y-2 border-r border-slate-100 pr-6">
+                    <button
+                        onClick={() => setActiveTab('DETALLES')}
+                        className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${activeTab === 'DETALLES' ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-slate-50'}`}
+                    >
+                        Detalles
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('DOCENTES')}
+                        className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${activeTab === 'DOCENTES' ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-slate-50'}`}
+                    >
+                        Docentes Asignados
+                    </button>
+                </div>
+
+                {/* Content Area */}
+                <div className="flex-1 pb-4 flex flex-col justify-between">
+                    <div>
+                        {activeTab === 'DETALLES' && (
+                            <div className="space-y-6">
+                                <div>
+                                    <h3 className="text-lg font-bold text-slate-800 mb-1">Detalles de la Sala</h3>
+                                    <p className="text-sm text-slate-500 mb-4">Define el nombre y el color identificador de la nueva aula.</p>
+                                </div>
+                                <div className="space-y-4 max-w-sm">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Nombre de Sala <span className="text-rose-500">*</span></label>
+                                        <input
+                                            type="text"
+                                            placeholder="Ej. Sala Vuelo (5 años)"
+                                            className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            autoFocus
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Color Identificador</label>
+                                        <select
+                                            className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                            value={color}
+                                            onChange={(e) => setColor(e.target.value)}
+                                        >
+                                            <option value="bg-slate-100 text-slate-700 border-slate-200">Gris</option>
+                                            <option value="bg-rose-100 text-rose-700 border-rose-200">Rosa / Rojo</option>
+                                            <option value="bg-emerald-100 text-emerald-700 border-emerald-200">Verde Esmeralda</option>
+                                            <option value="bg-blue-100 text-blue-700 border-blue-200">Azul Cielo</option>
+                                            <option value="bg-amber-100 text-amber-700 border-amber-200">Amarillo / Ámbar</option>
+                                            <option value="bg-violet-100 text-violet-700 border-violet-200">Violeta</option>
+                                            <option value="bg-indigo-100 text-indigo-700 border-indigo-200">Índigo / Morado</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'DOCENTES' && (
+                            <div className="space-y-6">
+                                <div>
+                                    <h3 className="text-lg font-bold text-slate-800 mb-1">Docentes Asignados</h3>
+                                    <p className="text-sm text-slate-500 mb-4">Selecciona qué maestros tendrán acceso a esta sala.</p>
+                                </div>
+                                <div className="bg-slate-50 rounded-xl border border-slate-200 p-2 max-h-[300px] overflow-y-auto space-y-1">
+                                    {allUsers.filter(u => u.role === 'DOCENTE').map(docente => {
+                                        const isAssigned = teachers.includes(docente.id);
+                                        return (
+                                            <label key={docente.id} className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-lg hover:border-primary-200 cursor-pointer transition-colors shadow-sm">
+                                                <div className="flex items-center gap-3">
+                                                    <img src={docente.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(docente.name)}`} className="w-8 h-8 rounded-full bg-slate-100" />
+                                                    <div>
+                                                        <p className="text-sm font-bold text-slate-800">{docente.name}</p>
+                                                        <p className="text-xs text-slate-500">{docente.email}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="relative flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="w-5 h-5 text-primary-600 focus:ring-primary-500 border-slate-300 rounded cursor-pointer"
+                                                        checked={isAssigned || false}
+                                                        onChange={() => {
+                                                            if (isAssigned) {
+                                                                setTeachers(teachers.filter(id => id !== docente.id));
+                                                            } else {
+                                                                setTeachers([...teachers, docente.id]);
+                                                            }
+                                                        }}
+                                                    />
+                                                </div>
+                                            </label>
+                                        )
+                                    })}
+                                    {allUsers.filter(u => u.role === 'DOCENTE').length === 0 && (
+                                        <div className="p-4 text-center text-slate-500 text-sm">
+                                            No hay docentes registrados en la institución aún.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="pt-6 flex justify-end gap-3 border-t border-slate-100 mt-8">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-4 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (name.trim()) {
+                                    onAdd({ name: name.trim(), color, teachers });
+                                    setName(''); // reset
+                                }
+                            }}
+                            disabled={!name.trim()}
+                            className="px-6 py-2.5 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 disabled:opacity-50 rounded-xl shadow-sm transition-colors flex items-center gap-2"
+                        >
+                            <Plus size={16} />
+                            Guardar y Crear Aula
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Modal>
     );
 }
