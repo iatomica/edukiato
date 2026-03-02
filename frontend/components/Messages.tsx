@@ -422,7 +422,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
                     )}
                     <div className={`max-w-[70%] ${isMe ? 'order-1' : 'order-2'}`}>
                       <div className={`px-4 py-2 rounded-2xl shadow-sm text-sm ${isMe
-                        ? 'bg-primary-600 text-white rounded-br-none'
+                        ? 'bg-slate-900 text-white rounded-br-none'
                         : 'bg-white text-slate-700 border border-slate-200 rounded-bl-none'
                         }`}>
                         {msg.file && msg.file.type.startsWith('image/') ? (

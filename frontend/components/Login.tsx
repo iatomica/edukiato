@@ -32,7 +32,7 @@ export const Login: React.FC = () => {
       <div className="max-w-md w-full">
         {/* Logo Section */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-xl shadow-primary-200 mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-900 text-white shadow-xl shadow-slate-900/20 mb-6">
             <span className="text-3xl font-bold">E</span>
           </div>
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{t.login.welcome}</h1>

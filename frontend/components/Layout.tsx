@@ -104,7 +104,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
       {/* Mobile Header */}
       <div className="md:hidden bg-white border-b border-slate-200 p-4 flex justify-between items-center sticky top-0 z-20 gap-4">
         <div className="flex items-center space-x-2 min-w-0 flex-1">
-          <div className="w-8 h-8 shrink-0 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">{theme.institutionName.charAt(0)}</div>
+          <div className="w-8 h-8 shrink-0 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold text-lg">{theme.institutionName.charAt(0)}</div>
           <span className="font-bold text-slate-800 text-lg truncate leading-tight">{theme.institutionName}</span>
         </div>
         <div className="flex items-center space-x-2 shrink-0">
@@ -132,7 +132,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
         )}
 
         <div className={`p-6 md:p-8 flex items-center w-full relative min-w-0 ${isDesktopCollapsed ? 'justify-center' : 'space-x-3'}`}>
-          <div className="w-9 h-9 min-w-[36px] bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex flex-shrink-0 items-center justify-center text-white shadow-lg shadow-primary-200">
+          <div className="w-9 h-9 min-w-[36px] bg-slate-900 rounded-xl flex flex-shrink-0 items-center justify-center text-white shadow-lg shadow-slate-900/20">
             <Send size={18} className="translate-x-[-1px] translate-y-[1px]" />
           </div>
           <span title={theme.institutionName} className={`font-bold text-slate-800 text-lg tracking-tight transition-all duration-300 ${isDesktopCollapsed ? 'w-0 opacity-0 overflow-hidden' : 'flex-1 opacity-100 truncate'}`}>{theme.institutionName}</span>
