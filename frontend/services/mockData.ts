@@ -18,8 +18,8 @@ export const INST_VINCULOS = 'inst-vinculos';
 export const MOCK_COURSES: Course[] = [];
 
 export const MOCK_AULAS: Aula[] = [
-  { id: 'aula_45d', institutionId: INST_VINCULOS, name: 'Sala (45 días a 2 años)', capacity: 15, teachers: ['u_teach_0'], assistants: [], color: 'bg-rose-100 text-rose-700 border-rose-200' }, // Fiorela
-  { id: 'aula_anidar', institutionId: INST_VINCULOS, name: 'Sala Anidar (2 años)', capacity: 20, teachers: ['u_teach_1'], assistants: [], color: 'bg-amber-100 text-amber-700 border-amber-200' }, // Antonela
+  { id: 'aula_anidar', institutionId: INST_VINCULOS, name: 'Sala Anidar (45 días a 2 años)', capacity: 15, teachers: ['u_teach_0'], assistants: [], color: 'bg-rose-100 text-rose-700 border-rose-200' }, // Fiorela
+  { id: 'aula_raiz', institutionId: INST_VINCULOS, name: 'Sala Raíz (2 años)', capacity: 20, teachers: ['u_teach_1'], assistants: [], color: 'bg-amber-100 text-amber-700 border-amber-200' }, // Antonela
   { id: 'aula_libertad', institutionId: INST_VINCULOS, name: 'Sala Libertad (3 años)', capacity: 20, teachers: ['u_teach_2'], assistants: [], color: 'bg-emerald-100 text-emerald-700 border-emerald-200' }, // Romina Engel
   { id: 'aula_cielo', institutionId: INST_VINCULOS, name: 'Sala Cielo (4 años)', capacity: 25, teachers: ['u_teach_3'], assistants: [], color: 'bg-blue-100 text-blue-700 border-blue-200' }, // Romina Alvarenga
   { id: 'aula_vuelo', institutionId: INST_VINCULOS, name: 'Sala Vuelo (5 años)', capacity: 25, teachers: ['u_teach_4'], assistants: [], color: 'bg-indigo-100 text-indigo-700 border-indigo-200' }, // Stefania

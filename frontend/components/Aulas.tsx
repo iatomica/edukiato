@@ -29,7 +29,7 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
 
     // Config Modal States
     const [configAulaId, setConfigAulaId] = useState<string | null>(null);
-    const [configTab, setConfigTab] = useState<'DOCENTES' | 'ALUMNOS'>('DOCENTES');
+    const [configTab, setConfigTab] = useState<'DETALLES' | 'DOCENTES' | 'ALUMNOS'>('DETALLES');
     const [allUsers, setAllUsers] = useState<User[]>([]);
 
     // Multiple Teacher Assignment States
@@ -251,6 +251,12 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                             {/* Sidebar Menu */}
                             <div className="w-48 flex-shrink-0 border-r border-slate-100 pr-4 space-y-1">
                                 <button
+                                    onClick={() => setConfigTab('DETALLES')}
+                                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${configTab === 'DETALLES' ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-slate-50'}`}
+                                >
+                                    Detalles
+                                </button>
+                                <button
                                     onClick={() => setConfigTab('DOCENTES')}
                                     className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${configTab === 'DOCENTES' ? 'bg-primary-50 text-primary-700' : 'text-slate-600 hover:bg-slate-50'}`}
                                 >
@@ -266,6 +272,52 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
 
                             {/* Content Area */}
                             <div className="flex-1 pb-4">
+                                {configTab === 'DETALLES' && (
+                                    <div className="space-y-6">
+                                        <div>
+                                            <h3 className="text-lg font-bold text-slate-800 mb-1">Detalles de la Sala</h3>
+                                            <p className="text-sm text-slate-500 mb-4">Modifica el nombre y color de esta aula.</p>
+                                        </div>
+                                        <div className="space-y-4 max-w-sm">
+                                            <div>
+                                                <label className="block text-sm font-semibold text-slate-700 mb-2">Nombre de Sala</label>
+                                                <input
+                                                    type="text"
+                                                    className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                                    value={state.aulas.find(a => a.id === configAulaId)?.name || ''}
+                                                    onChange={(e) => {
+                                                        const aula = state.aulas.find(a => a.id === configAulaId);
+                                                        if (aula) {
+                                                            dispatch({ type: 'UPDATE_AULA', payload: { ...aula, name: e.target.value } });
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-slate-700 mb-2">Color Asignado</label>
+                                                <select
+                                                    className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                                    value={state.aulas.find(a => a.id === configAulaId)?.color || 'bg-slate-500 text-white'}
+                                                    onChange={(e) => {
+                                                        const aula = state.aulas.find(a => a.id === configAulaId);
+                                                        if (aula) {
+                                                            dispatch({ type: 'UPDATE_AULA', payload: { ...aula, color: e.target.value } });
+                                                        }
+                                                    }}
+                                                >
+                                                    <option value="bg-slate-100 text-slate-700 border-slate-200">Gris</option>
+                                                    <option value="bg-rose-100 text-rose-700 border-rose-200">Rosa / Rojo</option>
+                                                    <option value="bg-emerald-100 text-emerald-700 border-emerald-200">Verde Esmeralda</option>
+                                                    <option value="bg-blue-100 text-blue-700 border-blue-200">Azul Cielo</option>
+                                                    <option value="bg-amber-100 text-amber-700 border-amber-200">Amarillo / Ámbar</option>
+                                                    <option value="bg-violet-100 text-violet-700 border-violet-200">Violeta</option>
+                                                    <option value="bg-indigo-100 text-indigo-700 border-indigo-200">Índigo / Morado</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {configTab === 'DOCENTES' && (
                                     <div className="space-y-6">
                                         <div>
