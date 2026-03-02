@@ -91,7 +91,7 @@ export const InstitutionPicker: React.FC = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading || !newInstName.trim()}
-                                className="px-5 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center"
+                                className="px-5 py-2 bg-slate-900 text-white font-medium rounded-lg hover:bg-black transition-colors disabled:opacity-50 flex items-center"
                             >
                                 {isLoading ? (
                                     <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />

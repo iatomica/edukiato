@@ -459,7 +459,7 @@ export const Usuarios: React.FC = () => {
 
                             <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
                                 <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700 transition-colors">Cancelar</button>
-                                <button type="submit" className="px-6 py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-200">
+                                <button type="submit" className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-lg">
                                     Crear Usuario
                                 </button>
                             </div>
@@ -525,7 +525,7 @@ export const Usuarios: React.FC = () => {
 
                             <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
                                 <button type="button" onClick={() => { setIsEditModalOpen(false); setEditUser(null); }} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700 transition-colors">Cancelar</button>
-                                <button type="submit" className="px-6 py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-200">
+                                <button type="submit" className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-lg">
                                     Guardar Cambios
                                 </button>
                             </div>
@@ -665,7 +665,7 @@ export const Usuarios: React.FC = () => {
                                 type="submit"
                                 form="edit-nino-form"
                                 disabled={isSavingNino || selectedParentsEdit.length === 0}
-                                className={`px-6 py-2 bg-primary-600 text-white font-bold rounded-xl outline-none transition-all shadow-lg flex items-center ${isSavingNino || selectedParentsEdit.length === 0 ? 'opacity-50 cursor-not-allowed shadow-none' : 'hover:bg-primary-700 shadow-primary-200'}`}
+                                className={`px-6 py-2 bg-slate-900 text-white font-bold rounded-xl outline-none transition-all shadow-lg flex items-center ${isSavingNino || selectedParentsEdit.length === 0 ? 'opacity-50 cursor-not-allowed shadow-none' : 'hover:bg-black'}`}
                             >
                                 {isSavingNino ? 'Guardando...' : 'Guardar Cambios'}
                             </button>
@@ -835,7 +835,7 @@ export const Usuarios: React.FC = () => {
                                     <button
                                         type="submit"
                                         disabled={isSavingNino || selectedParentsAdd.length === 0}
-                                        className={`px-6 py-2 bg-primary-600 text-white font-bold rounded-xl transition-all shadow-lg flex items-center ${isSavingNino || selectedParentsAdd.length === 0 ? 'opacity-50 cursor-not-allowed shadow-none' : 'hover:bg-primary-700 shadow-primary-200'}`}
+                                        className={`px-6 py-2 bg-slate-900 text-white font-bold rounded-xl transition-all shadow-lg flex items-center ${isSavingNino || selectedParentsAdd.length === 0 ? 'opacity-50 cursor-not-allowed shadow-none' : 'hover:bg-black'}`}
                                     >
                                         {isSavingNino ? 'Procesando...' : 'Finalizar Inscripción'}
                                     </button>

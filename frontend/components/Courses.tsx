@@ -96,7 +96,7 @@ export const Courses: React.FC<CoursesProps> = ({ onViewChange, onCourseSelect, 
           <button
             id="tour-courses-create"
             onClick={() => setIsCreateOpen(true)}
-            className="bg-primary-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-primary-700 transition-colors flex items-center shadow-lg shadow-primary-200"
+            className="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-black transition-colors flex items-center shadow-lg"
           >
             <Plus size={18} className="mr-2" />
             {t.courses.create}
@@ -308,7 +308,7 @@ export const Courses: React.FC<CoursesProps> = ({ onViewChange, onCourseSelect, 
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-6 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-200"
+                  className="px-6 py-2.5 bg-slate-900 text-white font-medium rounded-xl hover:bg-black transition-colors shadow-lg"
                 >
                   {isLoading ? t.courses.createModal.create : t.courses.createModal.create}
                 </button>

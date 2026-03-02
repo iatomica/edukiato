@@ -77,7 +77,7 @@ export const Institutions: React.FC = () => {
                 </div>
                 <button
                     onClick={() => setIsAddModalOpen(true)}
-                    className="bg-primary-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-primary-700 transition-colors flex items-center shadow-lg shadow-primary-200"
+                    className="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-black transition-colors flex items-center shadow-lg"
                 >
                     <Plus size={18} className="mr-2" />
                     Nueva Institución
@@ -186,7 +186,7 @@ export const Institutions: React.FC = () => {
 
                             <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
                                 <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700 transition-colors">Cancelar</button>
-                                <button type="submit" className="px-6 py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-200">
+                                <button type="submit" className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-lg">
                                     Crear Institución
                                 </button>
                             </div>

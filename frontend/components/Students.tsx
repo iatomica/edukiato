@@ -282,7 +282,7 @@ export const CommunicationsModal = ({
           <button type="button" onClick={onClose} className="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-50 rounded-xl transition-colors">
             Cancelar
           </button>
-          <button type="submit" form="communication-form" className="px-6 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 shadow-md shadow-primary-200 flex items-center transition-all hover:scale-105 active:scale-95">
+          <button type="submit" form="communication-form" className="px-6 py-2.5 bg-slate-900 text-white font-medium rounded-xl hover:bg-black shadow-lg flex items-center transition-all hover:scale-105 active:scale-95">
             <Send size={18} className="mr-2" /> Enviar Comunicado
           </button>
         </div>
@@ -334,7 +334,7 @@ const AddStudentModal = ({ onClose, onAdd }: { onClose: () => void, onAdd: (data
           </div>
           <div className="pt-4 flex justify-end gap-3">
             <button type="button" onClick={onClose} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700">Cancelar</button>
-            <button type="submit" className="px-6 py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700">Guardar</button>
+            <button type="submit" className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-black">Guardar</button>
           </div>
         </form>
       </div>

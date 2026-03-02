@@ -318,12 +318,6 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                 <h3 className="text-lg font-bold text-slate-800 mb-1">Alumnos Inscritos</h3>
                                                 <p className="text-sm text-slate-500">Añade alumnos y vincúlalos a la cuenta de sus tutores.</p>
                                             </div>
-                                            <button
-                                                onClick={() => alert('Mock: Abrir sub-modal para rellenar datos del nuevo niño')}
-                                                className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm shadow-primary-200 hover:bg-primary-700 flex items-center gap-2"
-                                            >
-                                                <Plus size={16} /> Inscribir Alumno
-                                            </button>
                                         </div>
 
                                         <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
@@ -627,7 +621,7 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                                     });
                                                                     setIsCommModalOpen(true);
                                                                 }}
-                                                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary-200 hover:bg-primary-700 transition-all hover:-translate-y-0.5"
+                                                                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-black transition-all hover:-translate-y-0.5"
                                                             >
                                                                 <Send size={16} /> Comunicado
                                                             </button>
@@ -671,7 +665,7 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all
                                               ${(!selectedNino.parentIds || selectedNino.parentIds.length === 0)
                                                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                                                    : 'bg-primary-600 text-white hover:bg-primary-700 shadow-primary-200 hover:-translate-y-0.5'}`}
+                                                    : 'bg-slate-900 text-white hover:bg-black hover:-translate-y-0.5'}`}
                                             title={(!selectedNino.parentIds || selectedNino.parentIds.length === 0) ? "El alumno no tiene familiares registrados." : "Enviar un comunicado a los familiares."}
                                         >
                                             <Send size={16} /> Enviar Comunicado

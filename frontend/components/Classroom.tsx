@@ -351,7 +351,7 @@ export const Classroom: React.FC<ClassroomProps> = ({ courseId, user, onBack }) 
                 <button type="button" onClick={() => setIsAddOpen(false)} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700">
                   {t.classroom.addMaterial.cancel}
                 </button>
-                <button type="submit" className="px-6 py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700">
+                <button type="submit" className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-black">
                   {t.classroom.addMaterial.publish}
                 </button>
               </div>

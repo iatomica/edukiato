@@ -89,7 +89,7 @@ export default function AcademicReportsTab({ studentId }: AcademicReportsTabProp
                 </h3>
                 <button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-primary-500/20 hover:shadow-lg hover:shadow-primary-500/40 hover:-translate-y-0.5 text-sm"
+                    className="flex items-center gap-2 bg-slate-900 hover:bg-black text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 text-sm"
                 >
                     <Plus size={18} /> Agregar Informe
                 </button>
@@ -113,7 +113,7 @@ export default function AcademicReportsTab({ studentId }: AcademicReportsTabProp
                     <p className="text-sm mt-1 mb-4">No hay documentación académica para este alumno aún.</p>
                     <button
                         onClick={() => setIsCreateModalOpen(true)}
-                        className="mt-4 bg-primary-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-primary-700 transition-all hover:-translate-y-1 shadow-lg shadow-primary-200 flex items-center justify-center mx-auto gap-2 text-base"
+                        className="mt-4 bg-slate-900 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-black transition-all hover:-translate-y-1 shadow-lg flex items-center justify-center mx-auto gap-2 text-base"
                     >
                         <Plus size={20} />
                         Redactar Primer Informe
@@ -210,7 +210,7 @@ export default function AcademicReportsTab({ studentId }: AcademicReportsTabProp
                             <button
                                 onClick={handleCreateReport}
                                 disabled={isSaving}
-                                className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 disabled:opacity-70 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-sm shadow-primary-500/20"
+                                className="flex items-center gap-2 bg-slate-900 hover:bg-black disabled:opacity-70 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-sm"
                             >
                                 {isSaving ? (
                                     <><Loader2 size={18} className="animate-spin" /> Guardando...</>

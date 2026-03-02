@@ -486,7 +486,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
               <button
                 type="submit"
                 disabled={!inputText.trim() && !selectedFile}
-                className="p-2 md:p-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0"
+                className="p-2 md:p-3 bg-slate-900 text-white rounded-lg hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0"
               >
                 <Send size={18} />
               </button>
@@ -557,7 +557,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
 
               <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
                 <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700 transition-colors">Cancelar</button>
-                <button type="submit" className="px-6 py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-all shadow-md shadow-primary-200">
+                <button type="submit" className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-md">
                   Crear Usuario
                 </button>
               </div>
