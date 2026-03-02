@@ -64,42 +64,45 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
 
   return (
     <div className="space-y-8 relative overflow-hidden min-h-[calc(100vh-4rem)]">
-      {/* Background SVG Animation Layer */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-20 overflow-hidden rounded-3xl">
-        <svg className="w-full h-full" preserveAspectRatio="none">
-          <path
-            id="flightPath"
-            d="M -100,200 Q 300,50 600,300 T 1200,100"
-            fill="transparent"
-            stroke="#94a3b8"
-            strokeWidth="2"
-            strokeDasharray="10 10"
-            className="animate-dash"
-          />
-          <g className="animate-fly">
-            {/* Paper Airplane SVG */}
-            <path
-              d="M 0,10 L 30,0 L 12,20 L 0,10 Z M 12,20 L 15,30 L 20,22 Z"
-              fill="#14b8a6"
-              transform="translate(-15, -15) rotate(15)"
-            />
-          </g>
-        </svg>
-      </div>
-
       {/* Main Content Component, Elevated to be clickable over SVG */}
       <div className="relative z-10 space-y-8">
-        {/* Header */}
-        <div className="flex justify-between items-end">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
-              {t.dashboard.greeting}, {user.name.split(' ')[0]}.
-            </h1>
-            <p className="text-slate-500 mt-2 text-lg">
-              {user.role === 'ADMIN_INSTITUCION' && t.dashboard.adminSub}
-              {user.role === 'DOCENTE' && t.dashboard.teacherSub}
-              {user.role === 'ESTUDIANTE' && t.dashboard.studentSub}
-            </p>
+        {/* Header Panel with Airplane Animation */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-indigo-50/50 via-teal-50/30 to-white border border-indigo-100/50 shadow-sm rounded-3xl p-8">
+
+          {/* Background SVG Animation Layer specifically for the header panel */}
+          <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+            <svg className="w-full h-full" preserveAspectRatio="xMinYMid slice" viewBox="0 0 1000 200">
+              <path
+                id="flightPath"
+                d="M -100,160 Q 200,40 600,130 T 1200,60"
+                fill="transparent"
+                stroke="#94a3b8"
+                strokeWidth="2"
+                strokeDasharray="10 10"
+                className="animate-dash"
+              />
+              <g className="animate-fly">
+                {/* Paper Airplane SVG */}
+                <path
+                  d="M 0,10 L 30,0 L 12,20 L 0,10 Z M 12,20 L 15,30 L 20,22 Z"
+                  fill="#14b8a6"
+                  transform="translate(-15, -15) rotate(15)"
+                />
+              </g>
+            </svg>
+          </div>
+
+          <div className="relative z-10 flex justify-between items-end">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+                {t.dashboard.greeting}, {user.name.split(' ')[0]}.
+              </h1>
+              <p className="text-slate-500 mt-2 text-lg">
+                {user.role === 'ADMIN_INSTITUCION' && t.dashboard.adminSub}
+                {user.role === 'DOCENTE' && t.dashboard.teacherSub}
+                {user.role === 'ESTUDIANTE' && t.dashboard.studentSub}
+              </p>
+            </div>
           </div>
         </div>
 

@@ -3,6 +3,7 @@ import { FeedItem } from '../types';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { MessageSquare, FileText, Upload, Bell, Filter, Search, Megaphone, BookOpen } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface FeedProps {
     items: FeedItem[];
@@ -10,6 +11,7 @@ interface FeedProps {
 }
 
 export const Feed: React.FC<FeedProps> = ({ items, className }) => {
+    const { t } = useLanguage();
     const [filterType, setFilterType] = useState<'ALL' | 'ANNOUNCEMENT' | 'MATERIAL' | 'ASSIGNMENT'>('ALL');
     const [filterScope, setFilterScope] = useState<'ALL' | 'INSTITUTION' | 'COURSE'>('ALL');
 
@@ -71,7 +73,7 @@ export const Feed: React.FC<FeedProps> = ({ items, className }) => {
                                 {item.type === 'ASSIGNMENT' && item.status && (
                                     <span className={`text-xs font-medium px-2 py-1 rounded-lg ${item.status === 'PENDING' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'
                                         }`}>
-                                        {item.status}
+                                        {item.status === 'PENDING' ? 'Pendiente' : 'Entregado'}
                                     </span>
                                 )}
                             </div>

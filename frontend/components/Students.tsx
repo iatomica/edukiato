@@ -13,7 +13,7 @@ import AcademicReportsTab from './AcademicReportsTab';
 
 // ── SUB-COMPONENTS ───────────────────────────────────────────
 
-const CommunicationsModal = ({
+export const CommunicationsModal = ({
   onClose,
   students,
   aulas,

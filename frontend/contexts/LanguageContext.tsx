@@ -297,6 +297,28 @@ export const translations = {
         }
       ] as TourStep[]
     },
+    notifications: {
+      title: 'Notificaciones',
+      markAllRead: 'Marcar como leídas',
+      empty: 'No tienes nuevas notificaciones.',
+      viewHistory: 'Ver historial',
+      types: {
+        ANNOUNCEMENT: 'Anuncio',
+        GRADE: 'Calificación',
+        SYSTEM: 'Sistema',
+        PAYMENT: 'Pago',
+        ATTENDANCE: 'Asistencia',
+        MESSAGE: 'Mensaje'
+      }
+    },
+    calendarTypes: {
+      event: 'Evento',
+      class: 'Clase',
+      workshop: 'Taller',
+      exam: 'Examen',
+      holiday: 'Feriado',
+      meeting: 'Reunión'
+    },
     institutionPicker: {
       title: 'Selecciona tu institución',
       subtitle: 'Elige en cuál institución deseas trabajar hoy.',
@@ -573,6 +595,7 @@ export const translations = {
           position: 'left'
         }
       ] as TourStep[],
+      // Fallback
       default: [
         {
           title: 'Navigation',
@@ -585,6 +608,28 @@ export const translations = {
           position: 'right'
         }
       ] as TourStep[]
+    },
+    notifications: {
+      title: 'Notifications',
+      markAllRead: 'Mark all read',
+      empty: 'You have no new notifications.',
+      viewHistory: 'View History',
+      types: {
+        ANNOUNCEMENT: 'Announcement',
+        GRADE: 'Grade',
+        SYSTEM: 'System',
+        PAYMENT: 'Payment',
+        ATTENDANCE: 'Attendance',
+        MESSAGE: 'Message'
+      }
+    },
+    calendarTypes: {
+      event: 'Event',
+      class: 'Class',
+      workshop: 'Workshop',
+      exam: 'Exam',
+      holiday: 'Holiday',
+      meeting: 'Meeting'
     },
     institutionPicker: {
       title: 'Select your institution',

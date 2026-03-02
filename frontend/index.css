@@ -7,6 +7,15 @@
   box-sizing: border-box;
 }
 
+:root {
+  --primary-h: 173;
+  --primary-s: 80%;
+  --primary-l: 40%;
+  --secondary-h: 315;
+  --secondary-s: 70%;
+  --secondary-l: 50%;
+}
+
 body {
   background-color: #f8fafc;
   font-family: 'Inter', sans-serif;
@@ -20,17 +29,43 @@ body {
 
 /* Paper Airplane Dashboard Animation */
 @keyframes flyPath {
-  0% { offset-distance: 0%; opacity: 0; }
-  5% { opacity: 0.6; }
-  50% { opacity: 0.6; }
-  95% { opacity: 0; }
-  100% { offset-distance: 100%; opacity: 0; }
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+
+  95% {
+    opacity: 0;
+  }
+
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
 }
 
 @keyframes dashDraw {
-  0% { stroke-dashoffset: 1000; opacity: 0; }
-  50% { opacity: 0.3; }
-  100% { stroke-dashoffset: 0; opacity: 0; }
+  0% {
+    stroke-dashoffset: 1000;
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
 }
 
 .animate-dash {

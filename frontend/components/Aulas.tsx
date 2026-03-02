@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAppState } from '../contexts/AppStateContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTenantData } from '../hooks/useTenantData';
-import { Aula, Nino, User } from '../types';
+import { Aula, Nino, User, Communication } from '../types';
 import { Users, LayoutGrid, List, MessageSquare, Info, ShieldAlert, ChevronRight, User as UserIcon, Settings, Plus, Search, Trash2, Send, BookOpen, Mail, Award, Paperclip, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -10,17 +10,22 @@ import Modal from './Modal';
 import { usersApi } from '../services/api';
 import { AnimatedAvatar } from './AnimatedAvatar';
 import AcademicReportsTab from './AcademicReportsTab';
+import { CommunicationsModal } from './Students';
 
 export default function Aulas({ onViewChange }: { onViewChange?: (view: any, params?: any) => void }) {
     const { state, dispatch } = useAppState();
     const { user, token, currentInstitution } = useAuth();
-    const { communications } = useTenantData();
+    const { communications, emitEvent } = useTenantData();
 
     // UI States
     const [selectedAulaId, setSelectedAulaId] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<'CARD' | 'LIST'>('CARD');
     const [selectedNino, setSelectedNino] = useState<Nino | null>(null);
     const [activeDetailTab, setActiveDetailTab] = useState<'INFO' | 'ACADEMIC' | 'COMMUNICATIONS'>('INFO');
+
+    // Communications Modal States
+    const [isCommModalOpen, setIsCommModalOpen] = useState(false);
+    const [commModalParams, setCommModalParams] = useState<any>(null);
 
     // Config Modal States
     const [configAulaId, setConfigAulaId] = useState<string | null>(null);
@@ -68,6 +73,27 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
             return false;
         });
     }, [communications, selectedNino]);
+
+    const handleSendCommunication = (data: any) => {
+        if (!currentInstitution) return;
+
+        const newComm: Communication = {
+            id: `comm_${Date.now()}`,
+            institutionId: currentInstitution.id,
+            type: data.type,
+            title: data.title,
+            content: data.content,
+            senderId: user?.id || 'current_user',
+            senderName: user?.name || 'Administrador',
+            recipientId: data.recipientId,
+            courseId: data.courseId,
+            createdAt: new Date().toISOString(),
+            isRead: false
+        };
+
+        dispatch({ type: 'ADD_COMMUNICATION', payload: newComm });
+        emitEvent({ type: 'COMMUNICATION_SENT', payload: newComm });
+    };
 
     // No access
     if (accessibleAulas.length === 0) {
@@ -594,15 +620,12 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                             </button>
                                                             <button
                                                                 onClick={() => {
-                                                                    if (onViewChange) {
-                                                                        onViewChange('communications', {
-                                                                            commParams: {
-                                                                                type: 'NOTIFICACION_INDIVIDUAL',
-                                                                                isLocked: true,
-                                                                                recipientIds: [pId]
-                                                                            }
-                                                                        });
-                                                                    }
+                                                                    setCommModalParams({
+                                                                        type: 'NOTIFICACION_INDIVIDUAL',
+                                                                        isLocked: true,
+                                                                        recipientIds: [pId]
+                                                                    });
+                                                                    setIsCommModalOpen(true);
                                                                 }}
                                                                 className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary-200 hover:bg-primary-700 transition-all hover:-translate-y-0.5"
                                                             >
@@ -628,6 +651,33 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
 
                             {activeDetailTab === 'COMMUNICATIONS' && (
                                 <div className="space-y-4 animate-fade-in">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <div className="flex-1">
+                                            <h3 className="font-bold text-slate-800 text-lg">Historial de Comunicados</h3>
+                                            <p className="text-sm text-slate-500">Notificaciones enviadas al alumno y sus familiares.</p>
+                                        </div>
+                                        <button
+                                            disabled={!selectedNino.parentIds || selectedNino.parentIds.length === 0}
+                                            onClick={() => {
+                                                if (selectedNino.parentIds && selectedNino.parentIds.length > 0) {
+                                                    setCommModalParams({
+                                                        type: 'NOTIFICACION_INDIVIDUAL',
+                                                        isLocked: true,
+                                                        recipientIds: selectedNino.parentIds
+                                                    });
+                                                    setIsCommModalOpen(true);
+                                                }
+                                            }}
+                                            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all
+                                              ${(!selectedNino.parentIds || selectedNino.parentIds.length === 0)
+                                                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                                    : 'bg-primary-600 text-white hover:bg-primary-700 shadow-primary-200 hover:-translate-y-0.5'}`}
+                                            title={(!selectedNino.parentIds || selectedNino.parentIds.length === 0) ? "El alumno no tiene familiares registrados." : "Enviar un comunicado a los familiares."}
+                                        >
+                                            <Send size={16} /> Enviar Comunicado
+                                        </button>
+                                    </div>
+
                                     {studentComms.length === 0 ? (
                                         <div className="text-center py-16 text-slate-400 bg-white rounded-2xl border border-slate-200 border-dashed">
                                             <BookOpen size={48} className="mx-auto mb-4 opacity-30" />
@@ -668,6 +718,20 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                     </div>
                 )}
             </Modal>
+
+            {isCommModalOpen && commModalParams && (
+                <CommunicationsModal
+                    onClose={() => setIsCommModalOpen(false)}
+                    students={state.students}
+                    aulas={state.aulas}
+                    user={user}
+                    ninos={state.ninos}
+                    onSend={handleSendCommunication}
+                    initialType={commModalParams.type}
+                    isTypeLocked={commModalParams.isLocked}
+                    initialRecipientIds={commModalParams.recipientIds}
+                />
+            )}
 
         </div>
     );

@@ -188,9 +188,9 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                                     onChange={(e) => setType(e.target.value as any)}
                                     className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-200 focus:border-slate-400 outline-none transition-all text-slate-700 font-medium appearance-none"
                                 >
-                                    <option value="class">Clase Regular</option>
-                                    <option value="workshop">Taller / Workshop</option>
-                                    <option value="event">Evento Especial</option>
+                                    <option value="class">{t.calendarTypes?.class || 'Clase Regular'}</option>
+                                    <option value="workshop">{t.calendarTypes?.workshop || 'Taller / Workshop'}</option>
+                                    <option value="event">{t.calendarTypes?.event || 'Evento Especial'}</option>
                                 </select>
                             </div>
 
