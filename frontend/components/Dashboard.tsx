@@ -37,19 +37,37 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
         author: c.senderName,
       }));
 
-    // 2. Map Events
-    const eventsMapped: FeedItem[] = events.map(e => ({
-      id: `evt_${e.id}`,
-      institutionId: e.institutionId,
-      scope: 'COURSE', // Reusing tag style
-      courseId: t.nav.schedule, // To display "Calendario" tag
-      type: 'MATERIAL', // Reusing existing Feed icon/color style (blue)
-      title: e.title,
-      description: e.description || `Evento programado para: ${new Date(e.start).toLocaleString()}`,
-      postedAt: new Date(e.start), // Using start date as the chronological anchor
-      dueDate: new Date(e.start),
-      author: 'Sistema',
-    }));
+    // 2. Map Events (Applying Visibility Privacy Filter)
+    const eventsMapped: FeedItem[] = events
+      .filter(e => {
+        if (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN_INSTITUCION') return true;
+        if (e.creatorId === user.id) return true;
+        if (!e.sharedWith || e.sharedWith.scope === 'ALL') return true;
+
+        if (e.sharedWith.scope === 'AULA' && e.sharedWith.targetIds) {
+          if (user.role === 'DOCENTE') {
+            const isTeacherOfAula = aulas.some(a => e.sharedWith!.targetIds!.includes(a.id) && a.teachers?.includes(user.id));
+            if (isTeacherOfAula) return true;
+          }
+          if (user.role === 'PADRE') {
+            const isParentOfAula = students.some(n => e.sharedWith!.targetIds!.includes(n.aulaId) && n.parentIds?.includes(user.id));
+            if (isParentOfAula) return true;
+          }
+        }
+        return false;
+      })
+      .map(e => ({
+        id: `evt_${e.id}`,
+        institutionId: e.institutionId,
+        scope: 'COURSE', // Reusing tag style
+        courseId: t.nav.schedule, // To display "Calendario" tag
+        type: 'MATERIAL', // Reusing existing Feed icon/color style (blue)
+        title: e.title,
+        description: e.description || `Evento programado para: ${new Date(e.start).toLocaleString()}`,
+        postedAt: new Date(e.start), // Using start date as the chronological anchor
+        dueDate: new Date(e.start),
+        author: 'Sistema',
+      }));
 
     // Combine and sort chronologically (newest first)
     return [...commsMapped, ...eventsMapped].sort((a, b) => b.postedAt.getTime() - a.postedAt.getTime());

@@ -86,6 +86,16 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
             event: 'bg-emerald-100 text-emerald-700 border-emerald-200'
         };
 
+        let finalColor = colorMap[type];
+
+        // Specific single-aula color override
+        if (scope === 'AULA' && targetIds.length === 1) {
+            const singleTargetAula = aulas.find(a => a.id === targetIds[0]);
+            if (singleTargetAula && singleTargetAula.color) {
+                finalColor = singleTargetAula.color;
+            }
+        }
+
         const [year, month, dayPart] = date.split('-').map(Number);
 
         const [startHH, startMM] = startTime.split(':').map(Number);
@@ -101,7 +111,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
             start: startFull,
             end: endFull,
             type,
-            color: colorMap[type],
+            color: finalColor,
             creatorId: initialData?.creatorId || currentUser.id,
             sharedWith: {
                 scope,
