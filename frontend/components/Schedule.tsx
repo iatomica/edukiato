@@ -6,6 +6,7 @@ import { useTenantData } from '../hooks/useTenantData';
 import { CalendarEvent, User } from '../types';
 import { EventDetailModal } from './EventDetailModal';
 import { EventEditorModal } from './EventEditorModal';
+import { UserAvatar } from './UserAvatar';
 
 interface ScheduleProps {
   user: User;
@@ -398,7 +399,7 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
             {students.map(student => (
               <div key={student.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all">
                 <div className="flex items-center space-x-3">
-                  <img src={student.avatar} className="w-8 h-8 rounded-full" alt={student.name} />
+                  <UserAvatar name={student.name} role={student.role} className="w-8 h-8 shrink-0" />
                   <div>
                     <p className="text-sm font-semibold text-slate-800">{student.name}</p>
                     <p className="text-xs text-slate-400">{student.program}</p>

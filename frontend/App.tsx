@@ -12,6 +12,7 @@ import { InstitutionPicker } from './components/InstitutionPicker';
 import { Usuarios } from './components/Usuarios';
 import { Institutions } from './components/Institutions';
 import Aulas from './components/Aulas';
+import { Settings } from './components/Settings/Settings';
 import { View } from './types';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -93,6 +94,8 @@ const AppContent: React.FC = () => {
         return <Institutions />;
       case 'aulas':
         return <Aulas onViewChange={(v: View, p?: any) => handleViewChange(v, p)} />;
+      case 'settings':
+        return <Settings />;
       default:
         return <Dashboard onViewChange={(v) => handleViewChange(v)} user={user!} />;
     }

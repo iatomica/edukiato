@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { useAuth } from '../contexts/AuthContext';
 import { useAppState } from '../contexts/AppStateContext';
 import { usersApi, messagesApi } from '../services/api';
+import { UserAvatar } from './UserAvatar';
 
 export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialUserId }) => {
   const { user: currentUser, currentInstitution, token } = useAuth();
@@ -317,7 +318,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
                     onClick={() => setSelectedUserId(u.id)}
                     className={`w-full flex items-center p-3 rounded-xl mb-1 transition-colors ${selectedUserId === u.id ? 'bg-primary-50 ring-1 ring-primary-100' : 'hover:bg-slate-100'}`}
                   >
-                    <img src={u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}`} alt="" className="w-10 h-10 rounded-full object-cover border border-slate-200" />
+                    <UserAvatar name={u.name} role={u.role} className="w-10 h-10 border border-slate-200 shrink-0" />
                     <div className="ml-3 text-left flex-1 min-w-0">
                       <p className={`text-sm font-semibold truncate ${selectedUserId === u.id ? 'text-primary-800' : 'text-slate-700'}`}>{displayName}</p>
                       <p className={`text-[10px] font-bold mt-0.5 inline-block px-1.5 rounded-sm ${getRoleBadgeColor(u.role)}`}>
@@ -356,8 +357,8 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
                     onClick={() => setSelectedUserId(conv.contactId)}
                     className={`w-full flex items-center p-3 rounded-xl mb-1 transition-colors ${selectedUserId === conv.contactId ? 'bg-white shadow-sm ring-1 ring-slate-200 border border-slate-100/50' : 'hover:bg-slate-100'}`}
                   >
-                    <div className="relative">
-                      <img src={contact.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(contact.name)}`} alt="" className="w-12 h-12 rounded-full object-cover border border-slate-200" />
+                    <div className="relative shrink-0">
+                      <UserAvatar name={contact.name} role={contact.role} className="w-12 h-12 border border-slate-200" />
                     </div>
                     <div className="ml-3 flex-1 min-w-0 flex flex-col justify-center">
                       <div className="flex justify-between items-baseline mb-0.5">
@@ -410,7 +411,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-left"><path d="m15 18-6-6 6-6" /></svg>
               </button>
 
-              <img src={selectedUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}`} className="w-10 h-10 object-cover mr-3 md:mr-4 rounded-full border border-slate-200" alt="" />
+              <UserAvatar name={selectedUser.name} role={selectedUser.role} className="w-10 h-10 mr-3 md:mr-4 border border-slate-200 shrink-0" />
               <div className="min-w-0">
                 <h3 className="font-bold text-slate-800 truncate">
                   {selectedUser.role === 'PADRE' && state.ninos.filter(n => n.parentIds?.includes(selectedUser.id)).length > 0
@@ -443,7 +444,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
                   <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                     {!isMe && (
                       <div className="w-8 mr-2 flex-shrink-0">
-                        {showAvatar && <img src={selectedUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}`} className="w-8 h-8 rounded-full border border-slate-200" alt="Sender" />}
+                        {showAvatar && <UserAvatar name={selectedUser.name} role={selectedUser.role} className="w-8 h-8 border border-slate-200" />}
                       </div>
                     )}
                     <div className={`max-w-[70%] ${isMe ? 'order-1' : 'order-2'}`}>

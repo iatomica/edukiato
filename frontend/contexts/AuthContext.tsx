@@ -7,6 +7,7 @@ import { authApi } from '../services/api';
 interface AuthContextType extends AuthState {
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
+    updateUser: (newData: Partial<User>) => void;
     selectInstitution: (institution: UserInstitution) => void;
     clearInstitution: () => void;
     error: string | null;
@@ -68,8 +69,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setToken(null);
         setCurrentInstitution(null);
         localStorage.removeItem('edukatio_token');
-        localStorage.removeItem('edukatio_user');
         localStorage.removeItem('edukatio_institution');
+    }, []);
+
+    const updateUser = useCallback((newData: Partial<User>) => {
+        setUser(prev => {
+            if (!prev) return null;
+            const updated = { ...prev, ...newData };
+            localStorage.setItem('edukatio_user', JSON.stringify(updated));
+            return updated;
+        });
     }, []);
 
     const selectInstitution = useCallback((inst: UserInstitution) => {
@@ -105,6 +114,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         error,
         login,
         logout,
+        updateUser,
         selectInstitution,
         clearInstitution,
     };

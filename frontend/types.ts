@@ -417,7 +417,7 @@ export interface Notification {
   courseId?: string; // Target specific course members
 }
 
-export type View = 'dashboard' | 'courses' | 'students' | 'schedule' | 'classroom' | 'messages' | 'communications' | 'usuarios' | 'institutions' | 'aulas';
+export type View = 'dashboard' | 'courses' | 'students' | 'schedule' | 'classroom' | 'messages' | 'communications' | 'usuarios' | 'institutions' | 'aulas' | 'settings';
 
 
 

@@ -6,6 +6,7 @@ import { usePermissions } from '../contexts/PermissionsContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTenantData } from '../hooks/useTenantData';
+import { UserAvatar } from './UserAvatar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -240,6 +241,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
 
           <button
             title={isDesktopCollapsed ? t.nav.settings : undefined}
+            onClick={() => onViewChange('settings')}
             className={`w-full flex items-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-xl transition-colors ${isDesktopCollapsed ? 'justify-center p-3' : 'space-x-3 px-4 py-2'}`}
           >
             <Settings size={20} className="shrink-0" />
@@ -261,7 +263,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
           )}
 
           <div className={`mt-4 flex bg-slate-50 rounded-xl w-full ${isDesktopCollapsed ? 'flex-col items-center p-2 text-center' : 'items-center p-3'}`}>
-            <img src={user.avatar} alt="User" className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm shrink-0" />
+            <UserAvatar name={user.name} role={user.role} className="w-10 h-10 border-2 border-white shadow-sm shrink-0" />
 
             <div className={`transition-all duration-300 delay-100 min-w-0 ${isDesktopCollapsed ? 'w-0 h-0 opacity-0 overflow-hidden m-0' : 'ml-3 flex-1 w-auto opacity-100 h-auto'}`}>
               <p className="text-sm font-medium text-slate-800 truncate">{user.name}</p>

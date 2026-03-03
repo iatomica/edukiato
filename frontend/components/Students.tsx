@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { format } from 'date-fns';
 import { usersApi } from '../services/api';
 import { AnimatedAvatar } from './AnimatedAvatar';
+import { UserAvatar } from './UserAvatar';
 import AcademicReportsTab from './AcademicReportsTab';
 
 // ── SUB-COMPONENTS ───────────────────────────────────────────
@@ -217,7 +218,7 @@ export const CommunicationsModal = ({
                             className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500 mr-3"
                           />
                           <div className="flex items-center gap-3">
-                            <img src={padre.avatar} alt="avatar" className="w-6 h-6 rounded-full border border-slate-200" />
+                            <UserAvatar name={padre.name} role={padre.role} className="w-6 h-6 border border-slate-200 shrink-0" />
                             <div>
                               <p className="text-sm font-medium text-slate-900">{padre.name}</p>
                               <p className="text-xs text-slate-500">{padre.email}</p>
@@ -425,7 +426,7 @@ const StudentDetail = ({ student, onClose, communications, aulas, ninos, allUser
           <button onClick={onClose} className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors backdrop-blur-md">
             <ArrowLeft size={20} className="text-white" />
           </button>
-          <img src={student.avatar} alt={student.name} className="w-20 h-20 rounded-full border-4 border-white/20 shadow-xl" />
+          <UserAvatar name={student.name} role={student.role || 'ESTUDIANTE'} className="w-20 h-20 border-4 border-white/20 shadow-xl shrink-0" />
           <div>
             <h2 className="text-3xl font-bold">{student.name}</h2>
             <p className="text-slate-300 flex items-center mt-1">

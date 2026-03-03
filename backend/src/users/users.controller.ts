@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Request, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, UseGuards, Request, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -25,5 +25,10 @@ export class UsersController {
         // For now we trust the payload or fallback to a dummy ID if not provided.
         const targetInstitutionId = createUserDto.institutionId || 'inst-001';
         return this.usersService.create(createUserDto, targetInstitutionId);
+    }
+
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updateData: Partial<CreateUserDto>) {
+        return this.usersService.update(id, updateData);
     }
 }

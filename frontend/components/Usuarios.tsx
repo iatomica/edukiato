@@ -6,6 +6,7 @@ import { useAppState } from '../contexts/AppStateContext';
 import { usersApi } from '../services/api';
 import Modal from './Modal';
 import { AnimatedAvatar } from './AnimatedAvatar';
+import { UserAvatar } from './UserAvatar';
 
 export const Usuarios: React.FC = () => {
     const { user: currentUser, currentInstitution, token } = useAuth();
@@ -323,7 +324,7 @@ export const Usuarios: React.FC = () => {
                                     >
                                         <td className="px-6 py-4">
                                             <div className="flex items-center">
-                                                <img className="h-10 w-10 rounded-full object-cover border border-slate-200 group-hover:ring-2 group-hover:ring-primary-100 transition-all" src={u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}`} alt="" />
+                                                <UserAvatar name={u.name} role={u.role} className="h-10 w-10 border border-slate-200 group-hover:ring-2 group-hover:ring-primary-100 transition-all shrink-0" />
                                                 <div className="ml-4">
                                                     <div className="text-sm font-bold text-slate-900 group-hover:text-primary-600 transition-colors">{u.name}</div>
                                                     <div className="text-xs text-slate-500 flex items-center mt-0.5">
@@ -375,7 +376,7 @@ export const Usuarios: React.FC = () => {
                                     <tr key={n.id} className="hover:bg-slate-50 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center">
-                                                <img className="h-10 w-10 rounded-full object-cover border border-slate-200" src={n.avatar} alt="" />
+                                                <UserAvatar name={n.name} role="ESTUDIANTE" className="h-10 w-10 border border-slate-200 shrink-0" />
                                                 <div className="ml-4">
                                                     <div className="text-sm font-bold text-slate-900">{n.name}</div>
                                                 </div>
@@ -484,8 +485,7 @@ export const Usuarios: React.FC = () => {
 
                         <form onSubmit={handleEditUser} className="p-6 space-y-4">
                             <div className="flex flex-col items-center mb-6">
-                                <img src={editUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(editUser.name)}`} alt="" className="w-24 h-24 rounded-full object-cover mb-3 border-4 border-white shadow-md ring-1 ring-slate-200" />
-                                <input type="url" name="avatar" defaultValue={editUser.avatar} className="w-full text-xs border border-slate-200 rounded-lg p-2 text-center text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-300" placeholder="URL de la imagen (opcional)" />
+                                <UserAvatar name={editUser.name} role={editUser.role} className="w-24 h-24 mb-3 border-4 border-white shadow-md ring-1 ring-slate-200 shrink-0" />
                             </div>
 
                             <div>

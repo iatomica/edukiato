@@ -9,6 +9,7 @@ import { es } from 'date-fns/locale';
 import Modal from './Modal';
 import { usersApi } from '../services/api';
 import { AnimatedAvatar } from './AnimatedAvatar';
+import { UserAvatar } from './UserAvatar';
 import AcademicReportsTab from './AcademicReportsTab';
 import { CommunicationsModal } from './Students';
 
@@ -372,7 +373,7 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                 return (
                                                     <label key={docente.id} className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-lg hover:border-primary-200 cursor-pointer transition-colors shadow-sm">
                                                         <div className="flex items-center gap-3">
-                                                            <img src={docente.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(docente.name)}`} className="w-8 h-8 rounded-full bg-slate-100" />
+                                                            <UserAvatar name={docente.name} role={docente.role} className="w-8 h-8 shrink-0 bg-slate-100" />
                                                             <div>
                                                                 <p className="text-sm font-bold text-slate-800">{docente.name}</p>
                                                                 <p className="text-xs text-slate-500">{docente.email}</p>
@@ -947,7 +948,7 @@ function AddAulaModal({ isOpen, onClose, onAdd, allUsers }: { isOpen: boolean, o
                                         return (
                                             <label key={docente.id} className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-lg hover:border-primary-200 cursor-pointer transition-colors shadow-sm">
                                                 <div className="flex items-center gap-3">
-                                                    <img src={docente.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(docente.name)}`} className="w-8 h-8 rounded-full bg-slate-100" />
+                                                    <UserAvatar name={docente.name} role={docente.role} className="w-8 h-8 shrink-0 bg-slate-100" />
                                                     <div>
                                                         <p className="text-sm font-bold text-slate-800">{docente.name}</p>
                                                         <p className="text-xs text-slate-500">{docente.email}</p>
