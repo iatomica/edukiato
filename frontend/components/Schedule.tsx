@@ -18,7 +18,7 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
   const { events, aulas, ninos, students, emitEvent, dispatch, institutionId } = useTenantData();
   const today = new Date();
   const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 });
-  const weekDays = Array.from({ length: 5 }).map((_, i) => addDays(startOfCurrentWeek, i));
+  const [weekOffset, setWeekOffset] = useState(0);
 
   const [attendanceEvent, setAttendanceEvent] = useState<CalendarEvent | null>(null);
   const [attendance, setAttendance] = useState<Record<string, string>>({});
@@ -117,6 +117,27 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
 
     return false;
   });
+
+  const currentWeekStart = addDays(startOfCurrentWeek, weekOffset * 7);
+  let daysToShow = 5;
+  const currentWeekSaturday = addDays(currentWeekStart, 5);
+  const currentWeekSunday = addDays(currentWeekStart, 6);
+
+  const hasEventOnDay = (day: Date) => {
+    return visibleEvents.some(e => {
+      const eStart = new Date(e.start);
+      const eEnd = new Date(e.end);
+      return isSameDay(eStart, day) || isSameDay(eEnd, day) || (eStart <= day && eEnd >= day);
+    });
+  };
+
+  if (hasEventOnDay(currentWeekSunday)) {
+    daysToShow = 7;
+  } else if (hasEventOnDay(currentWeekSaturday)) {
+    daysToShow = 6;
+  }
+
+  const weekDays = Array.from({ length: daysToShow }).map((_, i) => addDays(currentWeekStart, i));
 
   const handleSaveEvent = (eventData: Partial<CalendarEvent>) => {
     if (editingEvent && editingEvent.id) {
@@ -217,18 +238,18 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
                   <span className="hidden md:inline">Crear Evento</span>
                 </button>
               )}
-              <button className="bg-white border border-slate-200 text-slate-700 px-3 md:px-5 py-1.5 md:py-2 rounded-full font-medium text-xs md:text-sm shadow-sm hover:bg-slate-50 transition-all">
-                Hoy
-              </button>
+              <div className="bg-white border border-slate-200 text-slate-700 px-3 md:px-5 py-1.5 md:py-2 rounded-full font-medium text-xs md:text-sm shadow-sm select-none">
+                <span className="capitalize">{t.schedule.today || 'Hoy'}, {format(today, 'd MMM yyyy', { locale: es })}</span>
+              </div>
             </div>
             <div className="flex items-center gap-1 md:gap-2">
               <div id="tour-schedule-nav" className="flex items-center space-x-0.5 md:space-x-1 bg-white rounded-full border border-slate-200 p-0.5 md:p-1 shadow-sm">
-                <button className="p-1 hover:bg-slate-100 rounded-full text-slate-500 transition-colors"><ChevronLeft size={16} /></button>
-                <button className="p-1 hover:bg-slate-100 rounded-full text-slate-500 transition-colors"><ChevronRight size={16} /></button>
+                <button onClick={() => setWeekOffset(prev => prev - 1)} className="p-1 hover:bg-slate-100 rounded-full text-slate-500 transition-colors"><ChevronLeft size={16} /></button>
+                <button onClick={() => setWeekOffset(prev => prev + 1)} className="p-1 hover:bg-slate-100 rounded-full text-slate-500 transition-colors"><ChevronRight size={16} /></button>
               </div>
-              <span className="text-xs md:text-xl font-semibold text-slate-800 capitalize ml-1">
-                <span className="md:hidden">{getLocalizedMonth(today).slice(0, 3)} '{format(today, 'yy')}</span>
-                <span className="hidden md:inline">{getLocalizedMonth(today)} {format(today, 'yyyy')}</span>
+              <span className="text-xs md:text-lg font-semibold text-slate-800 capitalize ml-1 flex items-center justify-center min-w-[140px]">
+                <span className="md:hidden">{getLocalizedMonth(currentWeekStart).slice(0, 3)} '{format(currentWeekStart, 'yy')}</span>
+                <span className="hidden md:inline">{getLocalizedMonth(currentWeekStart)} {format(currentWeekStart, 'yyyy')}</span>
               </span>
             </div>
           </div>
@@ -241,7 +262,7 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
               <div className="flex border-b border-slate-200 bg-slate-50 sticky top-0 z-30">
                 {/* Empty corner for time column */}
                 <div className="w-10 md:w-16 shrink-0 border-r border-slate-200 bg-slate-50 sticky left-0 z-40"></div>
-                <div className="flex-1 grid grid-cols-5">
+                <div className="flex-1 grid" style={{ gridTemplateColumns: `repeat(${weekDays.length}, minmax(0, 1fr))` }}>
                   {weekDays.map((day, idx) => (
                     <div key={idx} className={`py-2 md:py-4 px-0.5 md:px-2 text-center border-r border-slate-200 last:border-r-0 flex flex-col items-center justify-center ${isSameDay(day, today) ? 'bg-primary-50/50' : ''}`}>
                       <span className="block text-[9px] md:text-xs uppercase font-bold text-slate-400 truncate w-full">
@@ -288,7 +309,7 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
                     </div>
                   )}
 
-                  <div className="flex-1 grid grid-cols-5 relative z-10">
+                  <div className="flex-1 grid relative z-10" style={{ gridTemplateColumns: `repeat(${weekDays.length}, minmax(0, 1fr))` }}>
                     {weekDays.map((day, colIndex) => {
                       const dayEvents = visibleEvents.filter(e => isSameDay(e.start, day));
 
