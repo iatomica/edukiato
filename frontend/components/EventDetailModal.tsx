@@ -43,7 +43,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
                 <div className="flex items-start justify-between p-8 pb-4">
                     <div>
                         <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 ${event.color}`}>
-                            {event.type}
+                            {typeMap[event.type as keyof typeof typeMap] || event.type}
                         </div>
                         <h2 className="text-3xl font-bold text-slate-900 tracking-tight leading-tight">{event.title}</h2>
                         <p className="text-sm font-semibold text-slate-500 mt-2 flex items-center">
