@@ -325,7 +325,7 @@ export interface CalendarEvent {
   title: string;
   start: Date;
   end: Date;
-  type: 'class' | 'workshop' | 'event';
+  type: 'EVENTO_DE_SALA' | 'EVENTOS_ESPECIALES' | 'ACTOS' | 'REUNION_INDIVIDUAL' | 'REUNION_JARDIN' | 'REUNION_DE_SALA';
   color: string;
   description?: string;
   creatorId?: string;

@@ -54,7 +54,7 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
     }
 
     const isAdmin = currentUser.role === 'ADMIN_INSTITUCION' || currentUser.role === 'SUPER_ADMIN';
-    const [type, setType] = useState<'class' | 'workshop' | 'event'>(initialData?.type || 'event');
+    const [type, setType] = useState<CalendarEvent['type']>(initialData?.type || 'EVENTO_DE_SALA');
     const [scope, setScope] = useState<'ALL' | 'COURSE' | 'AULA' | 'INDIVIDUAL'>(initialData?.sharedWith?.scope || (isAdmin ? 'ALL' : 'AULA'));
     const [targetIds, setTargetIds] = useState<string[]>(initialData?.sharedWith?.targetIds || []);
 
@@ -80,10 +80,13 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
         if (!isFormValid) return;
 
         // Choose color based on type
-        const colorMap = {
-            class: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-            workshop: 'bg-orange-100 text-orange-700 border-orange-200',
-            event: 'bg-emerald-100 text-emerald-700 border-emerald-200'
+        const colorMap: Record<CalendarEvent['type'], string> = {
+            EVENTO_DE_SALA: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+            EVENTOS_ESPECIALES: 'bg-orange-100 text-orange-700 border-orange-200',
+            ACTOS: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+            REUNION_INDIVIDUAL: 'bg-blue-100 text-blue-700 border-blue-200',
+            REUNION_JARDIN: 'bg-purple-100 text-purple-700 border-purple-200',
+            REUNION_DE_SALA: 'bg-rose-100 text-rose-700 border-rose-200'
         };
 
         let finalColor = colorMap[type];
@@ -198,9 +201,12 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
                                     onChange={(e) => setType(e.target.value as any)}
                                     className="w-full px-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-200 focus:border-slate-400 outline-none transition-all text-slate-700 font-medium appearance-none"
                                 >
-                                    <option value="class">{t.calendarTypes?.class || 'Clase Regular'}</option>
-                                    <option value="workshop">{t.calendarTypes?.workshop || 'Taller / Workshop'}</option>
-                                    <option value="event">{t.calendarTypes?.event || 'Evento Especial'}</option>
+                                    <option value="EVENTO_DE_SALA">Eventos de sala</option>
+                                    <option value="EVENTOS_ESPECIALES">Eventos especiales</option>
+                                    <option value="ACTOS">Actos</option>
+                                    <option value="REUNION_INDIVIDUAL">Reunión individual</option>
+                                    <option value="REUNION_JARDIN">Reunión jardín</option>
+                                    <option value="REUNION_DE_SALA">Reunión de sala</option>
                                 </select>
                             </div>
 

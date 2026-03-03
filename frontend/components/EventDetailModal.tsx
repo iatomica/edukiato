@@ -27,9 +27,12 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
     if (!event) return null;
 
     const typeMap = {
-        class: 'Clase Regular',
-        workshop: 'Taller / Workshop',
-        event: 'Evento Especial'
+        EVENTO_DE_SALA: 'Evento de Sala',
+        EVENTOS_ESPECIALES: 'Evento Especial',
+        ACTOS: 'Acto Institucional',
+        REUNION_INDIVIDUAL: 'Reunión Individual',
+        REUNION_JARDIN: 'Reunión Jardín',
+        REUNION_DE_SALA: 'Reunión de Sala',
     };
 
     // Edit/Delete Permissions: Only SuperAdmin, Admin, or the Creator can edit.
@@ -49,19 +52,22 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
                             {typeMap[event.type as keyof typeof typeMap] || event.type}
                         </div>
                         <h2 className="text-3xl font-bold text-slate-900 tracking-tight leading-tight">{event.title}</h2>
-                        <p className="text-sm font-semibold text-slate-500 mt-2 flex items-center">
+                        <p className="text-sm font-semibold text-slate-500 mt-2 flex items-center mb-6">
                             <Clock size={16} className="mr-1.5 text-slate-400" />
                             <span className="capitalize">{format(event.start, 'EEEE, d MMM yyyy', { locale: es })}</span>
                             <span className="mx-2">•</span>
                             {format(event.start, 'HH:mm', { locale: es })} - {format(event.end, 'HH:mm', { locale: es })}
                         </p>
-                        {creatorName && (
-                            <p className="text-xs font-medium text-slate-400 mt-1.5 flex items-center">
-                                <UserIcon size={14} className="mr-1.5" />
-                                Añadido por {creatorName}
-                            </p>
-                        )}
+                        <div className="flex flex-wrap gap-2 items-center">
+                            {creatorName && (
+                                <p className="text-xs font-medium text-slate-400 mt-1.5 flex items-center">
+                                    <UserIcon size={14} className="mr-1.5" />
+                                    Añadido por {creatorName}
+                                </p>
+                            )}
+                        </div>
                     </div>
+
                     <div className="flex items-center gap-2">
                         {canEdit && (
                             <>

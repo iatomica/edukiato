@@ -44,7 +44,7 @@ export const MOCK_EVENTS: CalendarEvent[] = [
     title: 'Acto Patrio',
     start: new Date(new Date().setHours(10, 0, 0, 0)),
     end: new Date(new Date().setHours(12, 0, 0, 0)),
-    type: 'event',
+    type: 'ACTOS',
     color: 'bg-emerald-100 text-emerald-700 border-emerald-200',
     creatorId: 'u_dir',
     description: 'Acto general con participación de todas las salas.',

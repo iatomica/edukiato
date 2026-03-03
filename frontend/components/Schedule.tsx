@@ -207,7 +207,7 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
     const newEventTemplate: Partial<CalendarEvent> = {
       start: clickDate,
       end: endDate,
-      type: 'event',
+      type: 'EVENTO_DE_SALA',
       color: 'bg-emerald-100 text-emerald-700 border-emerald-200'
     };
 
@@ -377,18 +377,6 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
                                 <span className="hidden md:inline"> - {format(event.end, 'HH:mm')}</span>
                               </p>
                               <p className="text-[9px] md:text-xs font-bold leading-tight opacity-90 truncate">{event.title}</p>
-
-                              {/* Only show "Pasar Lista" if event is long enough (e.g., >= 45m) and it's a class */}
-                              {event.type === 'class' && (event.end.getTime() - event.start.getTime()) >= 45 * 60000 && (
-                                <div className="hidden md:flex items-center mt-2 text-[10px] opacity-70" onClick={(e) => {
-                                  if (['DOCENTE', 'ADMIN_INSTITUCION', 'SUPER_ADMIN'].includes(user.role)) {
-                                    e.stopPropagation();
-                                    setAttendanceEvent(event);
-                                  }
-                                }}>
-                                  <Check size={10} className="mr-1" /> Pasar Lista
-                                </div>
-                              )}
                             </div>
                           ))}
                         </div>
