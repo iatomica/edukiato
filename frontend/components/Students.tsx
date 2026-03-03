@@ -905,8 +905,12 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
                 .map((student) => (
                   <tr
                     key={student.id}
-                    onClick={() => setSelectedStudentDetail(student)}
-                    className="hover:bg-slate-50/50 transition-colors cursor-pointer"
+                    onClick={() => {
+                      if (student.role !== 'PADRE') {
+                        setSelectedStudentDetail(student);
+                      }
+                    }}
+                    className={`hover:bg-slate-50/50 transition-colors ${student.role !== 'PADRE' ? 'cursor-pointer' : ''}`}
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center">
