@@ -174,7 +174,7 @@ export const ROLE_OWN_PERMISSIONS: Record<UserRole, PermissionRule[]> = {
     { action: 'manage', resource: 'enrollment' },
     { action: 'manage', resource: 'certificate' },
     { action: 'manage', resource: 'announcement' },
-    { action: ['create', 'read', 'update'], resource: 'user' },
+    { action: 'manage', resource: 'user' },
     { action: 'read', resource: 'institution' },
     { action: 'export', resource: 'report' },
   ],

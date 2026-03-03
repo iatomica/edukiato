@@ -227,10 +227,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
               <div className={`text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-6 transition-all duration-300 ${isDesktopCollapsed ? 'px-0 text-center text-[10px]' : 'px-4'}`}>
                 {isDesktopCollapsed ? '•••' : t.nav.admin}
               </div>
-              {can('manage', 'institution') && (
-                <NavItem view="institutions" icon={Building2} label="Instituciones" />
-              )}
-              {can('manage', 'user') && (
+              {(user.role === 'SUPER_ADMIN' || user.role === 'ADMIN_INSTITUCION') && can('manage', 'user') && (
                 <NavItem view="usuarios" icon={Users} label="Usuarios y Roles" />
               )}
             </>
