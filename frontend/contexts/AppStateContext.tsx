@@ -52,6 +52,7 @@ type AppAction =
     | { type: 'ADD_NINO'; payload: Nino }
     | { type: 'UPDATE_STUDENT'; payload: Partial<Student> & { id: string } }
     | { type: 'MARK_COMMUNICATIONS_READ'; payload: { userId: string } }
+    | { type: 'MARK_NOTIFICATIONS_READ'; payload: { userId: string } }
     | { type: 'ADD_EVENT'; payload: CalendarEvent }
     | { type: 'UPDATE_EVENT'; payload: Partial<CalendarEvent> & { id: string } }
     | { type: 'DELETE_EVENT'; payload: { id: string } }
@@ -216,6 +217,18 @@ function appReducer(state: AppState, action: AppAction): AppState {
             });
             try { localStorage.setItem('MOCK_COMMUNICATIONS', JSON.stringify(updatedComms)); } catch (e) { }
             return { ...state, communications: updatedComms };
+        }
+
+        case 'MARK_NOTIFICATIONS_READ': {
+            const updatedNotifs = state.notifications.map(n => {
+                // Mark all as read for the mock simulation
+                if (!n.isRead) {
+                    return { ...n, isRead: true };
+                }
+                return n;
+            });
+            try { localStorage.setItem('MOCK_NOTIFICATIONS', JSON.stringify(updatedNotifs)); } catch (e) { }
+            return { ...state, notifications: updatedNotifs };
         }
 
         case 'UPDATE_CONVERSATION':

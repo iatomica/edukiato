@@ -76,6 +76,10 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
 
         // Mark as read natively
         await messagesApi.markAsRead(currentUser.id, selectedUserId, token);
+
+        // Notify other components (like Layout sidebar) that messages were read
+        window.dispatchEvent(new CustomEvent('MOCK_MESSAGES_UPDATED'));
+
         fetchConversations();
       } catch (error) {
         console.error("Error fetching messages:", error);
@@ -92,6 +96,8 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
         messagesApi.getMessages(currentUser.id, selectedUserId, token).then(msgs => {
           setMessagesState(prev => ({ ...prev, [selectedUserId]: msgs }));
         });
+        // We call markAsRead to clear any new incoming unread messages synchronously
+        // markAsRead will only dispatch an event if actual unread msgs were found, preventing infinite loops.
         messagesApi.markAsRead(currentUser.id, selectedUserId, token);
       }
     };

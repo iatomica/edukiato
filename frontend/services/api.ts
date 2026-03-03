@@ -507,9 +507,8 @@ export const messagesApi = {
         const conversations: { contactId: string, lastMessage: Message, unreadCount: number }[] = [];
 
         for (const [chatId, messages] of Object.entries(MOCK_MESSAGES)) {
-            if (chatId.includes(userId) && messages.length > 0) {
-                // chatId format is "id1|id2", get the other id
-                const ids = chatId.split('|');
+            const ids = chatId.split('|');
+            if (ids.includes(userId) && messages.length > 0) {
                 const contactId = ids[0] === userId ? ids[1] : ids[0];
                 const lastMessage = messages[messages.length - 1];
                 const unreadCount = messages.filter(m => m.senderId !== userId && !m.isRead).length;

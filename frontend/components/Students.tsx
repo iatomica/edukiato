@@ -551,12 +551,26 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
   const [viewMode, setViewMode] = useState<'LIST' | 'NOTEBOOK'>(initialViewMode);
   const { user, currentInstitution, token } = useAuth();
   const [activeTab, setActiveTab] = useState<'ALUMNOS' | 'PADRES'>(user?.role === 'PADRE' ? 'PADRES' : 'ALUMNOS');
+  const [selectedAulaId, setSelectedAulaId] = useState<string>('ALL');
 
   const { t } = useLanguage();
   const { students, courses, communications, aulas, ninos, dispatch, emitEvent } = useTenantData();
   const { can } = usePermissions();
 
   const isAdmin = user?.role === 'ADMIN_INSTITUCION' || user?.role === 'SUPER_ADMIN';
+
+  // Aulas list for filter based on role
+  const filterableAulas = useMemo(() => {
+    if (isAdmin) return aulas;
+    if (user?.role === 'DOCENTE') {
+      return aulas.filter(a => a.teachers.includes(user.id));
+    }
+    if (user?.role === 'PADRE') {
+      const myKidsAulaIds = ninos.filter(n => n.parentIds?.includes(user.id)).map(n => n.aulaId);
+      return aulas.filter(a => myKidsAulaIds.includes(a.id));
+    }
+    return aulas;
+  }, [aulas, isAdmin, user, ninos]);
 
   const visibleTableStudents = useMemo(() => {
     let baseUsers = students.filter(s => s.role !== 'SUPER_ADMIN');
@@ -588,37 +602,52 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
       ))
     );
 
-    if (isAdmin) {
-      return baseUsers;
-    }
+    let result: Student[] = [];
 
-    if (user?.role === 'DOCENTE') {
+    if (isAdmin) {
+      result = baseUsers;
+    } else if (user?.role === 'DOCENTE') {
       const teacherAulas = aulas.filter(a => a.teachers.includes(user.id)).map(a => a.id);
       const teacherNinos = ninos.filter(n => teacherAulas.includes(n.aulaId));
       const teacherParentsIds = teacherNinos.flatMap(n => n.parentIds || []);
       const parentUserIds = Array.from(new Set(teacherParentsIds));
 
-      return baseUsers.filter(s => {
+      result = baseUsers.filter(s => {
         if (s.role === 'PADRE') return parentUserIds.includes(s.id);
         if (s.role === 'ESTUDIANTE') return teacherNinos.some(n => n.name === s.name);
         return false;
       });
-    }
-
-    if (user?.role === 'PADRE') {
+    } else if (user?.role === 'PADRE') {
       const myKidsAulaIds = ninos.filter(n => n.parentIds?.includes(user.id)).map(n => n.aulaId);
       const kidsInSameAulas = ninos.filter(n => myKidsAulaIds.includes(n.aulaId));
       const parentIdsInSameAulas = Array.from(new Set(kidsInSameAulas.flatMap(n => n.parentIds || [])));
 
-      return baseUsers.filter(s => {
+      result = baseUsers.filter(s => {
         // Padres see other padres in same aulas
         if (s.role === 'PADRE') return parentIdsInSameAulas.includes(s.id);
         return false;
       });
     }
 
-    return [];
-  }, [students, isAdmin, user, aulas, ninos]);
+    // Aplicar filtro por Sala/Aula
+    if (selectedAulaId !== 'ALL') {
+      const ninosInAula = ninos.filter(n => n.aulaId === selectedAulaId);
+      const ninoNamesInAula = new Set(ninosInAula.map(n => n.name));
+      const parentIdsInAula = new Set(ninosInAula.flatMap(n => n.parentIds || []));
+
+      result = result.filter(s => {
+        if (s.role === 'ESTUDIANTE') {
+          return ninosInAula.some(n => n.id === s.id) || ninoNamesInAula.has(s.name);
+        }
+        if (s.role === 'PADRE') {
+          return parentIdsInAula.has(s.id);
+        }
+        return true;
+      });
+    }
+
+    return result;
+  }, [students, isAdmin, user, aulas, ninos, selectedAulaId]);
 
   React.useEffect(() => {
     if (initialCommParams) {
@@ -875,15 +904,15 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
             />
           </div>
           <div className="flex gap-2">
-            <select className="text-sm border-slate-200 rounded-lg text-slate-600 focus:ring-primary-200 cursor-pointer">
-              <option>All Programs</option>
-              <option>Visual Arts</option>
-              <option>Music</option>
-            </select>
-            <select className="text-sm border-slate-200 rounded-lg text-slate-600 focus:ring-primary-200 cursor-pointer">
-              <option>{t.students.table.status}: All</option>
-              <option>{t.students.status.active}</option>
-              <option>{t.students.status.inactive}</option>
+            <select
+              value={selectedAulaId}
+              onChange={(e) => setSelectedAulaId(e.target.value)}
+              className="text-sm border-slate-200 rounded-lg text-slate-600 focus:ring-primary-200 cursor-pointer"
+            >
+              <option value="ALL">Todas las salas</option>
+              {filterableAulas.map(aula => (
+                <option key={aula.id} value={aula.id}>{aula.name}</option>
+              ))}
             </select>
           </div>
         </div>

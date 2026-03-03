@@ -25,7 +25,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
   const { can } = usePermissions();
   const { theme } = useTheme();
   const { clearInstitution } = useAuth();
-  const { notifications, aulas, ninos, events, communications } = useTenantData();
+  const { notifications, aulas, ninos, events, communications, dispatch } = useTenantData();
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
   // Close notifications on click outside
@@ -285,7 +285,13 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
           <div className="relative" ref={notifRef}>
             <button
               id="tour-notifs"
-              onClick={() => setIsNotifOpen(!isNotifOpen)}
+              onClick={() => {
+                const willOpen = !isNotifOpen;
+                setIsNotifOpen(willOpen);
+                if (willOpen && unreadCount > 0) {
+                  dispatch({ type: 'MARK_NOTIFICATIONS_READ', payload: { userId: user.id } });
+                }
+              }}
               className={`p-2 rounded-full transition-colors ${isNotifOpen ? 'bg-white shadow-sm text-primary-600' : 'text-slate-400 hover:bg-white hover:shadow-sm'}`}
             >
               <Bell size={20} />
@@ -297,7 +303,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
               <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 animate-scale-in origin-top-right">
                 <div className="p-4 border-b border-slate-50 flex justify-between items-center">
                   <h3 className="font-bold text-slate-800">{t.notifications?.title || 'Notificaciones'}</h3>
-                  <button className="text-xs text-primary-600 font-medium hover:underline">{t.notifications?.markAllRead || 'Marcar como leídas'}</button>
+                  <button
+                    onClick={() => dispatch({ type: 'MARK_NOTIFICATIONS_READ', payload: { userId: user.id } })}
+                    className="text-xs text-primary-600 font-medium hover:underline"
+                  >
+                    {t.notifications?.markAllRead || 'Marcar como leídas'}
+                  </button>
                 </div>
                 <div className="max-h-96 overflow-y-auto">
                   {/* 
