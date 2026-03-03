@@ -25,6 +25,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
   const { theme } = useTheme();
   const { clearInstitution } = useAuth();
   const { notifications, aulas, ninos } = useTenantData();
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
   // Close notifications on click outside
   useEffect(() => {
@@ -42,8 +43,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
     // 0. General Announcements go to everyone
     if (n.type === 'ANNOUNCEMENT' && !n.courseId && !n.recipientId) return true;
 
-    // 1. Direct recipient
-    if (n.recipientId && n.recipientId === user.id) return true;
     if (n.recipientId && n.recipientId !== user.id) return false;
 
     // 2. Admins can see broadcasts and room-specific announcements
@@ -73,12 +72,39 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
   });
 
   const unreadCount = userNotifications.filter(n => !n.isRead).length;
+  const hasUnreadCommunications = userNotifications.some(n => !n.isRead && n.type === 'ANNOUNCEMENT');
+  const hasUnreadMessages = unreadMessagesCount > 0;
+
+  // Real-time synchronization for Sidebar Dot
+  useEffect(() => {
+    const fetchUnread = async () => {
+      // @ts-ignore (Accessing global token from localStorage/Auth logic usually, but here we can just pass a dummy or use api without it since it's mocked)
+      const token = localStorage.getItem('token') || 'dummy';
+      if (!user) return;
+
+      // Dynamically import api to avoid circular dependencies if any, or just use the global
+      import('../services/api').then(({ messagesApi }) => {
+        messagesApi.getConversations(user.id, token).then(convs => {
+          const sum = convs.reduce((acc, curr) => acc + (curr.unreadCount || 0), 0);
+          setUnreadMessagesCount(sum);
+        });
+      });
+    };
+
+    fetchUnread();
+    window.addEventListener('MOCK_MESSAGES_UPDATED', fetchUnread);
+    const interval = setInterval(fetchUnread, 3000);
+    return () => {
+      window.removeEventListener('MOCK_MESSAGES_UPDATED', fetchUnread);
+      clearInterval(interval);
+    };
+  }, [user]);
 
   const toggleLanguage = () => {
     setLanguage(language === 'es' ? 'en' : 'es');
   };
 
-  const NavItem = ({ view, icon: Icon, label }: { view: View; icon: React.ElementType; label: string }) => {
+  const NavItem = ({ view, icon: Icon, label, hasDot }: { view: View; icon: React.ElementType; label: string; hasDot?: boolean }) => {
     const isActive = currentView === view;
     return (
       <button
@@ -92,7 +118,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
           : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
           }`}
       >
-        <Icon size={20} className={isActive ? 'text-primary-600 shrink-0' : 'text-slate-400 group-hover:text-slate-600 shrink-0'} />
+        <div className="relative">
+          <Icon size={20} className={isActive ? 'text-primary-600 shrink-0' : 'text-slate-400 group-hover:text-slate-600 shrink-0'} />
+          {hasDot && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>}
+        </div>
         <span className={`whitespace-nowrap transition-all duration-300 ${isDesktopCollapsed ? 'w-0 opacity-0 overflow-hidden' : 'opacity-100 w-auto'}`}>{label}</span>
       </button>
     );
@@ -162,8 +191,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
 
 
           <NavItem view="schedule" icon={Calendar} label={t.nav.schedule} />
-          <NavItem view="messages" icon={MessageSquare} label={t.nav.messages} />
-          <NavItem view="communications" icon={FileText} label="Cuaderno" />
+          <NavItem view="messages" icon={MessageSquare} label={t.nav.messages} hasDot={hasUnreadMessages} />
+          <NavItem view="communications" icon={FileText} label="Cuaderno" hasDot={hasUnreadCommunications} />
 
           {can('read', 'financial') && (
             <>

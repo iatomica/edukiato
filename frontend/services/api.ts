@@ -452,8 +452,19 @@ export const coursesApi = {
 
 // ── Messages API ──────────────────────────────────────────────
 
+// --- Utilities for cross-tab mock sync ---
+const refreshMockMessages = () => {
+    if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('MOCK_MESSAGES');
+        if (stored) {
+            Object.assign(MOCK_MESSAGES, JSON.parse(stored));
+        }
+    }
+};
+
 export const messagesApi = {
     getMessages: async (userId: string, targetUserId: string, token: string): Promise<Message[]> => {
+        refreshMockMessages();
         // Simular retraso de red
         await new Promise(resolve => setTimeout(resolve, 300));
 
@@ -463,6 +474,7 @@ export const messagesApi = {
     },
 
     sendMessage: async (senderId: string, recipientId: string, content: string, token: string, file?: Message['file']): Promise<Message> => {
+        refreshMockMessages();
         // Simular retraso de red
         await new Promise(resolve => setTimeout(resolve, 300));
 
@@ -482,15 +494,17 @@ export const messagesApi = {
         }
 
         MOCK_MESSAGES[chatId].push(newMessage);
-        if (typeof window !== 'undefined') localStorage.setItem('MOCK_MESSAGES', JSON.stringify(MOCK_MESSAGES));
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('MOCK_MESSAGES', JSON.stringify(MOCK_MESSAGES));
+            window.dispatchEvent(new Event('MOCK_MESSAGES_UPDATED'));
+        }
         return newMessage;
     },
 
-    getConversations: async (userId: string, token: string): Promise<{ contactId: string, lastMessage: Message }[]> => {
-        // Simular retraso de red
-        await new Promise(resolve => setTimeout(resolve, 300));
-
-        const conversations: { contactId: string, lastMessage: Message }[] = [];
+    getConversations: async (userId: string, token: string): Promise<{ contactId: string, lastMessage: Message, unreadCount: number }[]> => {
+        refreshMockMessages();
+        // Fast response for polling
+        const conversations: { contactId: string, lastMessage: Message, unreadCount: number }[] = [];
 
         for (const [chatId, messages] of Object.entries(MOCK_MESSAGES)) {
             if (chatId.includes(userId) && messages.length > 0) {
@@ -498,7 +512,8 @@ export const messagesApi = {
                 const ids = chatId.split('|');
                 const contactId = ids[0] === userId ? ids[1] : ids[0];
                 const lastMessage = messages[messages.length - 1];
-                conversations.push({ contactId, lastMessage });
+                const unreadCount = messages.filter(m => m.senderId !== userId && !m.isRead).length;
+                conversations.push({ contactId, lastMessage, unreadCount });
             }
         }
 
@@ -506,6 +521,26 @@ export const messagesApi = {
         return conversations.sort((a, b) =>
             new Date(b.lastMessage.timestamp).getTime() - new Date(a.lastMessage.timestamp).getTime()
         );
+    },
+
+    markAsRead: async (userId: string, targetUserId: string, token: string): Promise<void> => {
+        refreshMockMessages();
+        const chatId = [userId, targetUserId].sort().join('|');
+        const messages = MOCK_MESSAGES[chatId];
+
+        if (messages) {
+            let updated = false;
+            messages.forEach(m => {
+                if (m.senderId !== userId && !m.isRead) {
+                    m.isRead = true;
+                    updated = true;
+                }
+            });
+            if (updated && typeof window !== 'undefined') {
+                localStorage.setItem('MOCK_MESSAGES', JSON.stringify(MOCK_MESSAGES));
+                window.dispatchEvent(new Event('MOCK_MESSAGES_UPDATED'));
+            }
+        }
     }
 };
 

@@ -265,7 +265,7 @@ const AppStateContext = createContext<AppStateContextType | undefined>(undefined
 
 export const AppStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [state, dispatch] = useReducer(appReducer, initialState);
-    const { token, isAuthenticated, currentInstitution } = useAuth();
+    const { token, isAuthenticated, currentInstitution, user } = useAuth();
 
     // Fetch real data when authenticated
     useEffect(() => {
@@ -356,6 +356,39 @@ export const AppStateProvider: React.FC<{ children: ReactNode }> = ({ children }
             unsubscribers.forEach(unsub => unsub());
         };
     }, [dispatch]);
+
+    // Real-time Conversation Syncing (Mock WebSocket)
+    useEffect(() => {
+        if (!isAuthenticated || !token || !currentInstitution || !user) return;
+
+        const syncConversations = async () => {
+            try {
+                const result = await messagesApi.getConversations(user.id, token);
+                const mappedConvs = result.map(c => ({
+                    id: c.contactId, // Quick proxy for conversation ID
+                    institutionId: currentInstitution.id,
+                    name: 'Contact',
+                    type: 'DIRECT' as any,
+                    lastMessage: c.lastMessage as any,
+                    lastMessageTime: c.lastMessage.timestamp,
+                    unreadCount: c.unreadCount,
+                    participants: [user.id, c.contactId]
+                }));
+                // We use standard React dispatch to softly replace conversations without refreshing everything
+                dispatch({ type: 'HYDRATE_STATE', payload: { conversations: mappedConvs } });
+            } catch (err) { }
+        };
+
+        window.addEventListener('MOCK_MESSAGES_UPDATED', syncConversations);
+        const interval = setInterval(syncConversations, 5000); // 5 sec poll fallback
+
+        syncConversations(); // Initial load
+
+        return () => {
+            window.removeEventListener('MOCK_MESSAGES_UPDATED', syncConversations);
+            clearInterval(interval);
+        };
+    }, [isAuthenticated, token, currentInstitution, user]);
 
     const emitEvent = useCallback((event: AppEvent) => {
         eventBus.emit(event);

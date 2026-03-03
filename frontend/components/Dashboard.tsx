@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, User } from '../types';
 import { Users, Clock, AlertCircle, ArrowRight, TrendingUp, BookOpen, CheckCircle, MessageSquare, Calendar } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -12,14 +11,42 @@ interface DashboardProps {
   onViewChange: (view: View) => void;
   user: User;
 }
-// SVG Animation Keyframes (added to index.css later or via inline style block)
 
 export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
-  const { aulas, students, events, communications } = useTenantData();
+  const { aulas, events, communications, students } = useTenantData();
   const nextClass = aulas[0];
   const { t } = useLanguage();
 
   const [feedFilter, setFeedFilter] = React.useState<'ALL' | 'ONLY_COMMUNICATIONS' | 'ONLY_EVENTS'>('ALL');
+
+  const [totalUnreadMessages, setTotalUnreadMessages] = React.useState(0);
+
+  // Real-time synchronization for Dashboard Widget
+  useEffect(() => {
+    const fetchUnread = async () => {
+      // @ts-ignore
+      const token = localStorage.getItem('token') || 'dummy';
+      if (!user) return;
+
+      import('../services/api').then(({ messagesApi }) => {
+        messagesApi.getConversations(user.id, token).then(convs => {
+          const sum = convs.reduce((acc, curr) => acc + (curr.unreadCount || 0), 0);
+          // In Dashboard, typically counting all unread interactions or precisely conversations where count > 0
+          // The user asks "contador de conversaciones". Meaning how many distinct *chats* have unread messages?
+          const conversationsWithUnread = convs.filter(c => (c.unreadCount || 0) > 0).length;
+          setTotalUnreadMessages(conversationsWithUnread);
+        });
+      });
+    };
+
+    fetchUnread();
+    window.addEventListener('MOCK_MESSAGES_UPDATED', fetchUnread);
+    const interval = setInterval(fetchUnread, 3000);
+    return () => {
+      window.removeEventListener('MOCK_MESSAGES_UPDATED', fetchUnread);
+      clearInterval(interval);
+    };
+  }, [user]);
 
   // Map Communications and Events into a unified "Social Feed" structure matching FeedItem interface
   const unifiedFeed: FeedItem[] = React.useMemo(() => {
@@ -173,7 +200,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
                 </button>
                 <button onClick={() => onViewChange('messages')} className="w-full text-left p-3 hover:bg-slate-50 rounded-lg text-sm text-slate-600 flex items-center transition-colors">
                   <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mr-3"><MessageSquare size={16} /></div>
-                  {t.dashboard.unreadMessages} <span className="ml-auto bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-0.5 rounded-full">2</span>
+                  {t.dashboard.unreadMessages}
+                  {totalUnreadMessages > 0 && (
+                    <span className="ml-auto bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-0.5 rounded-full">{totalUnreadMessages}</span>
+                  )}
                 </button>
                 <button onClick={() => onViewChange('schedule')} className="w-full text-left p-3 hover:bg-slate-50 rounded-lg text-sm text-slate-600 flex items-center transition-colors">
                   <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mr-3"><Calendar size={16} /></div>

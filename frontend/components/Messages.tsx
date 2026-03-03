@@ -18,7 +18,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
 
   // Sidebar Tab State
   const [sidebarTab, setSidebarTab] = useState<'chats' | 'contacts'>('chats');
-  const [conversations, setConversations] = useState<{ contactId: string, lastMessage: any }[]>([]);
+  const [conversations, setConversations] = useState<{ contactId: string, lastMessage: any, unreadCount?: number }[]>([]);
 
   // Chat State
   const [selectedUserId, setSelectedUserId] = useState<string | null>(initialUserId || null);
@@ -72,11 +72,30 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
       try {
         const msgs = await messagesApi.getMessages(currentUser.id, selectedUserId, token);
         setMessagesState(prev => ({ ...prev, [selectedUserId]: msgs }));
+
+        // Mark as read natively
+        await messagesApi.markAsRead(currentUser.id, selectedUserId, token);
+        fetchConversations();
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
     };
     fetchMessages();
+  }, [selectedUserId, currentUser, token]);
+
+  // Real-time synchronization
+  useEffect(() => {
+    const handleUpdate = () => {
+      fetchConversations();
+      if (selectedUserId && currentUser && token) {
+        messagesApi.getMessages(currentUser.id, selectedUserId, token).then(msgs => {
+          setMessagesState(prev => ({ ...prev, [selectedUserId]: msgs }));
+        });
+        messagesApi.markAsRead(currentUser.id, selectedUserId, token);
+      }
+    };
+    window.addEventListener('MOCK_MESSAGES_UPDATED', handleUpdate);
+    return () => window.removeEventListener('MOCK_MESSAGES_UPDATED', handleUpdate);
   }, [selectedUserId, currentUser, token]);
 
   // 2. Filter Visible Users Based on Rules
@@ -345,9 +364,16 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
                         <p className={`text-[13px] font-bold truncate ${selectedUserId === conv.contactId ? 'text-primary-800' : 'text-slate-800'}`}>{displayName}</p>
                         <span className="text-[10px] text-slate-400 font-medium ml-2 whitespace-nowrap">{displayTime}</span>
                       </div>
-                      <div className="flex items-center text-xs text-slate-500">
-                        {isMsgMine && <CheckCheck size={14} className="mr-1 inline text-primary-400" />}
-                        <span className="truncate">{conv.lastMessage.content}</span>
+                      <div className="flex items-center text-xs text-slate-500 mt-1">
+                        <div className="flex-1 flex items-center min-w-0">
+                          {isMsgMine && <CheckCheck size={14} className="mr-1 shrink-0 text-primary-400" />}
+                          <span className="truncate">{conv.lastMessage.content}</span>
+                        </div>
+                        {conv.unreadCount > 0 && (
+                          <div className="ml-2 bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 leading-none flex items-center justify-center min-w-[18px] h-[18px]">
+                            {conv.unreadCount}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </button>
