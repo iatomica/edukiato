@@ -329,6 +329,7 @@ export interface CalendarEvent {
   color: string;
   description?: string;
   creatorId?: string;
+  createdAt?: string;
   sharedWith?: {
     scope: 'ALL' | 'COURSE' | 'AULA' | 'INDIVIDUAL';
     targetIds?: string[];

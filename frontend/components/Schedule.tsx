@@ -85,6 +85,14 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
     return () => clearInterval(timer);
   }, []);
 
+  // Mark calendar as seen
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('lastSeenCalendar_' + user.id, new Date().toISOString());
+      window.dispatchEvent(new Event('CALENDAR_VIEWED'));
+    }
+  }, [user]);
+
   // Filter events based on audience targeting and permissions
   const visibleEvents = events.filter(e => {
     if (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN_INSTITUCION') return true;
@@ -122,7 +130,8 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
       const newEvent = {
         ...eventData,
         id: `ev_${Date.now()}`,
-        institutionId: institutionId || ''
+        institutionId: institutionId || '',
+        createdAt: new Date().toISOString()
       } as CalendarEvent;
 
       dispatch({ type: 'ADD_EVENT', payload: newEvent });

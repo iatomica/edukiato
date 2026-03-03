@@ -24,7 +24,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
   const { can } = usePermissions();
   const { theme } = useTheme();
   const { clearInstitution } = useAuth();
-  const { notifications, aulas, ninos } = useTenantData();
+  const { notifications, aulas, ninos, events, communications } = useTenantData();
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
   // Close notifications on click outside
@@ -72,7 +72,34 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
   });
 
   const unreadCount = userNotifications.filter(n => !n.isRead).length;
-  const hasUnreadCommunications = userNotifications.some(n => !n.isRead && n.type === 'ANNOUNCEMENT');
+
+  const hasUnreadCommunications = communications.some(c => {
+    // Logic mirroring Dashboard: check if communication is not read and intended for user
+    if (c.recipientId && c.recipientId !== user.id) return false;
+    return !c.isRead;
+  });
+
+  const [lastSeenCalendar, setLastSeenCalendar] = useState<number>(0);
+
+  useEffect(() => {
+    if (!user) return;
+    const updateSeen = () => {
+      const seen = localStorage.getItem('lastSeenCalendar_' + user.id);
+      setLastSeenCalendar(seen ? new Date(seen).getTime() : 0);
+    };
+    updateSeen();
+    window.addEventListener('CALENDAR_VIEWED', updateSeen);
+    return () => window.removeEventListener('CALENDAR_VIEWED', updateSeen);
+  }, [user]);
+
+  const hasUpcomingEvents = events.some(e => {
+    const isUpcoming = new Date(e.start) >= new Date(new Date().setHours(0, 0, 0, 0));
+    if (!isUpcoming) return false;
+    if (lastSeenCalendar === 0) return true;
+    const eventCreated = e.createdAt ? new Date(e.createdAt).getTime() : 0;
+    return eventCreated > lastSeenCalendar;
+  });
+
   const hasUnreadMessages = unreadMessagesCount > 0;
 
   // Real-time synchronization for Sidebar Dot
@@ -190,7 +217,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
 
 
 
-          <NavItem view="schedule" icon={Calendar} label={t.nav.schedule} />
+          <NavItem view="schedule" icon={Calendar} label={t.nav.schedule} hasDot={hasUpcomingEvents} />
           <NavItem view="messages" icon={MessageSquare} label={t.nav.messages} hasDot={hasUnreadMessages} />
           <NavItem view="communications" icon={FileText} label="Cuaderno" hasDot={hasUnreadCommunications} />
 

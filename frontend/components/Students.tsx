@@ -626,6 +626,13 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
     }
   }, [initialCommParams, initialViewMode]);
 
+  // Mark all relevant communications as read when opening the Notebook
+  React.useEffect(() => {
+    if (viewMode === 'NOTEBOOK' && user) {
+      dispatch({ type: 'MARK_COMMUNICATIONS_READ', payload: { userId: user.id } });
+    }
+  }, [viewMode, user, dispatch]);
+
   // Verify permissions via role to show correct initial view
   const isStudentOrParent = user?.role === 'ESTUDIANTE'; // Add PARENT logic if needed
 

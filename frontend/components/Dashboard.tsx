@@ -21,6 +21,42 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
 
   const [totalUnreadMessages, setTotalUnreadMessages] = React.useState(0);
 
+  // Unread Communications (ANNOUNCEMENT notifications)
+  const unreadCommunicationsCount = React.useMemo(() => {
+    // We filter notifications globally first, then applying same recipient logic as Layout.tsx
+    const userNotifications = communications.filter(c => {
+      // Mock approach: check if communication is not read and intended for user
+      if (c.recipientId && c.recipientId !== user.id) return false;
+      return !c.isRead;
+    });
+    return userNotifications.length;
+  }, [communications, user]);
+
+  const [lastSeenCalendar, setLastSeenCalendar] = React.useState<number>(0);
+
+  // Sync Calendar view status
+  useEffect(() => {
+    if (!user) return;
+    const updateSeen = () => {
+      const seen = localStorage.getItem('lastSeenCalendar_' + user.id);
+      setLastSeenCalendar(seen ? new Date(seen).getTime() : 0);
+    };
+    updateSeen();
+    window.addEventListener('CALENDAR_VIEWED', updateSeen);
+    return () => window.removeEventListener('CALENDAR_VIEWED', updateSeen);
+  }, [user]);
+
+  // Upcoming Events (Events with start date >= today and created AFTER we last saw the calendar)
+  const upcomingEventsCount = React.useMemo(() => {
+    return events.filter(e => {
+      const isUpcoming = new Date(e.start) >= new Date(new Date().setHours(0, 0, 0, 0));
+      if (!isUpcoming) return false;
+      if (lastSeenCalendar === 0) return true; // Never opened calendar, so show all as unread
+      const eventCreated = e.createdAt ? new Date(e.createdAt).getTime() : 0;
+      return eventCreated > lastSeenCalendar;
+    }).length;
+  }, [events, lastSeenCalendar]);
+
   // Real-time synchronization for Dashboard Widget
   useEffect(() => {
     const fetchUnread = async () => {
@@ -197,6 +233,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
                 <button onClick={() => onViewChange('communications')} className="w-full text-left p-3 hover:bg-slate-50 rounded-lg text-sm text-slate-600 flex items-center transition-colors">
                   <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mr-3"><BookOpen size={16} /></div>
                   Cuaderno de Comunicados
+                  {unreadCommunicationsCount > 0 && (
+                    <span className="ml-auto bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-0.5 rounded-full">{unreadCommunicationsCount}</span>
+                  )}
                 </button>
                 <button onClick={() => onViewChange('messages')} className="w-full text-left p-3 hover:bg-slate-50 rounded-lg text-sm text-slate-600 flex items-center transition-colors">
                   <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mr-3"><MessageSquare size={16} /></div>
@@ -208,6 +247,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
                 <button onClick={() => onViewChange('schedule')} className="w-full text-left p-3 hover:bg-slate-50 rounded-lg text-sm text-slate-600 flex items-center transition-colors">
                   <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mr-3"><Calendar size={16} /></div>
                   {t.dashboard.viewSchedule}
+                  {upcomingEventsCount > 0 && (
+                    <span className="ml-auto bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">{upcomingEventsCount}</span>
+                  )}
                 </button>
               </div>
             </div>

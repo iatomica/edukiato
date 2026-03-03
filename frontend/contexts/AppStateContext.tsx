@@ -51,6 +51,7 @@ type AppAction =
     | { type: 'ADD_STUDENT'; payload: Student }
     | { type: 'ADD_NINO'; payload: Nino }
     | { type: 'UPDATE_STUDENT'; payload: Partial<Student> & { id: string } }
+    | { type: 'MARK_COMMUNICATIONS_READ'; payload: { userId: string } }
     | { type: 'ADD_EVENT'; payload: CalendarEvent }
     | { type: 'UPDATE_EVENT'; payload: Partial<CalendarEvent> & { id: string } }
     | { type: 'DELETE_EVENT'; payload: { id: string } }
@@ -203,6 +204,18 @@ function appReducer(state: AppState, action: AppAction): AppState {
             const newComms = [action.payload, ...state.communications];
             try { localStorage.setItem('MOCK_COMMUNICATIONS', JSON.stringify(newComms)); } catch (e) { }
             return { ...state, communications: newComms };
+        }
+
+        case 'MARK_COMMUNICATIONS_READ': {
+            const updatedComms = state.communications.map(c => {
+                // If unread, and it's directed either globally (no recipient) or specifically to user
+                if (!c.isRead && (!c.recipientId || c.recipientId === action.payload.userId)) {
+                    return { ...c, isRead: true };
+                }
+                return c;
+            });
+            try { localStorage.setItem('MOCK_COMMUNICATIONS', JSON.stringify(updatedComms)); } catch (e) { }
+            return { ...state, communications: updatedComms };
         }
 
         case 'UPDATE_CONVERSATION':

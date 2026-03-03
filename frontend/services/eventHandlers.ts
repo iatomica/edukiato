@@ -80,6 +80,7 @@ function handleCourseCreated(dispatch: Dispatch) {
             end: new Date(Date.now() + 86400000 + 7200000), // +2h
             type: courseTypeToCalendarType(course.courseType ?? 'REGULAR'),
             color: courseTypeToCalendarColor(course.courseType ?? 'REGULAR'),
+            createdAt: new Date().toISOString()
         };
         dispatch({ type: 'ADD_EVENT', payload: calEvent });
 
