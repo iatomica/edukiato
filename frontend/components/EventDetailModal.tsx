@@ -1,7 +1,8 @@
 import React from 'react';
 import { CalendarEvent, User } from '../types';
-import { X, Clock, Edit2, Trash2, Users, AlignLeft } from 'lucide-react';
+import { X, Clock, Edit2, Trash2, Users, AlignLeft, User as UserIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface EventDetailModalProps {
@@ -10,6 +11,7 @@ interface EventDetailModalProps {
     onEdit: (event: CalendarEvent) => void;
     onDelete: (eventId: string) => void;
     currentUser: User;
+    creatorName?: string;
 }
 
 export const EventDetailModal: React.FC<EventDetailModalProps> = ({
@@ -17,7 +19,8 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
     onClose,
     onEdit,
     onDelete,
-    currentUser
+    currentUser,
+    creatorName
 }) => {
     const { t } = useLanguage();
 
@@ -47,9 +50,17 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
                         </div>
                         <h2 className="text-3xl font-bold text-slate-900 tracking-tight leading-tight">{event.title}</h2>
                         <p className="text-sm font-semibold text-slate-500 mt-2 flex items-center">
-                            <Clock size={18} className="mr-2 text-slate-400" />
-                            {format(event.start, 'EEEE, d MMM yyyy')} • {format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}
+                            <Clock size={16} className="mr-1.5 text-slate-400" />
+                            <span className="capitalize">{format(event.start, 'EEEE, d MMM yyyy', { locale: es })}</span>
+                            <span className="mx-2">•</span>
+                            {format(event.start, 'HH:mm', { locale: es })} - {format(event.end, 'HH:mm', { locale: es })}
                         </p>
+                        {creatorName && (
+                            <p className="text-xs font-medium text-slate-400 mt-1.5 flex items-center">
+                                <UserIcon size={14} className="mr-1.5" />
+                                Añadido por {creatorName}
+                            </p>
+                        )}
                     </div>
                     <div className="flex items-center gap-2">
                         {canEdit && (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Clock, MapPin, Check, X, AlertCircle, Save, Plus } from 'lucide-react';
 import { format, addDays, startOfWeek, isSameDay, getHours } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTenantData } from '../hooks/useTenantData';
 import { CalendarEvent, User } from '../types';
@@ -131,6 +132,7 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
       const newEvent = {
         ...eventData,
         id: `ev_${Date.now()}`,
+        creatorId: user.id,
         institutionId: institutionId || '',
         createdAt: new Date().toISOString()
       } as CalendarEvent;
@@ -385,8 +387,8 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
           <div className="p-5 border-b border-slate-100 flex justify-between items-start">
             <div>
               <h3 className="font-bold text-slate-900">{attendanceEvent.title}</h3>
-              <p className="text-xs text-slate-500 mt-1 flex items-center">
-                <Clock size={12} className="mr-1" /> {format(attendanceEvent.start, 'EEEE, d MMMM')}
+              <p className="text-xs text-slate-500 mt-1 flex items-center capitalize">
+                <Clock size={12} className="mr-1" /> {format(attendanceEvent.start, 'EEEE, d MMMM', { locale: es })}
               </p>
             </div>
             <button onClick={() => setAttendanceEvent(null)} className="text-slate-400 hover:text-slate-600">
@@ -446,6 +448,7 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
         <EventDetailModal
           event={viewingEvent}
           currentUser={user}
+          creatorName={students.find(s => s.id === viewingEvent.creatorId)?.name}
           onClose={() => setViewingEvent(null)}
           onDelete={handleDeleteEvent}
           onEdit={(e) => {
