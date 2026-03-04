@@ -91,7 +91,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=%C3%81lvarez%20Nina&background=random",
     "birthDate": "2025-02-20",
-    "dni": "70216396",
     "attendanceRate": 97
   },
   {
@@ -105,7 +104,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Battini%20Lamarque%20Manuel&background=random",
     "birthDate": "2025-05-02",
-    "dni": "70417837",
     "attendanceRate": 80
   },
   {
@@ -119,7 +117,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Cisneros%20Rinaldi%20Anna&background=random",
     "birthDate": "2024-09-10",
-    "dni": "70216294",
     "attendanceRate": 85
   },
   {
@@ -133,7 +130,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Espinosa%20San%20Rom%C3%A1n%20Alaia&background=random",
     "birthDate": "2025-01-24",
-    "dni": "70416978",
     "attendanceRate": 80
   },
   {
@@ -147,7 +143,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Hughes%20Sotelo%20Lisandro&background=random",
     "birthDate": "2025-01-15",
-    "dni": "70216376",
     "attendanceRate": 81
   },
   {
@@ -161,7 +156,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Moreno%20P%C3%A9rsico%20Valent%C3%ADn&background=random",
     "birthDate": "2025-03-20",
-    "dni": "70417823",
     "attendanceRate": 91
   },
   {
@@ -175,7 +169,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Rocha%20Bruno&background=random",
     "birthDate": "2025-02-12",
-    "dni": "70216392",
     "attendanceRate": 98
   },
   {
@@ -189,7 +182,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=S%C3%A1nchez%20Felipe&background=random",
     "birthDate": "2025-09-18",
-    "dni": "70593200",
     "attendanceRate": 91
   },
   {
@@ -203,7 +195,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Segatti%20Suarez%20Stefano&background=random",
     "birthDate": "2024-12-16",
-    "dni": "70576468",
     "attendanceRate": 97
   },
   {
@@ -217,7 +208,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Bogado%20R%C3%ADos%20Coco&background=random",
     "birthDate": "2023-09-27",
-    "dni": "59904799",
     "attendanceRate": 88
   },
   {
@@ -231,7 +221,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Cevoli%20Charo&background=random",
     "birthDate": "2023-09-25",
-    "dni": "59904962",
     "attendanceRate": 86
   },
   {
@@ -245,7 +234,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Catal%C3%A1n%20Scmidtchen%20Luis%20Octavio&background=random",
     "birthDate": "2024-01-05",
-    "dni": "59905041",
     "attendanceRate": 82
   },
   {
@@ -259,7 +247,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Rocha%20Victorino&background=random",
     "birthDate": "2023-08-25",
-    "dni": "59904954",
     "attendanceRate": 86
   },
   {
@@ -273,7 +260,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Rodriguez%20Cuesta%20Nazareno&background=random",
     "birthDate": "2024-03-15",
-    "dni": "59905078",
     "attendanceRate": 94
   },
   {
@@ -287,7 +273,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Biasutti%20Ciro%20Eduardo&background=random",
     "birthDate": "2023-01-11",
-    "dni": "59630375",
     "attendanceRate": 84
   },
   {
@@ -301,7 +286,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Cisneros%20Rinaldi%20Facundo&background=random",
     "birthDate": "2022-09-08",
-    "dni": "59289270",
     "attendanceRate": 82
   },
   {
@@ -315,7 +299,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=C%C3%B3rdoba%20Sol%20Fiorella&background=random",
     "birthDate": "2022-09-26",
-    "dni": "59289293",
     "attendanceRate": 86
   },
   {
@@ -329,7 +312,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=D%C3%BCmmig%20Clara&background=random",
     "birthDate": "2022-08-17",
-    "dni": "59289258",
     "attendanceRate": 95
   },
   {
@@ -343,7 +325,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Fernandez%20Torres%20Juana&background=random",
     "birthDate": "2023-05-02",
-    "dni": "59538319",
     "attendanceRate": 86
   },
   {
@@ -357,7 +338,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Manzi%20Lautaro%20Andr%C3%A9s&background=random",
     "birthDate": "2022-12-09",
-    "dni": "59538855",
     "attendanceRate": 97
   },
   {
@@ -371,7 +351,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Ostanello%20Pierattini%20Luna&background=random",
     "birthDate": "2022-09-26",
-    "dni": "59289259",
     "attendanceRate": 95
   },
   {
@@ -385,7 +364,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=%C3%81lvarez%20Lola%20Milagros&background=random",
     "birthDate": "2022-05-30",
-    "dni": "59289187",
     "attendanceRate": 85
   },
   {
@@ -398,7 +376,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Arriagada%20Breppe%20Enzo%20Luka&background=random",
     "birthDate": "2022-06-06",
-    "dni": "59289193",
     "attendanceRate": 88
   },
   {
@@ -412,7 +389,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Barrientos%20Alejo&background=random",
     "birthDate": "2022-03-14",
-    "dni": "59246548",
     "attendanceRate": 81
   },
   {
@@ -426,7 +402,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=D%C3%ADaz%20Enzo%20Joaqu%C3%ADn&background=random",
     "birthDate": "2022-06-23",
-    "dni": "59289200",
     "attendanceRate": 91
   },
   {
@@ -440,7 +415,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Evans%20Asaro%20Justina&background=random",
     "birthDate": "2022-06-10",
-    "dni": "59289192",
     "attendanceRate": 80
   },
   {
@@ -454,7 +428,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Marchesani%20Franccesca&background=random",
     "birthDate": "2021-07-22",
-    "dni": "58987315",
     "attendanceRate": 91
   },
   {
@@ -468,7 +441,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Marciano%20Uranga%20Castro%20Sara&background=random",
     "birthDate": "2021-12-29",
-    "dni": "59125836",
     "attendanceRate": 81
   },
   {
@@ -482,7 +454,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Mieres%20Martiniano&background=random",
     "birthDate": "2021-10-20",
-    "dni": "58913759",
     "attendanceRate": 94
   },
   {
@@ -496,7 +467,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Olmedo%20Julieta&background=random",
     "birthDate": "2022-06-20",
-    "dni": "59289203",
     "attendanceRate": 93
   },
   {
@@ -510,7 +480,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Reimondez%20Oliver%20Luciano&background=random",
     "birthDate": "2022-05-11",
-    "dni": "59289166",
     "attendanceRate": 91
   },
   {
@@ -524,7 +493,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Salinas%20Piedrabuena%20Francisco%20Ren%C3%A9&background=random",
     "birthDate": "2022-04-18",
-    "dni": "59336409",
     "attendanceRate": 97
   },
   {
@@ -538,7 +506,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Tom%C3%A1s%20Segovia%20Ian&background=random",
     "birthDate": "2022-05-19",
-    "dni": "59289179",
     "attendanceRate": 83
   },
   {
@@ -552,7 +519,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Van%20Autenboer%20Terraza%20Mae&background=random",
     "birthDate": "2021-07-27",
-    "dni": "58543268",
     "attendanceRate": 98
   },
   {
@@ -566,7 +532,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Ver%C3%B3n%20Conchillo%20Blas&background=random",
     "birthDate": "2022-02-25",
-    "dni": "58913884",
     "attendanceRate": 81
   },
   {
@@ -579,7 +544,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Altuna%20Filomena&background=random",
     "birthDate": "2020-11-11",
-    "dni": "58544763",
     "attendanceRate": 97
   },
   {
@@ -593,7 +557,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Bengoa%20Walser%20Emma&background=random",
     "birthDate": "2020-07-29",
-    "dni": "58337890",
     "attendanceRate": 90
   },
   {
@@ -607,7 +570,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Boviez%20M%C3%A9ndez%20Felipe&background=random",
     "birthDate": "2021-06-23",
-    "dni": "58543225",
     "attendanceRate": 83
   },
   {
@@ -621,7 +583,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Brendel%20L%C3%B3pez%20Matheo&background=random",
     "birthDate": "2020-09-16",
-    "dni": "58337941",
     "attendanceRate": 92
   },
   {
@@ -635,7 +596,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Coronel%20Emma&background=random",
     "birthDate": "2021-05-24",
-    "dni": "58545158",
     "attendanceRate": 89
   },
   {
@@ -649,7 +609,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Fuentes%20Cancelarich%20Vera&background=random",
     "birthDate": "2020-07-28",
-    "dni": "58337685",
     "attendanceRate": 82
   },
   {
@@ -662,7 +621,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Gonz%C3%A1lez%20Ramirez%20Alexis%20Gast%C3%B3n&background=random",
     "birthDate": "2020-08-21",
-    "dni": "58243326",
     "attendanceRate": 99
   },
   {
@@ -676,7 +634,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Mehrbald%20Boloqui%20Victoria&background=random",
     "birthDate": "2021-01-06",
-    "dni": "58543074",
     "attendanceRate": 83
   },
   {
@@ -690,7 +647,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=Saenz%20Ariana&background=random",
     "birthDate": "2021-03-05",
-    "dni": "58543111",
     "attendanceRate": 80
   },
   {
@@ -704,7 +660,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=S%C3%A1nchez%20Fern%C3%A1ndez%20Miranda%20Xairo&background=random",
     "birthDate": "2021-02-17",
-    "dni": "58711210",
     "attendanceRate": 98
   },
   {
@@ -718,7 +673,6 @@ export const MOCK_NINOS: Nino[] = [
     ],
     "avatar": "https://ui-avatars.com/api/?name=T%C3%B3rtola%20Torres%20Sof%C3%ADa&background=random",
     "birthDate": "2020-09-12",
-    "dni": "58337939",
     "attendanceRate": 93
   }
 ];

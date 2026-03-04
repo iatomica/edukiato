@@ -59,7 +59,7 @@ sql += `CREATE TABLE IF NOT EXISTS students (
     institution_id VARCHAR(50) REFERENCES institutions(id),
     aula_id VARCHAR(50) REFERENCES aulas(id),
     name VARCHAR(255) NOT NULL,
-    dni VARCHAR(50),
+    birth_date VARCHAR(50),
     birth_date DATE,
     avatar VARCHAR(500),
     attendance_rate INT
@@ -163,7 +163,7 @@ if (MOCK_AULAS && MOCK_AULAS.length > 0) {
 // Students
 if (MOCK_NINOS && MOCK_NINOS.length > 0) {
     MOCK_NINOS.forEach((nino: any) => {
-        sql += `INSERT INTO students (id, institution_id, aula_id, name, dni, birth_date, avatar, attendance_rate) VALUES (${escape(nino.id)}, ${escape(nino.institutionId)}, ${escape(nino.aulaId)}, ${escape(nino.name)}, ${escape(nino.dni)}, ${escape(nino.birthDate)}, ${escape(nino.avatar)}, ${nino.attendanceRate || 'NULL'}) ON CONFLICT DO NOTHING;\n`;
+        sql += `INSERT INTO students (id, institution_id, aula_id, name, birth_date, avatar, attendance_rate) VALUES (${escape(nino.id)}, ${escape(nino.institutionId)}, ${escape(nino.aulaId)}, ${escape(nino.name)}, ${escape(nino.birthDate)}, ${escape(nino.avatar)}, ${nino.attendanceRate || 'NULL'}) ON CONFLICT DO NOTHING;\n`;
 
         if (nino.parentIds) {
             nino.parentIds.forEach((pid: any) => {

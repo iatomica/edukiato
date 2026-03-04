@@ -90,7 +90,6 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
   // Mark calendar as seen
   useEffect(() => {
     if (user) {
-      localStorage.setItem('lastSeenCalendar_' + user.id, new Date().toISOString());
       window.dispatchEvent(new Event('CALENDAR_VIEWED'));
     }
   }, [user]);

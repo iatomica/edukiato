@@ -25,27 +25,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Hydrate from localStorage on mount
+    // Hydrate from backend via token on mount
     useEffect(() => {
         const storedToken = localStorage.getItem('edukatio_token');
-        const storedUser = localStorage.getItem('edukatio_user');
         const storedInstitution = localStorage.getItem('edukatio_institution');
 
-        if (storedToken && storedUser) {
-            try {
-                setToken(storedToken);
-                setUser(JSON.parse(storedUser));
-                if (storedInstitution) {
+        if (storedToken) {
+            setToken(storedToken);
+            if (storedInstitution) {
+                try {
                     setCurrentInstitution(JSON.parse(storedInstitution));
-                }
-            } catch (e) {
-                console.error('Failed to hydrate auth state', e);
-                localStorage.removeItem('edukatio_token');
-                localStorage.removeItem('edukatio_user');
-                localStorage.removeItem('edukatio_institution');
+                } catch (e) { }
             }
+
+            authApi.getMe(storedToken).then(u => {
+                setUser(u);
+            }).catch((e) => {
+                console.warn("Sessión expirada", e);
+                localStorage.removeItem('edukatio_token');
+                localStorage.removeItem('edukatio_institution');
+                setToken(null);
+                setUser(null);
+            }).finally(() => {
+                setIsLoading(false);
+            });
+        } else {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     }, []);
 
     const login = useCallback(async (email: string, password: string) => {
@@ -56,7 +62,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setUser(result.user);
             setToken(result.token);
             localStorage.setItem('edukatio_token', result.token);
-            localStorage.setItem('edukatio_user', JSON.stringify(result.user));
         } catch (err: any) {
             setError(err.message || 'Error de autenticación');
             throw err;
@@ -76,9 +81,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const updateUser = useCallback((newData: Partial<User>) => {
         setUser(prev => {
             if (!prev) return null;
-            const updated = { ...prev, ...newData };
-            localStorage.setItem('edukatio_user', JSON.stringify(updated));
-            return updated;
+            return { ...prev, ...newData };
         });
     }, []);
 

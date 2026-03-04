@@ -14,7 +14,7 @@ import {
 import { useAuth } from './AuthContext';
 import { AppEvent, eventBus } from '../services/eventBus';
 import { registerEventHandlers } from '../services/eventHandlers';
-import { coursesApi, usersApi } from '../services/api';
+import { coursesApi, usersApi, messagesApi } from '../services/api';
 import { MOCK_COURSES, MOCK_FEED, MOCK_PAYMENTS, MOCK_NOTIFICATIONS, MOCK_CONVERSATIONS, MOCK_COMMUNICATIONS, MOCK_STUDENTS, MOCK_EVENTS, MOCK_AULAS, MOCK_NINOS } from '../services/mockData';
 
 // ── State Shape ──────────────────────────────────────────────
@@ -91,7 +91,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
         case 'ADD_AULA': {
             const newAulasList = [...state.aulas, action.payload];
-            try { localStorage.setItem('MOCK_AULAS', JSON.stringify(newAulasList)); } catch (e) { }
+
             return {
                 ...state,
                 aulas: newAulasList,
@@ -102,7 +102,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
             const updatedAulas = state.aulas.map(a =>
                 a.id === action.payload.id ? { ...a, ...action.payload } : a
             );
-            try { localStorage.setItem('MOCK_AULAS', JSON.stringify(updatedAulas)); } catch (e) { }
+
             return {
                 ...state,
                 aulas: updatedAulas,
@@ -115,10 +115,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
                 n.aulaId === action.payload.id ? { ...n, aulaId: '' } : n
             );
 
-            try {
-                localStorage.setItem('MOCK_AULAS', JSON.stringify(reducedAulas));
-                localStorage.setItem('MOCK_NINOS', JSON.stringify(updatedNinos));
-            } catch (e) { }
+
 
             return {
                 ...state,
@@ -142,7 +139,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
         case 'ADD_NINO': {
             const newNinos = [...state.ninos, action.payload];
-            try { localStorage.setItem('MOCK_NINOS', JSON.stringify(newNinos)); } catch (e) { }
+
             return { ...state, ninos: newNinos };
         }
 
@@ -156,7 +153,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
         case 'ADD_EVENT': {
             const newEventsList = [...state.events, action.payload];
-            try { localStorage.setItem('MOCK_EVENTS', JSON.stringify(newEventsList)); } catch (e) { }
+
             return { ...state, events: newEventsList };
         }
 
@@ -164,7 +161,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
             const updatedEvents = state.events.map(e =>
                 e.id === action.payload.id ? { ...e, ...action.payload } as CalendarEvent : e
             );
-            try { localStorage.setItem('MOCK_EVENTS', JSON.stringify(updatedEvents)); } catch (e) { }
+
             return {
                 ...state,
                 events: updatedEvents,
@@ -173,7 +170,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
         case 'DELETE_EVENT': {
             const reducedEvents = state.events.filter(e => e.id !== action.payload.id);
-            try { localStorage.setItem('MOCK_EVENTS', JSON.stringify(reducedEvents)); } catch (e) { }
+
             return {
                 ...state,
                 events: reducedEvents,
@@ -194,7 +191,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
         case 'ADD_NOTIFICATION': {
             const newNotifs = [action.payload, ...state.notifications];
-            try { localStorage.setItem('MOCK_NOTIFICATIONS', JSON.stringify(newNotifs)); } catch (e) { }
+
             return { ...state, notifications: newNotifs };
         }
 
@@ -203,7 +200,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
         case 'ADD_COMMUNICATION': {
             const newComms = [action.payload, ...state.communications];
-            try { localStorage.setItem('MOCK_COMMUNICATIONS', JSON.stringify(newComms)); } catch (e) { }
+
             return { ...state, communications: newComms };
         }
 
@@ -215,7 +212,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
                 }
                 return c;
             });
-            try { localStorage.setItem('MOCK_COMMUNICATIONS', JSON.stringify(updatedComms)); } catch (e) { }
+
             return { ...state, communications: updatedComms };
         }
 
@@ -227,7 +224,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
                 }
                 return n;
             });
-            try { localStorage.setItem('MOCK_NOTIFICATIONS', JSON.stringify(updatedNotifs)); } catch (e) { }
+
             return { ...state, notifications: updatedNotifs };
         }
 
@@ -298,29 +295,17 @@ export const AppStateProvider: React.FC<{ children: ReactNode }> = ({ children }
         if (isAuthenticated && token) {
             const hydrateAppData = async () => {
                 try {
-                    // Parse local storage dynamically to get the latest (to prevent soft-logout staleness)
-                    const storedComms = localStorage.getItem('MOCK_COMMUNICATIONS');
-                    const storedNotifs = localStorage.getItem('MOCK_NOTIFICATIONS');
-                    // Ignoramos cache de alumnos, aulas y eventos para inyectar correctamente la nueva metadata real.
-                    const storedNinos = null; // localStorage.getItem('MOCK_NINOS');
-                    const storedAulas = null; // localStorage.getItem('MOCK_AULAS');
-                    const storedEvents = null; // localStorage.getItem('MOCK_EVENTS');
-
                     let baseData: Partial<AppState> = {
                         courses: MOCK_COURSES,
-                        aulas: storedAulas ? JSON.parse(storedAulas) : MOCK_AULAS,
-                        ninos: storedNinos ? JSON.parse(storedNinos) : MOCK_NINOS,
+                        aulas: MOCK_AULAS,
+                        ninos: MOCK_NINOS,
                         students: MOCK_STUDENTS,
-                        events: storedEvents ? JSON.parse(storedEvents).map((e: any) => ({
-                            ...e,
-                            start: new Date(e.start),
-                            end: new Date(e.end)
-                        })) : MOCK_EVENTS,
+                        events: MOCK_EVENTS,
                         feed: MOCK_FEED,
                         payments: MOCK_PAYMENTS,
-                        notifications: storedNotifs ? JSON.parse(storedNotifs) : MOCK_NOTIFICATIONS,
+                        notifications: MOCK_NOTIFICATIONS,
                         conversations: MOCK_CONVERSATIONS,
-                        communications: storedComms ? JSON.parse(storedComms) : MOCK_COMMUNICATIONS,
+                        communications: MOCK_COMMUNICATIONS,
                     };
 
                     // Fetch courses

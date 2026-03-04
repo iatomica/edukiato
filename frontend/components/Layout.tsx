@@ -80,25 +80,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
     return !c.isRead;
   });
 
-  const [lastSeenCalendar, setLastSeenCalendar] = useState<number>(0);
-
-  useEffect(() => {
-    if (!user) return;
-    const updateSeen = () => {
-      const seen = localStorage.getItem('lastSeenCalendar_' + user.id);
-      setLastSeenCalendar(seen ? new Date(seen).getTime() : 0);
-    };
-    updateSeen();
-    window.addEventListener('CALENDAR_VIEWED', updateSeen);
-    return () => window.removeEventListener('CALENDAR_VIEWED', updateSeen);
-  }, [user]);
-
   const hasUpcomingEvents = events.some(e => {
-    const isUpcoming = new Date(e.start) >= new Date(new Date().setHours(0, 0, 0, 0));
-    if (!isUpcoming) return false;
-    if (lastSeenCalendar === 0) return true;
-    const eventCreated = e.createdAt ? new Date(e.createdAt).getTime() : 0;
-    return eventCreated > lastSeenCalendar;
+    return new Date(e.start) >= new Date(new Date().setHours(0, 0, 0, 0));
   });
 
   const hasUnreadMessages = unreadMessagesCount > 0;

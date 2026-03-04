@@ -14,7 +14,6 @@ import { MOCK_COURSES, MOCK_PAYMENTS, INST_VINCULOS, MOCK_AULAS, MOCK_NINOS, MOC
 // ── Config ────────────────────────────────────────────────────
 
 const API_BASE = '/api';
-const USE_MOCK = false; // Toggle to false when backend is connected
 
 // ── Mock Data for Auth ────────────────────────────────────────
 
@@ -758,124 +757,42 @@ export let MOCK_USERS: MockUser[] = storedUsers ? JSON.parse(storedUsers) : defa
 // ── Auth API ──────────────────────────────────────────────────
 
 export const authApi = {
+    getMe: async (token: string): Promise<User> => {
+        const response = await fetch(`${API_BASE}/auth/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Sesión expirada o inválida');
+        return response.json();
+    },
     login: async (email: string, _password: string): Promise<{ user: User; token: string }> => {
-        if (USE_MOCK) {
-            // Simulate network delay
-            await new Promise(resolve => setTimeout(resolve, 600));
+        const response = await fetch(`${API_BASE}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password: _password }),
+        });
 
-            const found = MOCK_USERS.find(u => u.user.email.toLowerCase() === email.toLowerCase())
-                || MOCK_USERS.find(u => email.toLowerCase().includes(u.emailPattern))
-                || MOCK_USERS[MOCK_USERS.length - 1]; // Fallback to student
-
-            // Password validation for all users in mock mode
-            const isInstitutional = ['SUPER_ADMIN', 'ADMIN_INSTITUCION', 'DOCENTE', 'ESPECIALES'].includes(found.user.role);
-
-            // Check against stored mock password
-            if (_password !== found.user.passwordHash) {
-                // Allow fallback if they haven't explicitly set a password and try 'vinculos'
-                if (!(_password === 'vinculos' && found.user.passwordHash === 'vinculos')) {
-                    throw new Error('Credenciales inválidas');
-                }
-            }
-
-            const user: User = {
-                ...found.user,
-                institutions: found.institutions,
-            };
-
-            return {
-                user,
-                token: `mock-jwt-${user.id}-${Date.now()}`,
-            };
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err.message || 'Credenciales inválidas');
         }
 
-        // Real API call (future)
-        try {
-            const response = await fetch(`${API_BASE}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password: _password }),
-            });
+        const data = await response.json();
 
-            if (!response.ok) {
-                throw new Error('Fallback to mock'); // Forzamos el fallback local
-            }
+        const user: User = {
+            id: data.user?.id || 'unknown',
+            name: data.user?.full_name || data.user?.name || 'Usuario',
+            email: data.user?.email || email,
+            role: data.user?.role || 'ESTUDIANTE',
+            avatar: data.user?.avatar,
+            institutions: data.user?.institutions || [],
+        };
 
-            const data = await response.json();
-            const found = MOCK_USERS.find(u => u.user.email.toLowerCase() === email.toLowerCase())
-                || MOCK_USERS.find(u => email.toLowerCase().includes(u.emailPattern))
-                || MOCK_USERS[MOCK_USERS.length - 1]; // Fallback to student institutions for demo
-
-            // Password validation for Institutional users on API success too
-            const isInstitutional = ['SUPER_ADMIN', 'ADMIN_INSTITUCION', 'DOCENTE', 'ESPECIALES'].includes(found.user.role);
-            if (isInstitutional && _password !== 'vinculos') {
-                throw new Error('Credenciales inválidas');
-            }
-
-            const user: User = {
-                id: data.user?.id || 'unknown',
-                name: data.user?.full_name || data.user?.name || found.user.name,
-                email: data.user?.email || email,
-                role: data.user?.role || found.user.role,
-                avatar: data.user?.avatar || found.user.avatar,
-                institutions: found.institutions,
-            };
-
-            return {
-                user,
-                token: data.access_token || data.token || `mock-jwt-${user.id}-${Date.now()}`,
-            };
-        } catch (error: any) {
-            // Si el backend real falla o no existe, usamos la validación Mock al 100%
-            if (error.message === 'Credenciales inválidas') {
-                throw error; // Propagar error de contraseña institucional si falló
-            }
-
-            console.warn("Falling back to MOCK login validation.", error.message);
-            // Simulate network delay
-            await new Promise(resolve => setTimeout(resolve, 600));
-
-            const found = MOCK_USERS.find(u => u.user.email.toLowerCase() === email.toLowerCase())
-                || MOCK_USERS.find(u => email.toLowerCase().includes(u.emailPattern));
-
-            if (!found) {
-                throw new Error('Usuario no encontrado o credenciales inválidas');
-            }
-
-            // Password validation for all users in mock fallback
-            if (_password !== found.user.passwordHash) {
-                // Allow fallback if they haven't explicitly set a password and try 'vinculos'
-                if (!(_password === 'vinculos' && found.user.passwordHash === 'vinculos')) {
-                    throw new Error('Credenciales inválidas');
-                }
-            }
-
-            const user: User = {
-                ...found.user,
-                institutions: found.institutions,
-            };
-
-            return {
-                user,
-                token: `mock-jwt-${user.id}-${Date.now()}`,
-            };
-        }
+        return {
+            user,
+            token: data.access_token || data.token,
+        };
     },
     setInitialPassword: async (userId: string, newPassword: string): Promise<{ success: boolean }> => {
-        if (USE_MOCK) {
-            await new Promise(resolve => setTimeout(resolve, 600));
-            const mockIndex = MOCK_USERS.findIndex(u => u.user.id === userId);
-            if (mockIndex >= 0) {
-                MOCK_USERS[mockIndex].user.requiresPasswordChange = false;
-                MOCK_USERS[mockIndex].user.passwordHash = newPassword;
-                if (typeof window !== 'undefined') {
-                    localStorage.setItem('MOCK_USERS', JSON.stringify(MOCK_USERS));
-                }
-                return { success: true };
-            }
-            throw new Error('Usuario no encontrado');
-        }
-
         const response = await fetch(`${API_BASE}/auth/set-initial-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -883,17 +800,8 @@ export const authApi = {
         });
 
         if (!response.ok) {
-            // Fallback a fallback mock
-            const mockIndex = MOCK_USERS.findIndex(u => u.user.id === userId);
-            if (mockIndex >= 0) {
-                MOCK_USERS[mockIndex].user.requiresPasswordChange = false;
-                MOCK_USERS[mockIndex].user.passwordHash = newPassword;
-                if (typeof window !== 'undefined') {
-                    localStorage.setItem('MOCK_USERS', JSON.stringify(MOCK_USERS));
-                }
-                return { success: true };
-            }
-            throw new Error('Error cambiando la contraseña');
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err.message || 'Error cambiando la contraseña');
         }
         return { success: true };
     }
@@ -955,116 +863,58 @@ export const institutionsApi = {
 
 export const usersApi = {
     getAll: async (institutionId: string, token: string): Promise<User[]> => {
-        try {
-            const response = await fetch(`${API_BASE}/users?institutionId=${institutionId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            if (!response.ok) throw new Error('Error fetching users');
-            const data = await response.json();
-            if (data && data.length > 0) return data;
-            return MOCK_USERS.map(m => m.user);
-        } catch (error) {
-            console.warn("Falling back to MOCK_USERS for users directory.");
-            return MOCK_USERS.map(m => m.user);
-        }
+        const response = await fetch(`${API_BASE}/users?institutionId=${institutionId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error('Error fetching users');
+        const data = await response.json();
+        return data || [];
     },
 
     create: async (data: Partial<User>, institutionId: string, token: string): Promise<User> => {
-        try {
-            const response = await fetch(`${API_BASE}/users`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: data.name,
-                    email: data.email,
-                    role: data.role || 'ESTUDIANTE',
-                    institutionId: institutionId
-                })
-            });
-            if (!response.ok) throw new Error('Error creating user');
-            return await response.json();
-        } catch (error) {
-            console.warn("Mocking user creation fallback.");
-            const newUser: User = {
-                id: `new_user_${Date.now()}`,
-                name: data.name || 'Nuevo Usuario',
-                email: data.email || 'nuevo@ejemplo.com',
-                role: data.role as UserRole || 'DOCENTE',
-                avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || 'N U')}`
-            };
-            MOCK_USERS.push({
-                emailPattern: newUser.email,
-                user: newUser,
-                institutions: [{ ...MOCK_INSTITUTIONS[0], role: newUser.role }]
-            });
-            if (typeof window !== 'undefined') localStorage.setItem('MOCK_USERS', JSON.stringify(MOCK_USERS));
-            return newUser;
-        }
+        const response = await fetch(`${API_BASE}/users`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: data.name,
+                email: data.email,
+                role: data.role || 'ESTUDIANTE',
+                institutionId: institutionId
+            })
+        });
+        if (!response.ok) throw new Error('Error creating user');
+        return await response.json();
     },
 
     update: async (userId: string, data: Partial<User>, token: string): Promise<User> => {
-        try {
-            const response = await fetch(`${API_BASE}/users/${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-            if (!response.ok) throw new Error('Error updating user');
-            return await response.json();
-        } catch (error) {
-            console.warn("Mocking user update fallback.");
-            const mockIndex = MOCK_USERS.findIndex(m => m.user.id === userId);
-            if (mockIndex >= 0) {
-                MOCK_USERS[mockIndex].user = { ...MOCK_USERS[mockIndex].user, ...data };
-                if (data.role) {
-                    MOCK_USERS[mockIndex].institutions[0].role = data.role;
-                }
-                if (typeof window !== 'undefined') localStorage.setItem('MOCK_USERS', JSON.stringify(MOCK_USERS));
-                return MOCK_USERS[mockIndex].user;
-            }
-            throw new Error("Usuario no encontrado en los datos de prueba");
-        }
+        const response = await fetch(`${API_BASE}/users/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Error updating user');
+        return await response.json();
     },
 
     resetPassword: async (userId: string, token: string): Promise<{ success: boolean; message: string }> => {
-        try {
-            const response = await fetch(`${API_BASE}/users/${userId}/reset-password`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            if (!response.ok) throw new Error('Error resetting password');
-            return await response.json();
-        } catch (error) {
-            console.warn("Mocking password reset fallback.");
-            const mockIndex = MOCK_USERS.findIndex(m => m.user.id === userId);
-            if (mockIndex < 0) throw new Error("Usuario no encontrado");
-
-            // Forzar el recambio de clave la proxima vez
-            MOCK_USERS[mockIndex].user.requiresPasswordChange = true;
-            MOCK_USERS[mockIndex].user.passwordHash = 'vinculos';
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('MOCK_USERS', JSON.stringify(MOCK_USERS));
+        const response = await fetch(`${API_BASE}/users/${userId}/reset-password`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
-
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 800));
-            return {
-                success: true,
-                message: `Clave restablecida a "vinculos". Se ha enviado un aviso a ${MOCK_USERS[mockIndex].user.email}`
-            };
-        }
+        });
+        if (!response.ok) throw new Error('Error resetting password');
+        return await response.json();
     }
 };
 
@@ -1127,155 +977,77 @@ export const coursesApi = {
 // ── Messages API ──────────────────────────────────────────────
 
 // --- Utilities for cross-tab mock sync ---
-const refreshMockMessages = () => {
-    if (typeof window !== 'undefined') {
-        const stored = localStorage.getItem('MOCK_MESSAGES');
-        if (stored) {
-            Object.assign(MOCK_MESSAGES, JSON.parse(stored));
-        }
-    }
-};
 
 export const messagesApi = {
     getMessages: async (userId: string, targetUserId: string, token: string): Promise<Message[]> => {
-        refreshMockMessages();
-        // Simular retraso de red
-        await new Promise(resolve => setTimeout(resolve, 300));
-
-        // Enforce the same key regardless of who is sender/receiver
-        const chatId = [userId, targetUserId].sort().join('|');
-        return MOCK_MESSAGES[chatId] || [];
+        const response = await fetch(`${API_BASE}/messages/${targetUserId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok) throw new Error('Error fetching messages');
+        return response.json();
     },
 
     sendMessage: async (senderId: string, recipientId: string, content: string, token: string, file?: Message['file']): Promise<Message> => {
-        refreshMockMessages();
-        // Simular retraso de red
-        await new Promise(resolve => setTimeout(resolve, 300));
-
-        const chatId = [senderId, recipientId].sort().join('|');
-
-        const newMessage: Message = {
-            id: `msg_${Date.now()}`,
-            senderId,
-            content,
-            timestamp: new Date(),
-            isRead: false,
-            ...(file && { file })
-        };
-
-        if (!MOCK_MESSAGES[chatId]) {
-            MOCK_MESSAGES[chatId] = [];
-        }
-
-        MOCK_MESSAGES[chatId].push(newMessage);
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('MOCK_MESSAGES', JSON.stringify(MOCK_MESSAGES));
-            window.dispatchEvent(new Event('MOCK_MESSAGES_UPDATED'));
-        }
-        return newMessage;
+        const response = await fetch(`${API_BASE}/messages/${recipientId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ content, file })
+        });
+        if (!response.ok) throw new Error('Error sending message');
+        return response.json();
     },
 
     getConversations: async (userId: string, token: string): Promise<{ contactId: string, lastMessage: Message, unreadCount: number }[]> => {
-        refreshMockMessages();
-        // Fast response for polling
-        const conversations: { contactId: string, lastMessage: Message, unreadCount: number }[] = [];
-
-        for (const [chatId, messages] of Object.entries(MOCK_MESSAGES)) {
-            const ids = chatId.split('|');
-            if (ids.includes(userId) && messages.length > 0) {
-                const contactId = ids[0] === userId ? ids[1] : ids[0];
-                const lastMessage = messages[messages.length - 1];
-                const unreadCount = messages.filter(m => m.senderId !== userId && !m.isRead).length;
-                conversations.push({ contactId, lastMessage, unreadCount });
+        const response = await fetch(`${API_BASE}/messages/conversations`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
             }
-        }
-
-        // Sort by most recent message
-        return conversations.sort((a, b) =>
-            new Date(b.lastMessage.timestamp).getTime() - new Date(a.lastMessage.timestamp).getTime()
-        );
+        });
+        if (!response.ok) throw new Error('Error fetching conversations');
+        return response.json();
     },
 
     markAsRead: async (userId: string, targetUserId: string, token: string): Promise<void> => {
-        refreshMockMessages();
-        const chatId = [userId, targetUserId].sort().join('|');
-        const messages = MOCK_MESSAGES[chatId];
-
-        if (messages) {
-            let updated = false;
-            messages.forEach(m => {
-                if (m.senderId !== userId && !m.isRead) {
-                    m.isRead = true;
-                    updated = true;
-                }
-            });
-            if (updated && typeof window !== 'undefined') {
-                localStorage.setItem('MOCK_MESSAGES', JSON.stringify(MOCK_MESSAGES));
-                window.dispatchEvent(new Event('MOCK_MESSAGES_UPDATED'));
+        const response = await fetch(`${API_BASE}/messages/${targetUserId}/read`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`
             }
-        }
+        });
+        if (!response.ok) throw new Error('Error marking messages as read');
     }
 };
 
 // ── Reports API ───────────────────────────────────────────────
 
-const storedReports = typeof window !== 'undefined' ? localStorage.getItem('MOCK_REPORTS') : null;
-let MOCK_REPORTS: AcademicReport[] = storedReports ? JSON.parse(storedReports) : [];
-
 export const reportsApi = {
     create: async (studentId: string, title: string, content: string, token: string): Promise<{ message: string, report: AcademicReport }> => {
-        try {
-            const response = await fetch(`${API_BASE}/reports/student/${studentId}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ title, content })
-            });
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Error creando informe');
-            }
-            return response.json();
-        } catch (error: any) {
-            console.warn('Backend unavailable, using mock data for reports...', error.message);
-            // Fallback to Mock / LocalStorage
-            let uploaderId = 'u_dir'; // default fallback
-            try {
-                const parts = token.split('-');
-                if (parts.length > 2) uploaderId = parts[2];
-            } catch (e) { }
-
-            const newReport: AcademicReport = {
-                id: `mock-report-${Date.now()}`,
-                studentId,
-                uploaderId,
-                title,
-                content,
-                createdAt: new Date().toISOString()
-            };
-            MOCK_REPORTS.push(newReport);
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('MOCK_REPORTS', JSON.stringify(MOCK_REPORTS));
-            }
-            return { message: 'Informe guardado (Mock)', report: newReport };
+        const response = await fetch(`${API_BASE}/reports/student/${studentId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title, content })
+        });
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Error creando informe');
         }
+        return response.json();
     },
     getByStudent: async (studentId: string, token: string): Promise<AcademicReport[]> => {
-        try {
-            const response = await fetch(`${API_BASE}/reports/student/${studentId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (!response.ok) throw new Error('Error al cargar informes');
-            return response.json();
-        } catch (error: any) {
-            console.warn('Backend unavailable, using mock reports...', error.message);
-            return MOCK_REPORTS
-                .filter(r => r.studentId === studentId)
-                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        }
+        const response = await fetch(`${API_BASE}/reports/student/${studentId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok) throw new Error('Error al cargar informes');
+        return response.json();
     }
 };
