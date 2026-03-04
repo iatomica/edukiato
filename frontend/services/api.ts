@@ -753,7 +753,7 @@ const defaultMockUsersLinked = defaultMockUsers.map(m => ({
         passwordHash: 'vinculos' // Default mock password
     }
 }));
-let MOCK_USERS: MockUser[] = storedUsers ? JSON.parse(storedUsers) : defaultMockUsersLinked;
+export let MOCK_USERS: MockUser[] = storedUsers ? JSON.parse(storedUsers) : defaultMockUsersLinked;
 
 // ── Auth API ──────────────────────────────────────────────────
 

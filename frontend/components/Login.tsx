@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Lock, Mail, Loader2, User, GraduationCap, Shield, AlertCircle } from 'lucide-react';
+import { ArrowRight, Lock, Mail, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -8,15 +8,6 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const { login, isLoading, error } = useAuth();
   const { t } = useLanguage();
-
-  // Quick access buttons — use AuthContext login which goes through the API layer
-  const handleQuickLogin = async (emailHint: string, pwdHint: string) => {
-    try {
-      await login(emailHint, pwdHint);
-    } catch {
-      // error is handled by AuthContext
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,54 +40,6 @@ export const Login: React.FC = () => {
               <p>{error}</p>
             </div>
           )}
-
-          <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-2">
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('seila@vinculos.edu', 'vinculos')}
-              disabled={isLoading}
-              className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-100 hover:border-primary-200 hover:bg-primary-50 transition-all group disabled:opacity-50"
-            >
-              <Shield size={20} className="text-slate-400 group-hover:text-primary-600 mb-1" />
-              <span className="text-xs font-semibold text-slate-600 group-hover:text-primary-700">Super Admin</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('directora@vinculos.edu', 'vinculos')}
-              disabled={isLoading}
-              className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-100 hover:border-primary-200 hover:bg-primary-50 transition-all group disabled:opacity-50"
-            >
-              <Shield size={20} className="text-slate-400 group-hover:text-primary-600 mb-1" />
-              <span className="text-xs font-semibold text-slate-600 group-hover:text-primary-700">{t.login.admin}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('fiorela@vinculos.edu', 'vinculos')}
-              disabled={isLoading}
-              className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-100 hover:border-primary-200 hover:bg-primary-50 transition-all group disabled:opacity-50"
-            >
-              <User size={20} className="text-slate-400 group-hover:text-primary-600 mb-1" />
-              <span className="text-xs font-semibold text-slate-600 group-hover:text-primary-700">{t.login.teacher}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('padre.perez@vinculos.edu', 'demo')}
-              disabled={isLoading}
-              className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-100 hover:border-primary-200 hover:bg-primary-50 transition-all group disabled:opacity-50"
-            >
-              <GraduationCap size={20} className="text-slate-400 group-hover:text-primary-600 mb-1" />
-              <span className="text-xs font-semibold text-slate-600 group-hover:text-primary-700">Familia</span>
-            </button>
-          </div>
-
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-100"></div>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-slate-400">{t.login.orEmail}</span>
-            </div>
-          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
