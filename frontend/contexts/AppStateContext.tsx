@@ -301,10 +301,10 @@ export const AppStateProvider: React.FC<{ children: ReactNode }> = ({ children }
                     // Parse local storage dynamically to get the latest (to prevent soft-logout staleness)
                     const storedComms = localStorage.getItem('MOCK_COMMUNICATIONS');
                     const storedNotifs = localStorage.getItem('MOCK_NOTIFICATIONS');
-                    const storedNinos = localStorage.getItem('MOCK_NINOS');
-                    const storedAulas = localStorage.getItem('MOCK_AULAS');
-
-                    const storedEvents = localStorage.getItem('MOCK_EVENTS');
+                    // Ignoramos cache de alumnos, aulas y eventos para inyectar correctamente la nueva metadata real.
+                    const storedNinos = null; // localStorage.getItem('MOCK_NINOS');
+                    const storedAulas = null; // localStorage.getItem('MOCK_AULAS');
+                    const storedEvents = null; // localStorage.getItem('MOCK_EVENTS');
 
                     let baseData: Partial<AppState> = {
                         courses: MOCK_COURSES,
