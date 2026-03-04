@@ -19,4 +19,6 @@ export interface User {
     role: UserRole;
     avatar: string;
     institutions?: UserInstitution[];
+    requiresPasswordChange?: boolean;
+    passwordHash?: string;
 }

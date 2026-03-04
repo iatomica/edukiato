@@ -8,7 +8,7 @@ import { Roles } from './decorators/roles.decorator';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
@@ -24,6 +24,11 @@ export class AuthController {
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+  }
+
+  @Post('set-initial-password')
+  async setInitialPassword(@Body() body: { userId: string, newPassword: string }) {
+    return this.authService.setInitialPassword(body.userId, body.newPassword);
   }
 
   @UseGuards(JwtAuthGuard)

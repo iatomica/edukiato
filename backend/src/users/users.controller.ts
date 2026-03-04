@@ -31,4 +31,9 @@ export class UsersController {
     update(@Param('id') id: string, @Body() updateData: Partial<CreateUserDto>) {
         return this.usersService.update(id, updateData);
     }
+
+    @Post(':id/reset-password')
+    resetPassword(@Param('id') id: string) {
+        return this.usersService.resetPassword(id);
+    }
 }

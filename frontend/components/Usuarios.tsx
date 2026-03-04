@@ -189,7 +189,7 @@ export const Usuarios: React.FC = () => {
 
     const handleResetPassword = async () => {
         if (!token || !editUser) return;
-        if (window.confirm(`¿Estás seguro que deseas enviar un enlace de recuperación de contraseña a ${editUser.email}?`)) {
+        if (window.confirm(`¿Estás seguro que deseas restablecer la contraseña de ${editUser.name} a "vinculos"? En su próximo inicio de sesión se le requerirá que la cambie.`)) {
             try {
                 const res = await usersApi.resetPassword(editUser.id, token);
                 alert(res.message);
@@ -516,7 +516,7 @@ export const Usuarios: React.FC = () => {
                                     <p className="text-sm font-bold text-slate-700 flex items-center mb-0.5">
                                         <Key size={14} className="mr-1.5" /> Seguridad
                                     </p>
-                                    <p className="text-xs text-slate-500">Enviar link para que recupere su clave</p>
+                                    <p className="text-xs text-slate-500">Restablecer la clave por defecto ("vinculos")</p>
                                 </div>
                                 <button type="button" onClick={handleResetPassword} className="px-4 py-2 bg-white text-rose-600 text-sm font-bold rounded-lg border border-rose-200 hover:bg-rose-50 transition-colors">
                                     Restablecer

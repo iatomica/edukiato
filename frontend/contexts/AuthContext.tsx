@@ -8,6 +8,7 @@ interface AuthContextType extends AuthState {
     login: (email: string, password: string) => Promise<void>;
     logout: () => void;
     updateUser: (newData: Partial<User>) => void;
+    completePasswordChange: (newPassword: string) => Promise<void>;
     selectInstitution: (institution: UserInstitution) => void;
     clearInstitution: () => void;
     error: string | null;
@@ -81,6 +82,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         });
     }, []);
 
+    const completePasswordChange = useCallback(async (newPassword: string) => {
+        if (!user) throw new Error("No hay usuario autenticado.");
+        setIsLoading(true);
+        setError(null);
+        try {
+            await authApi.setInitialPassword(user.id, newPassword);
+            updateUser({ requiresPasswordChange: false });
+        } catch (err: any) {
+            setError(err.message || 'Error al cambiar la contraseña');
+            throw err;
+        } finally {
+            setIsLoading(false);
+        }
+    }, [user, updateUser]);
+
     const selectInstitution = useCallback((inst: UserInstitution) => {
         const institution: Institution = {
             id: inst.institutionId,
@@ -115,6 +131,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         login,
         logout,
         updateUser,
+        completePasswordChange,
         selectInstitution,
         clearInstitution,
     };

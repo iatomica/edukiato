@@ -9,6 +9,7 @@ import { Classroom } from './components/Classroom';
 import { Messages } from './components/Messages';
 import { Login } from './components/Login';
 import { InstitutionPicker } from './components/InstitutionPicker';
+import { ForcePasswordChange } from './components/ForcePasswordChange';
 import { Usuarios } from './components/Usuarios';
 import { Institutions } from './components/Institutions';
 import Aulas from './components/Aulas';
@@ -113,6 +114,11 @@ const AppContent: React.FC = () => {
   // Step 1: Login
   if (!isAuthenticated || !user) {
     return <Login />;
+  }
+
+  // Step 1.5: Force Password Change if required
+  if (user.requiresPasswordChange) {
+    return <ForcePasswordChange />;
   }
 
   // Step 2: Institution selection (multi-tenant)

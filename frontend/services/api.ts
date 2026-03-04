@@ -745,7 +745,15 @@ export const defaultMockUsers: any[] = [
 ];
 
 const storedUsers = null; // typeof window !== 'undefined' ? localStorage.getItem('MOCK_USERS') : null;
-let MOCK_USERS: MockUser[] = storedUsers ? JSON.parse(storedUsers) : defaultMockUsers;
+const defaultMockUsersLinked = defaultMockUsers.map(m => ({
+    ...m,
+    user: {
+        ...m.user,
+        requiresPasswordChange: !['SUPER_ADMIN', 'ADMIN_INSTITUCION'].includes(m.user.role),
+        passwordHash: 'vinculos' // Default mock password
+    }
+}));
+let MOCK_USERS: MockUser[] = storedUsers ? JSON.parse(storedUsers) : defaultMockUsersLinked;
 
 // ── Auth API ──────────────────────────────────────────────────
 
@@ -759,10 +767,15 @@ export const authApi = {
                 || MOCK_USERS.find(u => email.toLowerCase().includes(u.emailPattern))
                 || MOCK_USERS[MOCK_USERS.length - 1]; // Fallback to student
 
-            // Password validation for Institutional users
+            // Password validation for all users in mock mode
             const isInstitutional = ['SUPER_ADMIN', 'ADMIN_INSTITUCION', 'DOCENTE', 'ESPECIALES'].includes(found.user.role);
-            if (isInstitutional && _password !== 'vinculos') {
-                throw new Error('Credenciales inválidas');
+
+            // Check against stored mock password
+            if (_password !== found.user.passwordHash) {
+                // Allow fallback if they haven't explicitly set a password and try 'vinculos'
+                if (!(_password === 'vinculos' && found.user.passwordHash === 'vinculos')) {
+                    throw new Error('Credenciales inválidas');
+                }
             }
 
             const user: User = {
@@ -829,10 +842,12 @@ export const authApi = {
                 throw new Error('Usuario no encontrado o credenciales inválidas');
             }
 
-            // Password validation for Institutional users
-            const isInstitutional = ['SUPER_ADMIN', 'ADMIN_INSTITUCION', 'DOCENTE', 'ESPECIALES'].includes(found.user.role);
-            if (isInstitutional && _password !== 'vinculos') {
-                throw new Error('Credenciales inválidas');
+            // Password validation for all users in mock fallback
+            if (_password !== found.user.passwordHash) {
+                // Allow fallback if they haven't explicitly set a password and try 'vinculos'
+                if (!(_password === 'vinculos' && found.user.passwordHash === 'vinculos')) {
+                    throw new Error('Credenciales inválidas');
+                }
             }
 
             const user: User = {
@@ -846,6 +861,42 @@ export const authApi = {
             };
         }
     },
+    setInitialPassword: async (userId: string, newPassword: string): Promise<{ success: boolean }> => {
+        if (USE_MOCK) {
+            await new Promise(resolve => setTimeout(resolve, 600));
+            const mockIndex = MOCK_USERS.findIndex(u => u.user.id === userId);
+            if (mockIndex >= 0) {
+                MOCK_USERS[mockIndex].user.requiresPasswordChange = false;
+                MOCK_USERS[mockIndex].user.passwordHash = newPassword;
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('MOCK_USERS', JSON.stringify(MOCK_USERS));
+                }
+                return { success: true };
+            }
+            throw new Error('Usuario no encontrado');
+        }
+
+        const response = await fetch(`${API_BASE}/auth/set-initial-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, newPassword }),
+        });
+
+        if (!response.ok) {
+            // Fallback a fallback mock
+            const mockIndex = MOCK_USERS.findIndex(u => u.user.id === userId);
+            if (mockIndex >= 0) {
+                MOCK_USERS[mockIndex].user.requiresPasswordChange = false;
+                MOCK_USERS[mockIndex].user.passwordHash = newPassword;
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('MOCK_USERS', JSON.stringify(MOCK_USERS));
+                }
+                return { success: true };
+            }
+            throw new Error('Error cambiando la contraseña');
+        }
+        return { success: true };
+    }
 };
 
 // ── Institutions API ──────────────────────────────────────────
@@ -997,13 +1048,21 @@ export const usersApi = {
             return await response.json();
         } catch (error) {
             console.warn("Mocking password reset fallback.");
-            const user = MOCK_USERS.find(m => m.user.id === userId);
-            if (!user) throw new Error("Usuario no encontrado");
+            const mockIndex = MOCK_USERS.findIndex(m => m.user.id === userId);
+            if (mockIndex < 0) throw new Error("Usuario no encontrado");
+
+            // Forzar el recambio de clave la proxima vez
+            MOCK_USERS[mockIndex].user.requiresPasswordChange = true;
+            MOCK_USERS[mockIndex].user.passwordHash = 'vinculos';
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('MOCK_USERS', JSON.stringify(MOCK_USERS));
+            }
+
             // Simulate API delay
             await new Promise(resolve => setTimeout(resolve, 800));
             return {
                 success: true,
-                message: `Se ha enviado un correo de recuperación a ${user.user.email}`
+                message: `Clave restablecida a "vinculos". Se ha enviado un aviso a ${MOCK_USERS[mockIndex].user.email}`
             };
         }
     }

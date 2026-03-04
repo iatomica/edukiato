@@ -11,6 +11,7 @@ export class UsersService {
             id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
             name: 'Alex Rivera',
             email: 'admin@edukiato.edu',
+            passwordHash: 'vinculos',
             role: 'ADMIN_INSTITUCION',
             avatar: 'https://picsum.photos/seed/alex/200',
             institutions: [
@@ -29,6 +30,7 @@ export class UsersService {
             id: 't1eebc99-9c0b-4ef8-bb6d-6bb9bd380t11',
             name: 'Elena Fisher',
             email: 'elena@edukiato.edu',
+            passwordHash: 'vinculos',
             role: 'DOCENTE',
             avatar: 'https://picsum.photos/seed/elena/200',
             institutions: [
@@ -47,6 +49,7 @@ export class UsersService {
             id: 's1eebc99-9c0b-4ef8-bb6d-6bb9bd380s11',
             name: 'Sofía Chen',
             email: 'sofia@student.com',
+            passwordHash: 'vinculos',
             role: 'ESTUDIANTE',
             avatar: 'https://picsum.photos/seed/sofia/200',
             institutions: [
@@ -79,12 +82,17 @@ export class UsersService {
         return user;
     }
 
+    findByEmail(email: string) {
+        return this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    }
+
     create(createUserDto: CreateUserDto, institutionId: string) {
         // Basic mock of user creation tied to an institution
-        const newUser: User = {
+        const newUser: User & { passwordHash?: string } = {
             id: `usr_${crypto.randomUUID()}`,
             name: createUserDto.name,
             email: createUserDto.email,
+            passwordHash: 'vinculos',
             role: (createUserDto.role as UserRole) || 'ESTUDIANTE',
             avatar: createUserDto.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${createUserDto.name}`,
             institutions: [
@@ -99,5 +107,23 @@ export class UsersService {
 
         this.users.push(newUser);
         return newUser;
+    }
+
+    update(id: string, updateData: Partial<CreateUserDto>) {
+        const user = this.findOne(id);
+        Object.assign(user, updateData);
+        return user;
+    }
+
+    resetPassword(id: string) {
+        const user = this.findOne(id);
+        // Force the user to change password on next login
+        user.requiresPasswordChange = true;
+        user.passwordHash = 'vinculos';
+        // The frontend uses "vinculos" as the default password for institutional users
+        return {
+            success: true,
+            message: `Contraseña de ${user.name} restablecida a "vinculos". Deberá cambiarla en su próximo ingreso.`
+        };
     }
 }
