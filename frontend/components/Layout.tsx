@@ -1,12 +1,12 @@
+import { UserAvatar } from '@/components/UserAvatar';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { usePermissions } from '@/contexts/PermissionsContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useTenantData } from '@/hooks/useTenantData';
+import { View, User } from '@/types';
+import { Home, Users, Calendar, Settings, LogOut, Menu, Bell, MessageSquare, Building2, FileText, GraduationCap, X, Send } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
-import { Home, BookOpen, Users, Calendar, Settings, LogOut, Menu, Bell, MessageSquare, Globe, Info, Building2, ChevronDown, FileText, GraduationCap, X, Send } from 'lucide-react';
-import { View, User } from '../types';
-import { useLanguage } from '../contexts/LanguageContext';
-import { usePermissions } from '../contexts/PermissionsContext';
-import { useTheme } from '../contexts/ThemeContext';
-import { useAuth } from '../contexts/AuthContext';
-import { useTenantData } from '../hooks/useTenantData';
-import { UserAvatar } from './UserAvatar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -21,12 +21,20 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
-  const { t, language, setLanguage } = useLanguage();
+  const { t } = useLanguage();
   const { can } = usePermissions();
   const { theme } = useTheme();
-  const { clearInstitution } = useAuth();
+  const { clearInstitution, token } = useAuth();
   const { notifications, aulas, ninos, events, communications, dispatch } = useTenantData();
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+  const [lastSeenCalendar, setLastSeenCalendar] = useState<number>(0);
+
+  const markCalendarAsSeen = React.useCallback(() => {
+    if (!user?.id) return;
+    const nowIso = new Date().toISOString();
+    localStorage.setItem(`lastSeenCalendar_${user.id}`, nowIso);
+    setLastSeenCalendar(new Date(nowIso).getTime());
+  }, [user?.id]);
 
   // Close notifications on click outside
   useEffect(() => {
@@ -80,8 +88,34 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
     return !c.isRead;
   });
 
-  const hasUpcomingEvents = events.some(e => {
-    return new Date(e.start) >= new Date(new Date().setHours(0, 0, 0, 0));
+  useEffect(() => {
+    if (!user?.id) return;
+    const seen = localStorage.getItem(`lastSeenCalendar_${user.id}`);
+    setLastSeenCalendar(seen ? new Date(seen).getTime() : 0);
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (currentView === 'schedule') {
+      markCalendarAsSeen();
+    }
+  }, [currentView, markCalendarAsSeen]);
+
+  useEffect(() => {
+    const handleCalendarViewed = () => {
+      markCalendarAsSeen();
+    };
+
+    window.addEventListener('CALENDAR_VIEWED', handleCalendarViewed);
+    return () => window.removeEventListener('CALENDAR_VIEWED', handleCalendarViewed);
+  }, [markCalendarAsSeen]);
+
+  const hasUpcomingEvents = currentView !== 'schedule' && events.some(e => {
+    const isUpcoming = new Date(e.start) >= new Date(new Date().setHours(0, 0, 0, 0));
+    if (!isUpcoming) return false;
+
+    if (lastSeenCalendar === 0) return true;
+    const eventTimestamp = e.createdAt ? new Date(e.createdAt).getTime() : new Date(e.start).getTime();
+    return eventTimestamp > lastSeenCalendar;
   });
 
   const hasUnreadMessages = unreadMessagesCount > 0;
@@ -89,31 +123,22 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
   // Real-time synchronization for Sidebar Dot
   useEffect(() => {
     const fetchUnread = async () => {
-      // @ts-ignore (Accessing global token from localStorage/Auth logic usually, but here we can just pass a dummy or use api without it since it's mocked)
-      const token = localStorage.getItem('token') || 'dummy';
-      if (!user) return;
+      if (!user || !token) return;
 
-      // Dynamically import api to avoid circular dependencies if any, or just use the global
-      import('../services/api').then(({ messagesApi }) => {
+      import('@/services/api').then(({ messagesApi }) => {
         messagesApi.getConversations(user.id, token).then(convs => {
           const sum = convs.reduce((acc, curr) => acc + (curr.unreadCount || 0), 0);
           setUnreadMessagesCount(sum);
-        });
+        }).catch(() => setUnreadMessagesCount(0));
       });
     };
 
     fetchUnread();
-    window.addEventListener('MOCK_MESSAGES_UPDATED', fetchUnread);
     const interval = setInterval(fetchUnread, 3000);
     return () => {
-      window.removeEventListener('MOCK_MESSAGES_UPDATED', fetchUnread);
       clearInterval(interval);
     };
-  }, [user]);
-
-  const toggleLanguage = () => {
-    setLanguage(language === 'es' ? 'en' : 'es');
-  };
+  }, [user, token]);
 
   const NavItem = ({ view, icon: Icon, label, hasDot }: { view: View; icon: React.ElementType; label: string; hasDot?: boolean }) => {
     const isActive = currentView === view;

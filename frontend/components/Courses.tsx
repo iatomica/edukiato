@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { usePermissions } from '@/contexts/PermissionsContext';
+import { useTenantData } from '@/hooks/useTenantData';
+import { coursesApi } from '@/services/api';
+import { COURSE_TYPES, getCourseTypeConfig } from '@/services/courseTypeConfig';
+import { View, Course, UserRole, CourseType } from '@/types';
 import { Search, Plus, Filter, X } from 'lucide-react';
-import { View, Course, UserRole, CourseType } from '../types';
-import { useLanguage } from '../contexts/LanguageContext';
-import { usePermissions } from '../contexts/PermissionsContext';
-import { useTenantData } from '../hooks/useTenantData';
-import { COURSE_TYPES, getCourseTypeConfig } from '../services/courseTypeConfig';
-import { useAuth } from '../contexts/AuthContext';
-import { coursesApi } from '../services/api';
+import React, { useState } from 'react';
 
 interface CoursesProps {
   onViewChange?: (view: View) => void;
@@ -14,10 +14,10 @@ interface CoursesProps {
   userRole: UserRole;
 }
 
-export const Courses: React.FC<CoursesProps> = ({ onViewChange, onCourseSelect, userRole }) => {
+export const Courses: React.FC<CoursesProps> = ({ onViewChange: _onViewChange, onCourseSelect, userRole: _userRole }) => {
   const { t, language } = useLanguage();
   const { can } = usePermissions();
-  const { courses, institutionId, emitEvent, dispatch } = useTenantData();
+  const { courses, emitEvent, dispatch } = useTenantData();
   const { currentInstitution, token } = useAuth();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

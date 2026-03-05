@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { ArrowRight, Lock, Mail, Loader2, AlertCircle } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { useLanguage } from '../contexts/LanguageContext';
+import React, { useState } from 'react';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');

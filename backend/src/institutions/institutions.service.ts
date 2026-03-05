@@ -1,50 +1,117 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateInstitutionDto } from './dto/create-institution.dto';
 import * as crypto from 'crypto';
+import { Pool } from 'pg';
 
 @Injectable()
 export class InstitutionsService {
-    // Temporary in-memory store since there is no DB connection yet
-    private institutions = [
-        {
-            id: 'inst_arte_123',
-            name: 'Instituto de Arte Contemporáneo',
-            slug: 'instituto-arte',
-            logoUrl: 'https://images.unsplash.com/photo-1544605151-6c2e22c9f91a?auto=format&fit=crop&q=80&w=200&h=200',
-            primaryColor: '#0f766e',
-            secondaryColor: '#1e293b',
-            plan: 'FREE',
-            isActive: true,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        },
-        {
-            id: 'inst_tech_456',
-            name: 'Academia Tech & Código',
-            slug: 'academia-tech',
-            logoUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=200&h=200',
-            primaryColor: '#4f46e5',
-            secondaryColor: '#0f172a',
-            plan: 'PRO',
-            isActive: true,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        }
-    ];
+    constructor(@Inject('DB_POOL') private readonly dbPool: Pool) { }
 
-    findAll() {
-        return this.institutions;
+    private async ensureTables(): Promise<void> {
+        await this.dbPool.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id VARCHAR(80) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password_hash VARCHAR(255),
+                role VARCHAR(50) NOT NULL,
+                avatar VARCHAR(500),
+                requires_password_change BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW()
+            );
+        `);
+
+        await this.dbPool.query(`
+            CREATE TABLE IF NOT EXISTS institutions (
+                id VARCHAR(80) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                slug VARCHAR(255),
+                logo_url VARCHAR(500),
+                primary_color VARCHAR(50),
+                secondary_color VARCHAR(50),
+                plan VARCHAR(30),
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW()
+            );
+        `);
+
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS logo_url VARCHAR(500)`);
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS primary_color VARCHAR(50)`);
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS secondary_color VARCHAR(50)`);
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS plan VARCHAR(30)`);
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE`);
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW()`);
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW()`);
+
+        await this.dbPool.query(`
+            CREATE TABLE IF NOT EXISTS user_institutions (
+                user_id VARCHAR(80) REFERENCES users(id) ON DELETE CASCADE,
+                institution_id VARCHAR(80) REFERENCES institutions(id) ON DELETE CASCADE,
+                role VARCHAR(50) NOT NULL,
+                PRIMARY KEY(user_id, institution_id)
+            );
+        `);
     }
 
-    findOne(id: string) {
-        const institution = this.institutions.find(i => i.id === id);
+    async findAll() {
+        await this.ensureTables();
+        const rows = await this.dbPool.query(
+            `
+            SELECT id, name, slug, logo_url, primary_color, secondary_color, plan, is_active, created_at, updated_at
+            FROM institutions
+            ORDER BY created_at DESC
+            `,
+        );
+
+        return rows.rows.map((row) => ({
+            id: row.id,
+            name: row.name,
+            slug: row.slug,
+            logoUrl: row.logo_url,
+            primaryColor: row.primary_color,
+            secondaryColor: row.secondary_color,
+            plan: row.plan,
+            isActive: row.is_active,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
+        }));
+    }
+
+    async findOne(id: string) {
+        await this.ensureTables();
+        const rows = await this.dbPool.query(
+            `
+            SELECT id, name, slug, logo_url, primary_color, secondary_color, plan, is_active, created_at, updated_at
+            FROM institutions
+            WHERE id = $1
+            `,
+            [id],
+        );
+
+        const institution = rows.rows[0];
         if (!institution) {
             throw new NotFoundException(`Institution with ID ${id} not found`);
         }
-        return institution;
+
+        return {
+            id: institution.id,
+            name: institution.name,
+            slug: institution.slug,
+            logoUrl: institution.logo_url,
+            primaryColor: institution.primary_color,
+            secondaryColor: institution.secondary_color,
+            plan: institution.plan,
+            isActive: institution.is_active,
+            createdAt: institution.created_at,
+            updatedAt: institution.updated_at,
+        };
     }
 
-    create(createDto: CreateInstitutionDto, userId: string) {
+    async create(createDto: CreateInstitutionDto, userId: string) {
+        await this.ensureTables();
+
         const newInst = {
             id: `inst_${crypto.randomUUID()}`,
             name: createDto.name,
@@ -54,15 +121,25 @@ export class InstitutionsService {
             secondaryColor: createDto.secondaryColor || '#0f766e',
             plan: createDto.plan || 'FREE',
             isActive: true,
-            createdAt: new Date(),
-            updatedAt: new Date()
         };
 
-        this.institutions.push(newInst);
+        await this.dbPool.query(
+            `
+            INSERT INTO institutions (id, name, slug, logo_url, primary_color, secondary_color, plan, is_active, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE, NOW(), NOW())
+            `,
+            [newInst.id, newInst.name, newInst.slug, newInst.logoUrl, newInst.primaryColor, newInst.secondaryColor, newInst.plan],
+        );
 
-        // In a real database, we would also insert into `user_institution_roles` here 
-        // to link the creating user as ADMIN_INSTITUCION
+        await this.dbPool.query(
+            `
+            INSERT INTO user_institutions (user_id, institution_id, role)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (user_id, institution_id) DO UPDATE SET role = EXCLUDED.role
+            `,
+            [userId, newInst.id, 'ADMIN_INSTITUCION'],
+        );
 
-        return newInst;
+        return this.findOne(newInst.id);
     }
 }

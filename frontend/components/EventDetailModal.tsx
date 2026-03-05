@@ -1,9 +1,8 @@
-import React from 'react';
-import { CalendarEvent, User } from '../types';
-import { X, Clock, Edit2, Trash2, Users, AlignLeft, User as UserIcon } from 'lucide-react';
+import { CalendarEvent, User } from '@/types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { useLanguage } from '../contexts/LanguageContext';
+import { X, Clock, Edit2, Trash2, User as UserIcon } from 'lucide-react';
+import React from 'react';
 
 interface EventDetailModalProps {
     event: CalendarEvent | null;
@@ -22,8 +21,6 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
     currentUser,
     creatorName
 }) => {
-    const { t } = useLanguage();
-
     if (!event) return null;
 
     const typeMap = {

@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsDateString, IsOptional, IsArray, IsEnum, ValidateNested } from 'class-validator';
+import { IsString, IsNotEmpty, IsDateString, IsOptional, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum EventType {
@@ -10,11 +10,12 @@ export enum EventType {
 export enum SharedScope {
     ALL = 'ALL',
     COURSE = 'COURSE',
+    AULA = 'AULA',
     INDIVIDUAL = 'INDIVIDUAL',
 }
 
 class SharedWithDto {
-    @IsEnum(SharedScope)
+    @IsString()
     scope: SharedScope;
 
     @IsArray()
@@ -38,9 +39,9 @@ export class CreateEventDto {
     @IsDateString()
     end: Date;
 
-    @IsEnum(EventType)
+    @IsString()
     @IsOptional()
-    type?: EventType;
+    type?: string;
 
     @IsString()
     @IsOptional()

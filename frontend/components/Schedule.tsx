@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Clock, MapPin, Check, X, AlertCircle, Save, Plus } from 'lucide-react';
+import { EventDetailModal } from '@/components/EventDetailModal';
+import { EventEditorModal } from '@/components/EventEditorModal';
+import { UserAvatar } from '@/components/UserAvatar';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTenantData } from '@/hooks/useTenantData';
+import { eventsApi } from '@/services/api';
+import { CalendarEvent, User } from '@/types';
 import { format, addDays, startOfWeek, isSameDay, getHours } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useTenantData } from '../hooks/useTenantData';
-import { CalendarEvent, User } from '../types';
-import { EventDetailModal } from './EventDetailModal';
-import { EventEditorModal } from './EventEditorModal';
-import { UserAvatar } from './UserAvatar';
+import { ChevronLeft, ChevronRight, Clock, Check, X, AlertCircle, Save, Plus, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 interface ScheduleProps {
   user: User;
@@ -16,6 +18,7 @@ interface ScheduleProps {
 export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
   const { t } = useLanguage();
   const { events, aulas, ninos, students, emitEvent, dispatch, institutionId } = useTenantData();
+  const { token } = useAuth();
   const today = new Date();
   const startOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 });
   const [weekOffset, setWeekOffset] = useState(0);
@@ -27,6 +30,8 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
   const [viewingEvent, setViewingEvent] = useState<CalendarEvent | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
+  const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(null);
+  const [isDeletingEvent, setIsDeletingEvent] = useState(false);
 
 
   const handleAttendance = (studentId: string, status: string) => {
@@ -138,41 +143,79 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
 
   const weekDays = Array.from({ length: daysToShow }).map((_, i) => addDays(currentWeekStart, i));
 
-  const handleSaveEvent = (eventData: Partial<CalendarEvent>) => {
-    if (editingEvent && editingEvent.id) {
-      dispatch({
-        type: 'UPDATE_EVENT',
-        payload: { ...eventData, id: editingEvent.id } as CalendarEvent
-      });
+  const handleSaveEvent = async (eventData: Partial<CalendarEvent>) => {
+    if (!token || !institutionId) {
       emitEvent({
         type: 'SYSTEM_NOTIFICATION' as any,
-        payload: { message: 'Evento actualizado exitosamente.', type: 'SYSTEM' } as any
+        payload: { message: 'No hay sesión activa para guardar el evento.', type: 'SYSTEM' } as any
       });
-    } else {
-      const newEvent = {
-        ...eventData,
-        id: `ev_${Date.now()}`,
-        creatorId: user.id,
-        institutionId: institutionId || '',
-        createdAt: new Date().toISOString()
-      } as CalendarEvent;
+      return;
+    }
 
-      dispatch({ type: 'ADD_EVENT', payload: newEvent });
+    try {
+      if (editingEvent && editingEvent.id) {
+        const updatedEvent = await eventsApi.update(editingEvent.id, eventData, institutionId, token);
+        dispatch({
+          type: 'UPDATE_EVENT',
+          payload: updatedEvent
+        });
+        emitEvent({
+          type: 'SYSTEM_NOTIFICATION' as any,
+          payload: { message: 'Evento actualizado exitosamente.', type: 'SYSTEM' } as any
+        });
+      } else {
+        const createdEvent = await eventsApi.create(
+          {
+            ...eventData,
+            creatorId: user.id,
+            institutionId,
+          },
+          institutionId,
+          token,
+        );
+
+        dispatch({ type: 'ADD_EVENT', payload: createdEvent });
+        emitEvent({
+          type: 'SYSTEM_NOTIFICATION' as any,
+          payload: { message: 'Evento creado exitosamente.', type: 'SYSTEM' } as any
+        });
+      }
+    } catch (error) {
+      console.error('Error saving event:', error);
       emitEvent({
         type: 'SYSTEM_NOTIFICATION' as any,
-        payload: { message: 'Evento creado exitosamente.', type: 'SYSTEM' } as any
+        payload: { message: 'No se pudo guardar el evento.', type: 'SYSTEM' } as any
       });
     }
   };
 
-  const handleDeleteEvent = (eventId: string) => {
-    if (window.confirm("¿Seguro que deseas eliminar este evento?")) {
-      dispatch({ type: 'DELETE_EVENT', payload: { id: eventId } });
-      setViewingEvent(null);
+  const handleDeleteEvent = async (eventId: string) => {
+    if (!token || !institutionId) {
       emitEvent({
         type: 'SYSTEM_NOTIFICATION' as any,
-        payload: { message: 'Evento eliminado comunmente.', type: 'SYSTEM' } as any
+        payload: { message: 'No hay sesión activa para eliminar el evento.', type: 'SYSTEM' } as any
       });
+      return;
+    }
+
+    setIsDeletingEvent(true);
+    try {
+      await eventsApi.remove(eventId, institutionId, token);
+      dispatch({ type: 'DELETE_EVENT', payload: { id: eventId } });
+      setViewingEvent(null);
+      setEventToDelete(null);
+      emitEvent({
+        type: 'SYSTEM_NOTIFICATION' as any,
+        payload: { message: 'Evento eliminado correctamente.', type: 'SYSTEM' } as any
+      });
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      emitEvent({
+        type: 'SYSTEM_NOTIFICATION' as any,
+        payload: { message: 'No se pudo eliminar el evento.', type: 'SYSTEM' } as any
+      });
+    } finally {
+      setIsDeletingEvent(false);
     }
   };
   // Restrict calendar creation entirely for Students and Parents
@@ -458,7 +501,10 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
           currentUser={user}
           creatorName={students.find(s => s.id === viewingEvent.creatorId)?.name}
           onClose={() => setViewingEvent(null)}
-          onDelete={handleDeleteEvent}
+          onDelete={(eventId) => {
+            const selected = visibleEvents.find((e) => e.id === eventId) ?? null;
+            setEventToDelete(selected);
+          }}
           onEdit={(e) => {
             setViewingEvent(null);
             setEditingEvent(e);
@@ -477,6 +523,47 @@ export const Schedule: React.FC<ScheduleProps> = ({ user }) => {
           currentUser={user}
           aulas={aulas}
         />
+      )}
+
+      {eventToDelete && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/35 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden animate-fade-in-up">
+            <div className="p-5 border-b border-slate-100 flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                <AlertCircle size={18} />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">Eliminar evento</h3>
+                <p className="text-sm text-slate-500 mt-1">Esta acción no se puede deshacer.</p>
+              </div>
+            </div>
+
+            <div className="p-5 bg-slate-50/60 border-b border-slate-100">
+              <p className="text-sm text-slate-700 font-medium">{eventToDelete.title}</p>
+              <p className="text-xs text-slate-500 mt-1">{format(eventToDelete.start, 'dd/MM/yyyy HH:mm', { locale: es })} - {format(eventToDelete.end, 'HH:mm', { locale: es })}</p>
+            </div>
+
+            <div className="p-4 flex justify-end gap-2">
+              <button
+                type="button"
+                disabled={isDeletingEvent}
+                onClick={() => setEventToDelete(null)}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={isDeletingEvent}
+                onClick={() => handleDeleteEvent(eventToDelete.id)}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Trash2 size={14} />
+                {isDeletingEvent ? 'Eliminando...' : 'Eliminar evento'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

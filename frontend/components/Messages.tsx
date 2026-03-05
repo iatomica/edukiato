@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { User, UserRole } from '../types';
-import { Search, Send, UserPlus, X, Mail, Phone, Video, MoreVertical, Paperclip, CheckCheck, Users as UsersIcon, MessageSquare } from 'lucide-react';
+import { UserAvatar } from '@/components/UserAvatar';
+import { useAppState } from '@/contexts/AppStateContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { usersApi, messagesApi } from '@/services/api';
+import { User, UserRole } from '@/types';
 import { format } from 'date-fns';
-import { useAuth } from '../contexts/AuthContext';
-import { useAppState } from '../contexts/AppStateContext';
-import { usersApi, messagesApi } from '../services/api';
-import { UserAvatar } from './UserAvatar';
+import { Search, Send, UserPlus, X, Mail, Paperclip, CheckCheck, Users as UsersIcon, MessageSquare } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialUserId }) => {
   const { user: currentUser, currentInstitution, token } = useAuth();

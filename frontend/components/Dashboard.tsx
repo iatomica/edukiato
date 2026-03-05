@@ -1,11 +1,10 @@
+import { Feed } from '@/components/Feed';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTenantData } from '@/hooks/useTenantData';
+import { FeedItem, View, User } from '@/types';
+import { BookOpen, MessageSquare, Calendar } from 'lucide-react';
 import React, { useEffect } from 'react';
-import { View, User } from '../types';
-import { Users, Clock, AlertCircle, ArrowRight, TrendingUp, BookOpen, CheckCircle, MessageSquare, Calendar } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useTenantData } from '../hooks/useTenantData';
-import { Feed } from './Feed';
-import { FeedItem } from '../types';
 
 interface DashboardProps {
   onViewChange: (view: View) => void;
@@ -13,9 +12,18 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
-  const { aulas, events, communications, students } = useTenantData();
-  const nextClass = aulas[0];
+  const { aulas, events, communications, ninos } = useTenantData();
+  const { token } = useAuth();
   const { t } = useLanguage();
+  const userFirstName = React.useMemo(() => {
+    const normalizedName = user?.name?.trim();
+    if (normalizedName) {
+      return normalizedName.split(/\s+/)[0];
+    }
+
+    const emailPrefix = user?.email?.split('@')[0]?.trim();
+    return emailPrefix || 'Usuario';
+  }, [user]);
 
   const [feedFilter, setFeedFilter] = React.useState<'ALL' | 'ONLY_COMMUNICATIONS' | 'ONLY_EVENTS'>('ALL');
 
@@ -60,29 +68,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
   // Real-time synchronization for Dashboard Widget
   useEffect(() => {
     const fetchUnread = async () => {
-      // @ts-ignore
-      const token = localStorage.getItem('token') || 'dummy';
-      if (!user) return;
+      if (!user || !token) return;
 
-      import('../services/api').then(({ messagesApi }) => {
+      import('@/services/api').then(({ messagesApi }) => {
         messagesApi.getConversations(user.id, token).then(convs => {
-          const sum = convs.reduce((acc, curr) => acc + (curr.unreadCount || 0), 0);
           // In Dashboard, typically counting all unread interactions or precisely conversations where count > 0
           // The user asks "contador de conversaciones". Meaning how many distinct *chats* have unread messages?
           const conversationsWithUnread = convs.filter(c => (c.unreadCount || 0) > 0).length;
           setTotalUnreadMessages(conversationsWithUnread);
-        });
+        }).catch(() => setTotalUnreadMessages(0));
       });
     };
 
     fetchUnread();
-    window.addEventListener('MOCK_MESSAGES_UPDATED', fetchUnread);
     const interval = setInterval(fetchUnread, 3000);
     return () => {
-      window.removeEventListener('MOCK_MESSAGES_UPDATED', fetchUnread);
       clearInterval(interval);
     };
-  }, [user]);
+  }, [user, token]);
 
   // Map Communications and Events into a unified "Social Feed" structure matching FeedItem interface
   const unifiedFeed: FeedItem[] = React.useMemo(() => {
@@ -113,7 +116,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
             if (isTeacherOfAula) return true;
           }
           if (user.role === 'PADRE') {
-            const isParentOfAula = students.some(n => e.sharedWith!.targetIds!.includes(n.aulaId) && n.parentIds?.includes(user.id));
+            const isParentOfAula = ninos.some(n => e.sharedWith!.targetIds!.includes(n.aulaId) && n.parentIds?.includes(user.id));
             if (isParentOfAula) return true;
           }
         }
@@ -176,7 +179,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
           <div className="relative z-10 flex justify-between items-end">
             <div>
               <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
-                {t.dashboard.greeting}, {user.name.split(' ')[0]}.
+                {t.dashboard.greeting}, {userFirstName}.
               </h1>
               <p className="text-slate-500 mt-2 text-lg">
                 {user.role === 'ADMIN_INSTITUCION' && t.dashboard.adminSub}

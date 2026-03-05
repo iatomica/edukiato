@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { CalendarEvent, User, Aula } from '../types';
-import { X, Clock, MapPin, Tag } from 'lucide-react';
-import { useLanguage } from '../contexts/LanguageContext';
-import { RichTextEditor } from './RichTextEditor';
+import { RichTextEditor } from '@/components/RichTextEditor';
+import { CalendarEvent, User, Aula } from '@/types';
+import { X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 interface EventEditorModalProps {
     isOpen: boolean;
@@ -21,14 +20,15 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
     currentUser,
     aulas
 }) => {
-    const { t } = useLanguage();
-
     const [title, setTitle] = useState(initialData?.title || '');
     const [description, setDescription] = useState(initialData?.description || '');
 
     // Instead of datetime-local, we use separate states for date, startTime, and endTime
     const formatForDateInput = (date: Date) => {
-        return date.toISOString().slice(0, 10);
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
     };
 
     const formatForTimeInput = (date: Date) => {
@@ -57,6 +57,20 @@ export const EventEditorModal: React.FC<EventEditorModalProps> = ({
     const [type, setType] = useState<CalendarEvent['type']>(initialData?.type || 'EVENTO_DE_SALA');
     const [scope, setScope] = useState<'ALL' | 'COURSE' | 'AULA' | 'INDIVIDUAL'>(initialData?.sharedWith?.scope || (isAdmin ? 'ALL' : 'AULA'));
     const [targetIds, setTargetIds] = useState<string[]>(initialData?.sharedWith?.targetIds || []);
+
+    useEffect(() => {
+        const startBase = initialData?.start || new Date();
+        const endBase = initialData?.end || new Date(Date.now() + 3600000);
+
+        setTitle(initialData?.title || '');
+        setDescription(initialData?.description || '');
+        setDate(formatForDateInput(startBase));
+        setStartTime(formatForTimeInput(startBase));
+        setEndTime(formatForTimeInput(endBase));
+        setType(initialData?.type || 'EVENTO_DE_SALA');
+        setScope(initialData?.sharedWith?.scope || (isAdmin ? 'ALL' : 'AULA'));
+        setTargetIds(initialData?.sharedWith?.targetIds || []);
+    }, [initialData, isAdmin, isOpen]);
 
     // Time validation mathematically
     const parseMins = (timeStr: string) => {

@@ -1,9 +1,9 @@
-import { IsString, IsDateString, IsOptional, IsEnum, ValidateNested } from 'class-validator';
+import { IsString, IsDateString, IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { EventType, SharedScope } from './create-event.dto';
+import { SharedScope } from './create-event.dto';
 
 class SharedWithDto {
-    @IsEnum(SharedScope)
+    @IsString()
     @IsOptional()
     scope?: SharedScope;
 
@@ -29,9 +29,9 @@ export class UpdateEventDto {
     @IsOptional()
     end?: Date;
 
-    @IsEnum(EventType)
+    @IsString()
     @IsOptional()
-    type?: EventType;
+    type?: string;
 
     @IsString()
     @IsOptional()

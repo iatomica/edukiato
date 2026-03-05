@@ -1,5 +1,8 @@
 import { Module, Global } from '@nestjs/common';
 import { Pool } from 'pg';
+import { ensureEnvLoaded } from '../config/env';
+
+ensureEnvLoaded();
 
 @Global()
 @Module({
@@ -7,12 +10,22 @@ import { Pool } from 'pg';
         {
             provide: 'DB_POOL',
             useFactory: () => {
+                const connectionString = process.env.DATABASE_URL;
+
+                if (connectionString) {
+                    return new Pool({
+                        connectionString,
+                        ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
+                    });
+                }
+
                 return new Pool({
-                    user: process.env.DB_USER || 'postgres',
-                    host: process.env.DB_HOST || 'localhost',
-                    database: process.env.DB_NAME || 'edukidDB',
-                    password: process.env.DB_PASSWORD || 'password', // Typically postgres or empty in local pg
+                    user: process.env.DB_USER,
+                    host: process.env.DB_HOST,
+                    database: process.env.DB_NAME,
+                    password: process.env.DB_PASSWORD,
                     port: parseInt(process.env.DB_PORT || '5432', 10),
+                    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
                 });
             },
         },

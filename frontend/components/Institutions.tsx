@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Institution, UserInstitution } from '../types';
+import { useAuth } from '@/contexts/AuthContext';
+import { institutionsApi } from '@/services/api';
+import { UserInstitution } from '@/types';
 import { Search, Plus, Building2, X, MoreHorizontal } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { institutionsApi } from '../services/api';
+import React, { useState, useEffect } from 'react';
 
 export const Institutions: React.FC = () => {
     const { user: currentUser, token } = useAuth();

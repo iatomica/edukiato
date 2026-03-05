@@ -1,7 +1,7 @@
-import React from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Bold, Italic, List, ListOrdered, Heading1, Heading2 } from 'lucide-react';
+import React from 'react';
 
 interface RichTextEditorProps {
     value: string;

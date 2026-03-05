@@ -5,7 +5,7 @@
  * All events are typed for compile-time safety.
  */
 
-import { Course, CalendarEvent, FeedItem, Payment, Notification, Conversation, Communication } from '../types';
+import { Course, FeedItem, Payment, Notification, Communication } from '@/types';
 
 // ── Event Definitions ────────────────────────────────────────
 

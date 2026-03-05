@@ -1,129 +1,332 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as crypto from 'crypto';
 import type { User, UserInstitution, UserRole } from '../types';
+import { Pool } from 'pg';
 
 @Injectable()
 export class UsersService {
-    // Mock DB matching the MOCK_USERS from frontend api.ts
-    private users: User[] = [
-        {
-            id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-            name: 'Alex Rivera',
-            email: 'admin@edukiato.edu',
-            passwordHash: 'vinculos',
-            role: 'ADMIN_INSTITUCION',
-            avatar: 'https://picsum.photos/seed/alex/200',
-            institutions: [
-                {
-                    institutionId: 'inst-001',
-                    institutionName: 'Instituto de Arte Contemporáneo',
-                    institutionSlug: 'arte-contemporaneo',
-                    role: 'ADMIN_INSTITUCION',
-                    logoUrl: 'https://picsum.photos/seed/inst1/200',
-                    primaryColor: '#7c3aed',
-                    secondaryColor: '#5b21b6',
-                },
-            ],
-        },
-        {
-            id: 't1eebc99-9c0b-4ef8-bb6d-6bb9bd380t11',
-            name: 'Elena Fisher',
-            email: 'elena@edukiato.edu',
-            passwordHash: 'vinculos',
-            role: 'DOCENTE',
-            avatar: 'https://picsum.photos/seed/elena/200',
-            institutions: [
-                {
-                    institutionId: 'inst-001',
-                    institutionName: 'Instituto de Arte Contemporáneo',
-                    institutionSlug: 'arte-contemporaneo',
-                    role: 'DOCENTE',
-                    logoUrl: 'https://picsum.photos/seed/inst1/200',
-                    primaryColor: '#7c3aed',
-                    secondaryColor: '#5b21b6',
-                },
-            ],
-        },
-        {
-            id: 's1eebc99-9c0b-4ef8-bb6d-6bb9bd380s11',
-            name: 'Sofía Chen',
-            email: 'sofia@student.com',
-            passwordHash: 'vinculos',
-            role: 'ESTUDIANTE',
-            avatar: 'https://picsum.photos/seed/sofia/200',
-            institutions: [
-                {
-                    institutionId: 'inst-001',
-                    institutionName: 'Instituto de Arte Contemporáneo',
-                    institutionSlug: 'arte-contemporaneo',
-                    role: 'ESTUDIANTE',
-                    logoUrl: 'https://picsum.photos/seed/inst1/200',
-                    primaryColor: '#7c3aed',
-                    secondaryColor: '#5b21b6',
-                },
-            ],
-        },
-    ];
+    constructor(@Inject('DB_POOL') private readonly dbPool: Pool) { }
 
-    findAll(institutionId?: string) {
-        if (!institutionId) {
-            return this.users;
+    private async ensureTables(): Promise<void> {
+        await this.dbPool.query(`
+            CREATE TABLE IF NOT EXISTS institutions (
+                id VARCHAR(80) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                slug VARCHAR(255),
+                logo_url VARCHAR(500),
+                primary_color VARCHAR(50),
+                secondary_color VARCHAR(50),
+                plan VARCHAR(30),
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW()
+            );
+        `);
+
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS logo_url VARCHAR(500)`);
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS primary_color VARCHAR(50)`);
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS secondary_color VARCHAR(50)`);
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS plan VARCHAR(30)`);
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE`);
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW()`);
+        await this.dbPool.query(`ALTER TABLE institutions ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW()`);
+
+        await this.dbPool.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id VARCHAR(80) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password_hash VARCHAR(255),
+                role VARCHAR(50) NOT NULL,
+                avatar VARCHAR(500),
+                requires_password_change BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW()
+            );
+        `);
+
+        await this.dbPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255)`);
+        await this.dbPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS requires_password_change BOOLEAN DEFAULT FALSE`);
+        await this.dbPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW()`);
+        await this.dbPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW()`);
+
+        await this.dbPool.query(`
+            CREATE TABLE IF NOT EXISTS user_institutions (
+                user_id VARCHAR(80) REFERENCES users(id) ON DELETE CASCADE,
+                institution_id VARCHAR(80) REFERENCES institutions(id) ON DELETE CASCADE,
+                role VARCHAR(50) NOT NULL,
+                PRIMARY KEY(user_id, institution_id)
+            );
+        `);
+
+        const countResult = await this.dbPool.query(`SELECT COUNT(*)::int AS total FROM users`);
+        const totalUsers = countResult.rows[0]?.total || 0;
+
+        if (totalUsers === 0) {
+            await this.dbPool.query(
+                `
+                INSERT INTO institutions (id, name, slug, logo_url, primary_color, secondary_color, plan, is_active, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE, NOW(), NOW())
+                ON CONFLICT (id) DO NOTHING
+                `,
+                ['inst-vinculos', 'Vínculos de Libertad', 'vinculos-de-libertad', null, '#0ea5e9', '#0369a1', 'PRO'],
+            );
+
+            await this.dbPool.query(
+                `
+                INSERT INTO users (id, name, email, password_hash, role, avatar, requires_password_change, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, $5, $6, FALSE, NOW(), NOW())
+                ON CONFLICT (id) DO NOTHING
+                `,
+                [
+                    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+                    'Admin Edukiato',
+                    'admin@edukiato.edu',
+                    'vinculos',
+                    'ADMIN_INSTITUCION',
+                    'https://ui-avatars.com/api/?name=Admin%20Edukiato&background=random',
+                ],
+            );
+
+            await this.dbPool.query(
+                `
+                INSERT INTO user_institutions (user_id, institution_id, role)
+                VALUES ($1, $2, $3)
+                ON CONFLICT (user_id, institution_id) DO NOTHING
+                `,
+                ['a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'inst-vinculos', 'ADMIN_INSTITUCION'],
+            );
         }
-        // Filter users belonging to the specific institution
-        return this.users.filter(user =>
-            user.institutions?.some(inst => inst.institutionId === institutionId)
+    }
+
+    private mapRowsToUsers(rows: any[]): User[] {
+        const grouped = new Map<string, User>();
+
+        rows.forEach((row) => {
+            const existing = grouped.get(row.id);
+            const institution: UserInstitution | null = row.institution_id ? {
+                institutionId: row.institution_id,
+                institutionName: row.institution_name,
+                institutionSlug: row.institution_slug,
+                role: row.institution_role,
+                logoUrl: row.logo_url,
+                primaryColor: row.primary_color,
+                secondaryColor: row.secondary_color,
+            } : null;
+
+            if (!existing) {
+                grouped.set(row.id, {
+                    id: row.id,
+                    name: row.name,
+                    email: row.email,
+                    role: row.role,
+                    avatar: row.avatar,
+                    passwordHash: row.password_hash,
+                    requiresPasswordChange: row.requires_password_change,
+                    institutions: institution ? [institution] : [],
+                });
+                return;
+            }
+
+            if (institution) {
+                existing.institutions = [...(existing.institutions || []), institution];
+            }
+        });
+
+        return [...grouped.values()];
+    }
+
+    async findAll(institutionId?: string): Promise<User[]> {
+        await this.ensureTables();
+
+        const rows = await this.dbPool.query(
+            `
+            SELECT
+                u.id,
+                u.name,
+                u.email,
+                u.password_hash,
+                u.role,
+                u.avatar,
+                u.requires_password_change,
+                ui.institution_id,
+                i.name AS institution_name,
+                i.slug AS institution_slug,
+                ui.role AS institution_role,
+                i.logo_url,
+                i.primary_color,
+                i.secondary_color
+            FROM users u
+            LEFT JOIN user_institutions ui ON ui.user_id = u.id
+            LEFT JOIN institutions i ON i.id = ui.institution_id
+            WHERE ($1::text IS NULL OR ui.institution_id = $1)
+            ORDER BY u.name ASC
+            `,
+            [institutionId || null],
         );
+
+        return this.mapRowsToUsers(rows.rows);
     }
 
-    findOne(id: string) {
-        const user = this.users.find(u => u.id === id);
-        if (!user) throw new NotFoundException('User not found');
-        return user;
+    async findOne(id: string): Promise<User> {
+        const users = await this.findByIdInternal(id);
+        if (!users.length) {
+            throw new NotFoundException('User not found');
+        }
+        return users[0];
     }
 
-    findByEmail(email: string) {
-        return this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    async findByEmail(email: string): Promise<User | undefined> {
+        await this.ensureTables();
+
+        const rows = await this.dbPool.query(
+            `
+            SELECT
+                u.id,
+                u.name,
+                u.email,
+                u.password_hash,
+                u.role,
+                u.avatar,
+                u.requires_password_change,
+                ui.institution_id,
+                i.name AS institution_name,
+                i.slug AS institution_slug,
+                ui.role AS institution_role,
+                i.logo_url,
+                i.primary_color,
+                i.secondary_color
+            FROM users u
+            LEFT JOIN user_institutions ui ON ui.user_id = u.id
+            LEFT JOIN institutions i ON i.id = ui.institution_id
+            WHERE LOWER(u.email) = LOWER($1)
+            ORDER BY u.name ASC
+            `,
+            [email],
+        );
+
+        return this.mapRowsToUsers(rows.rows)[0];
     }
 
-    create(createUserDto: CreateUserDto, institutionId: string) {
-        // Basic mock of user creation tied to an institution
-        const newUser: User & { passwordHash?: string } = {
-            id: `usr_${crypto.randomUUID()}`,
-            name: createUserDto.name,
-            email: createUserDto.email,
-            passwordHash: 'vinculos',
-            role: (createUserDto.role as UserRole) || 'ESTUDIANTE',
-            avatar: createUserDto.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${createUserDto.name}`,
-            institutions: [
-                {
-                    institutionId: institutionId,
-                    institutionName: 'Current Institution', // Normally fetched from DB
-                    institutionSlug: 'current-institution',
-                    role: (createUserDto.role as UserRole) || 'ESTUDIANTE',
-                }
-            ]
-        };
+    async create(createUserDto: CreateUserDto, institutionId: string): Promise<User> {
+        await this.ensureTables();
 
-        this.users.push(newUser);
-        return newUser;
+        const newId = `usr_${crypto.randomUUID()}`;
+        const role = (createUserDto.role as UserRole) || 'ESTUDIANTE';
+        const avatar = createUserDto.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${createUserDto.name}`;
+
+        await this.dbPool.query(
+            `
+            INSERT INTO institutions (id, name, slug, logo_url, primary_color, secondary_color, plan, is_active, created_at, updated_at)
+            VALUES ($1, $2, $3, NULL, $4, $5, 'PRO', TRUE, NOW(), NOW())
+            ON CONFLICT (id) DO NOTHING
+            `,
+            [institutionId, 'Institución', institutionId, '#14b8a6', '#0f766e'],
+        );
+
+        await this.dbPool.query(
+            `
+            INSERT INTO users (id, name, email, password_hash, role, avatar, requires_password_change, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+            `,
+            [newId, createUserDto.name, createUserDto.email, 'vinculos', role, avatar, true],
+        );
+
+        await this.dbPool.query(
+            `
+            INSERT INTO user_institutions (user_id, institution_id, role)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (user_id, institution_id) DO UPDATE SET role = EXCLUDED.role
+            `,
+            [newId, institutionId, role],
+        );
+
+        return this.findOne(newId);
     }
 
-    update(id: string, updateData: Partial<CreateUserDto>) {
-        const user = this.findOne(id);
-        Object.assign(user, updateData);
-        return user;
+    async update(id: string, updateData: Partial<CreateUserDto>): Promise<User> {
+        await this.ensureTables();
+
+        const existing = await this.findOne(id);
+        const updatedName = updateData.name ?? existing.name;
+        const updatedEmail = updateData.email ?? existing.email;
+        const updatedAvatar = updateData.avatar ?? existing.avatar;
+        const updatedRole = (updateData.role as UserRole) ?? existing.role;
+
+        await this.dbPool.query(
+            `
+            UPDATE users
+            SET name = $1,
+                email = $2,
+                avatar = $3,
+                role = $4,
+                updated_at = NOW()
+            WHERE id = $5
+            `,
+            [updatedName, updatedEmail, updatedAvatar, updatedRole, id],
+        );
+
+        await this.dbPool.query(
+            `
+            UPDATE user_institutions
+            SET role = $1
+            WHERE user_id = $2
+            `,
+            [updatedRole, id],
+        );
+
+        return this.findOne(id);
     }
 
-    resetPassword(id: string) {
-        const user = this.findOne(id);
-        // Force the user to change password on next login
-        user.requiresPasswordChange = true;
-        user.passwordHash = 'vinculos';
-        // The frontend uses "vinculos" as the default password for institutional users
+    async resetPassword(id: string): Promise<{ success: boolean; message: string }> {
+        const user = await this.findOne(id);
+
+        await this.dbPool.query(
+            `
+            UPDATE users
+            SET requires_password_change = TRUE,
+                password_hash = 'vinculos',
+                updated_at = NOW()
+            WHERE id = $1
+            `,
+            [id],
+        );
+
         return {
             success: true,
             message: `Contraseña de ${user.name} restablecida a "vinculos". Deberá cambiarla en su próximo ingreso.`
         };
+    }
+
+    private async findByIdInternal(id: string): Promise<User[]> {
+        await this.ensureTables();
+
+        const rows = await this.dbPool.query(
+            `
+            SELECT
+                u.id,
+                u.name,
+                u.email,
+                u.password_hash,
+                u.role,
+                u.avatar,
+                u.requires_password_change,
+                ui.institution_id,
+                i.name AS institution_name,
+                i.slug AS institution_slug,
+                ui.role AS institution_role,
+                i.logo_url,
+                i.primary_color,
+                i.secondary_color
+            FROM users u
+            LEFT JOIN user_institutions ui ON ui.user_id = u.id
+            LEFT JOIN institutions i ON i.id = ui.institution_id
+            WHERE u.id = $1
+            `,
+            [id],
+        );
+
+        return this.mapRowsToUsers(rows.rows);
     }
 }

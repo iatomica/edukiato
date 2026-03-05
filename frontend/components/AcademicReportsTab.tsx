@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { FileText, Plus, Loader2, AlertCircle, X, Calendar, User as UserIcon } from 'lucide-react';
-import { AcademicReport } from '../types';
-import { reportsApi } from '../services/api';
-import { useAuth } from '../contexts/AuthContext';
-import { useTenantData } from '../hooks/useTenantData';
+import { RichTextEditor } from '@/components/RichTextEditor';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenantData } from '@/hooks/useTenantData';
+import { reportsApi } from '@/services/api';
+import { AcademicReport } from '@/types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { RichTextEditor } from './RichTextEditor';
+import { FileText, Plus, Loader2, AlertCircle, X, Calendar, User as UserIcon } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface AcademicReportsTabProps {
     studentId: string;

@@ -1,16 +1,17 @@
 
-import React, { useState, useMemo } from 'react';
-import { Search, Mail, MoreHorizontal, Download, Award, X, Printer, ArrowLeft, Send, Paperclip, Filter, User, Users, Calendar, BookOpen, MessageSquare, Plus, GraduationCap } from 'lucide-react';
-import { Student, Communication, CommunicationType, UserRole, Aula, Nino } from '../types';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useTenantData } from '../hooks/useTenantData';
-import { usePermissions } from '../contexts/PermissionsContext';
-import { useAuth } from '../contexts/AuthContext';
+import AcademicReportsTab from '@/components/AcademicReportsTab';
+import { AnimatedAvatar } from '@/components/AnimatedAvatar';
+import { UserAvatar } from '@/components/UserAvatar';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { usePermissions } from '@/contexts/PermissionsContext';
+import { useTenantData } from '@/hooks/useTenantData';
+import { communicationsApi, usersApi } from '@/services/api';
+import type { Student, Communication, CommunicationType, Aula, Nino } from '@/types';
 import { format } from 'date-fns';
-import { usersApi } from '../services/api';
-import { AnimatedAvatar } from './AnimatedAvatar';
-import { UserAvatar } from './UserAvatar';
-import AcademicReportsTab from './AcademicReportsTab';
+import { Search, Mail, Award, X, Printer, ArrowLeft, Send, Paperclip, User as UserIcon, Users, BookOpen, MessageSquare, GraduationCap } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 
 // ── SUB-COMPONENTS ───────────────────────────────────────────
 
@@ -30,13 +31,15 @@ export const CommunicationsModal = ({
   aulas: Aula[],
   user: any,
   ninos: Nino[],
-  onSend: (data: any) => void,
+  onSend: (data: any) => Promise<Communication>,
   initialType?: CommunicationType,
   isTypeLocked?: boolean,
   initialRecipientIds?: string[]
 }) => {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sendFeedback, setSendFeedback] = useState<{ success: string[]; failed: string[] } | null>(null);
 
   const isAdmin = user?.role === 'ADMIN_INSTITUCION' || user?.role === 'SUPER_ADMIN';
   const fallbackCommType: CommunicationType = isAdmin ? 'ANUNCIO_GENERAL' : 'ANUNCIO_SALA';
@@ -98,8 +101,9 @@ export const CommunicationsModal = ({
     setSelectedRecipients([]);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSendFeedback(null);
 
     const baseData = {
       type: commType,
@@ -107,23 +111,57 @@ export const CommunicationsModal = ({
       content: message,
     };
 
-    if (commType === 'ANUNCIO_GENERAL') {
-      onSend({ ...baseData, recipientId: null, courseId: null });
-    } else if (commType === 'ANUNCIO_SALA') {
-      onSend({ ...baseData, recipientId: null, courseId: selectedCourse });
-    } else if (commType === 'NOTIFICACION_INDIVIDUAL') {
-      // If multiple selected, we send multiple communications (or you could adapt your backend to accept an array)
-      if (selectedRecipients.length === 0) return alert('Debes seleccionar al menos un destinatario.');
+    setIsSubmitting(true);
 
-      selectedRecipients.forEach(recipientId => {
-        onSend({ ...baseData, recipientId, courseId: null });
+    try {
+      if (commType === 'ANUNCIO_GENERAL') {
+        await onSend({ ...baseData, recipientId: null, courseId: null });
+        onClose();
+        return;
+      }
+
+      if (commType === 'ANUNCIO_SALA') {
+        await onSend({ ...baseData, recipientId: null, courseId: selectedCourse });
+        onClose();
+        return;
+      }
+
+      if (selectedRecipients.length === 0) {
+        alert('Debes seleccionar al menos un destinatario.');
+        return;
+      }
+
+      const recipientById = new Map(availableRecipients.map((r) => [r.id, r.name]));
+      const sendPromises = selectedRecipients.map((recipientId) =>
+        onSend({ ...baseData, recipientId, courseId: null }),
+      );
+      const settledResults = await Promise.allSettled(sendPromises);
+
+      const success: string[] = [];
+      const failed: string[] = [];
+
+      settledResults.forEach((result, index) => {
+        const recipientId = selectedRecipients[index];
+        const recipientName = recipientById.get(recipientId) ?? recipientId;
+
+        if (result.status === 'fulfilled') {
+          success.push(recipientName);
+        } else {
+          failed.push(recipientName);
+        }
       });
-    }
 
-    onClose();
+      setSendFeedback({ success, failed });
+
+      if (failed.length === 0) {
+        onClose();
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
       <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-scale-in flex flex-col max-h-[90vh]">
 
@@ -237,6 +275,17 @@ export const CommunicationsModal = ({
           </div>
 
           <div className="flex flex-col gap-4">
+            {sendFeedback && (
+              <div className={`rounded-xl border p-3 text-sm ${sendFeedback.failed.length > 0 ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
+                {sendFeedback.success.length > 0 && (
+                  <p className="font-medium">Enviados: {sendFeedback.success.join(', ')}</p>
+                )}
+                {sendFeedback.failed.length > 0 && (
+                  <p className="font-medium mt-1">Fallaron: {sendFeedback.failed.join(', ')}</p>
+                )}
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Asunto del Comunicado</label>
               <input
@@ -244,6 +293,7 @@ export const CommunicationsModal = ({
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 required
+                disabled={isSubmitting}
                 className="w-full text-sm border-slate-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 px-4 py-2.5 shadow-sm"
                 placeholder="Escribe un título claro... (Ej. Suspensión de actividades)"
               />
@@ -256,6 +306,7 @@ export const CommunicationsModal = ({
                 onChange={(e) => setMessage(e.target.value)}
                 required
                 rows={6}
+                disabled={isSubmitting}
                 className="w-full text-sm border-slate-200 rounded-xl focus:ring-primary-500 focus:border-primary-500 px-4 py-3 shadow-sm resize-none"
                 placeholder="Desarrolla el contenido del comunicado aquí..."
               />
@@ -280,16 +331,19 @@ export const CommunicationsModal = ({
 
         {/* Footer */}
         <div className="p-4 border-t border-slate-100 bg-white flex justify-end items-center gap-3">
-          <button type="button" onClick={onClose} className="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-50 rounded-xl transition-colors">
+          <button type="button" disabled={isSubmitting} onClick={onClose} className="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             Cancelar
           </button>
-          <button type="submit" form="communication-form" className="px-6 py-2.5 bg-slate-900 text-white font-medium rounded-xl hover:bg-black shadow-lg flex items-center transition-all hover:scale-105 active:scale-95">
-            <Send size={18} className="mr-2" /> Enviar Comunicado
+          <button type="submit" disabled={isSubmitting} form="communication-form" className="px-6 py-2.5 bg-slate-900 text-white font-medium rounded-xl hover:bg-black shadow-lg flex items-center transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+            <Send size={18} className="mr-2" /> {isSubmitting ? 'Enviando...' : 'Enviar Comunicado'}
           </button>
         </div>
       </div>
     </div>
   );
+
+  if (typeof document === 'undefined') return modalContent;
+  return createPortal(modalContent, document.body);
 };
 
 const AddStudentModal = ({ onClose, onAdd }: { onClose: () => void, onAdd: (data: { name: string, email: string }) => void }) => {
@@ -370,7 +424,7 @@ const NotebookView = ({ communications }: { communications: Communication[] }) =
 
             <div className="flex justify-between items-center pt-3 border-t border-slate-100">
               <div className="flex items-center text-xs text-slate-500">
-                <User size={14} className="mr-1" />
+                <UserIcon size={14} className="mr-1" />
                 Enviado por: <span className="font-medium ml-1 text-slate-700">{comm.senderName}</span>
               </div>
               {comm.attachments && (
@@ -390,7 +444,7 @@ const NotebookView = ({ communications }: { communications: Communication[] }) =
   );
 };
 
-const StudentDetail = ({ student, onClose, communications, aulas, ninos, allUsers, onViewChange, onOpenComm }: { student: Student, onClose: () => void, communications: Communication[], aulas: Aula[], ninos: Nino[], allUsers: User[], onViewChange?: (view: any, params?: any) => void, onOpenComm?: (recipientId: string) => void }) => {
+const StudentDetail = ({ student, onClose, communications, aulas, ninos, allUsers, onViewChange, onOpenComm }: { student: Student, onClose: () => void, communications: Communication[], aulas: Aula[], ninos: Nino[], allUsers: Student[], onViewChange?: (view: any, params?: any) => void, onOpenComm?: (recipientId: string) => void }) => {
   const [activeTab, setActiveTab] = useState<'INFO' | 'ACADEMIC' | 'COMMUNICATIONS'>('INFO');
 
   // Filter comms for this student
@@ -448,7 +502,7 @@ const StudentDetail = ({ student, onClose, communications, aulas, ninos, allUser
       {/* Tabs */}
       <div className="flex border-b border-slate-200 bg-white sticky top-0 z-20">
         {[
-          { id: 'INFO', label: 'Información Personal', icon: User },
+          { id: 'INFO', label: 'Información Personal', icon: UserIcon },
           { id: 'ACADEMIC', label: 'Académico', icon: Award },
           { id: 'COMMUNICATIONS', label: 'Cuaderno de Comunicados', icon: BookOpen },
         ].map(tab => (
@@ -555,7 +609,12 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
 
   const { t } = useLanguage();
   const { students, courses, communications, aulas, ninos, dispatch, emitEvent } = useTenantData();
-  const { can } = usePermissions();
+  const { canAny } = usePermissions();
+
+  const canCreateCommunications = canAny([
+    { action: 'create', resource: 'announcement' },
+    { action: 'manage', resource: 'announcement' },
+  ]);
 
   const isAdmin = user?.role === 'ADMIN_INSTITUCION' || user?.role === 'SUPER_ADMIN';
 
@@ -663,35 +722,29 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
     }
   }, [viewMode, user, dispatch]);
 
-  // Verify permissions via role to show correct initial view
-  const isStudentOrParent = user?.role === 'ESTUDIANTE'; // Add PARENT logic if needed
-
   // If user is student, default to showing their notebook (or allow toggling if they want to see "classmates" - usually restricted)
   // For this demo, we assume Students section for Admin is "Management", and for Student is "My Notebook"
 
   const courseName = courses[0]?.title ?? 'N/A';
   const instructorName = courses[0]?.instructor ?? 'N/A';
 
-  const handleSendCommunication = (data: any) => {
-    if (!currentInstitution) return;
+  const handleSendCommunication = async (data: any): Promise<Communication> => {
+    if (!currentInstitution || !token) return;
 
-    const newComm: Communication = {
-      id: `comm_${Date.now()}`,
-      institutionId: currentInstitution.id,
-      type: data.type,
-      title: data.title,
-      content: data.content,
-      senderId: user?.id || 'current_user',
-      senderName: user?.name || 'Admin Usuario',
-      recipientId: data.recipientId,
-      courseId: data.courseId,
-      createdAt: new Date().toISOString(),
-      isRead: false
-    };
+    const newComm = await communicationsApi.create(
+      {
+        type: data.type,
+        title: data.title,
+        content: data.content,
+        recipientId: data.recipientId,
+        courseId: data.courseId,
+      },
+      currentInstitution.id,
+      token,
+    );
 
     dispatch({ type: 'ADD_COMMUNICATION', payload: newComm });
-    emitEvent({ type: 'COMMUNICATION_SENT', payload: newComm }); // Emit full payload for handlers
-    // Optional: Local toast for success feedback (could be handled by a separate Toaster component listening to same event)
+    emitEvent({ type: 'COMMUNICATION_SENT', payload: newComm });
     emitEvent({
       type: 'NOTIFICATION_CREATED', payload: {
         id: `sys_${Date.now()}`,
@@ -703,6 +756,8 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
         isRead: true
       }
     });
+
+    return newComm;
   };
 
   const handleAddStudent = async (data: { name: string, email: string }) => {
@@ -834,18 +889,42 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
 
     return (
       <div className="space-y-6">
-        <div className="flex justify-center items-center mb-8">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <BookOpen size={32} />
-            </div>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
             <h1 className="text-3xl font-bold text-slate-900">Cuaderno de Comunicados</h1>
             <p className="text-slate-500 mt-2">Notificaciones oficiales y actas académicas</p>
           </div>
+
+          {canCreateCommunications && (
+            <button
+              onClick={() => {
+                setCommModalParams(null);
+                setIsCommModalOpen(true);
+              }}
+              className="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-slate-800 transition-all flex items-center shadow-lg shadow-slate-900/10"
+            >
+              <Send size={18} className="mr-2" />
+              Nuevo Comunicado
+            </button>
+          )}
         </div>
         <div className="max-w-3xl mx-auto">
           <NotebookView communications={myComms} />
         </div>
+
+        {isCommModalOpen && (
+          <CommunicationsModal
+            onClose={() => setIsCommModalOpen(false)}
+            students={students}
+            aulas={aulas}
+            user={user}
+            ninos={ninos}
+            onSend={handleSendCommunication}
+            initialType={commModalParams?.type}
+            isTypeLocked={commModalParams?.isLocked}
+            initialRecipientIds={commModalParams?.recipientIds}
+          />
+        )}
       </div>
     );
   }
@@ -859,14 +938,17 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
         </div>
 
         <div className="flex space-x-3">
-          {can('manage', 'student') && (
+          {canCreateCommunications && (
             <>
               {/* Botón Agregar Estudiante eliminado por solicitud */}
               <button
-                onClick={() => setIsCommModalOpen(true)}
-                className="flex items-center px-4 py-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800 text-sm font-medium shadow-lg shadow-slate-200 transition-all hover:scale-105"
+                onClick={() => {
+                  setCommModalParams(null);
+                  setIsCommModalOpen(true);
+                }}
+                className="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-slate-800 transition-all flex items-center shadow-lg shadow-slate-900/10"
               >
-                <Send size={16} className="mr-2" />
+                <Send size={18} className="mr-2" />
                 Enviar Comunicado
               </button>
             </>

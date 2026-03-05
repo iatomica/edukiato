@@ -1,43 +1,23 @@
-import { Injectable, OnModuleInit, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { AcademicReport } from './entities/report.entity';
-import * as fs from 'fs';
-import * as path from 'path';
 import { randomUUID } from 'crypto';
+import { Pool } from 'pg';
 
 @Injectable()
 export class ReportsService implements OnModuleInit {
-    // For local dev without Postgres running, we fall back to a JSON file
-    private readonly dbFile = path.join(process.cwd(), 'data', 'reports_db.json');
-    private reports: AcademicReport[] = [];
+    constructor(@Inject('DB_POOL') private readonly dbPool: Pool) { }
 
     async onModuleInit() {
-        // Ensure data directory exists
-        const dataDir = path.dirname(this.dbFile);
-        if (!fs.existsSync(dataDir)) {
-            fs.mkdirSync(dataDir, { recursive: true });
-        }
-
-        // Load existing data if any
-        if (fs.existsSync(this.dbFile)) {
-            try {
-                const data = fs.readFileSync(this.dbFile, 'utf8');
-                this.reports = JSON.parse(data);
-            } catch (error) {
-                console.error('Error reading reports_db.json fallback database:', error);
-                this.reports = [];
-            }
-        } else {
-            // Create empty file
-            this.saveDb();
-        }
-    }
-
-    private saveDb() {
-        try {
-            fs.writeFileSync(this.dbFile, JSON.stringify(this.reports, null, 2));
-        } catch (error) {
-            console.error('Error writing to reports_db.json:', error);
-        }
+        await this.dbPool.query(`
+            CREATE TABLE IF NOT EXISTS academic_reports (
+                id VARCHAR(80) PRIMARY KEY,
+                student_id VARCHAR(80) NOT NULL,
+                uploader_id VARCHAR(80) NOT NULL,
+                title VARCHAR(255) NOT NULL,
+                content TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT NOW()
+            );
+        `);
     }
 
     async createReport(studentId: string, uploaderId: string, title: string, content: string): Promise<AcademicReport> {
@@ -51,25 +31,62 @@ export class ReportsService implements OnModuleInit {
                 createdAt: new Date()
             };
 
-            this.reports.push(newReport);
-            this.saveDb();
+            await this.dbPool.query(
+                `
+                INSERT INTO academic_reports (id, student_id, uploader_id, title, content, created_at)
+                VALUES ($1, $2, $3, $4, $5, $6)
+                `,
+                [newReport.id, newReport.studentId, newReport.uploaderId, newReport.title, newReport.content, newReport.createdAt],
+            );
 
             return newReport;
         } catch (error) {
-            console.error('Error saving report metadata to JSON fallback:', error);
+            console.error('Error saving report metadata to PostgreSQL:', error);
             throw new InternalServerErrorException('Error saving report metadata');
         }
     }
 
     async getReportsByStudent(studentId: string): Promise<AcademicReport[]> {
-        // Sort by newest first
-        return this.reports
-            .filter(r => r.studentId === studentId)
-            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const rows = await this.dbPool.query(
+            `
+            SELECT id, student_id, uploader_id, title, content, created_at
+            FROM academic_reports
+            WHERE student_id = $1
+            ORDER BY created_at DESC
+            `,
+            [studentId],
+        );
+
+        return rows.rows.map((row) => ({
+            id: row.id,
+            studentId: row.student_id,
+            uploaderId: row.uploader_id,
+            title: row.title,
+            content: row.content,
+            createdAt: row.created_at,
+        }));
     }
 
     async getReportById(reportId: string): Promise<AcademicReport> {
-        const report = this.reports.find(r => r.id === reportId);
+        const rows = await this.dbPool.query(
+            `
+            SELECT id, student_id, uploader_id, title, content, created_at
+            FROM academic_reports
+            WHERE id = $1
+            `,
+            [reportId],
+        );
+
+        const reportRow = rows.rows[0];
+        const report = reportRow ? {
+            id: reportRow.id,
+            studentId: reportRow.student_id,
+            uploaderId: reportRow.uploader_id,
+            title: reportRow.title,
+            content: reportRow.content,
+            createdAt: reportRow.created_at,
+        } : null;
+
         if (!report) {
             throw new NotFoundException('Report not found');
         }

@@ -1,9 +1,9 @@
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { institutionsApi } from '@/services/api';
+import { UserInstitution } from '@/types';
+import { Building2, ChevronRight, LogOut, Plus } from 'lucide-react';
 import React, { useState } from 'react';
-import { UserInstitution } from '../types';
-import { useAuth } from '../contexts/AuthContext';
-import { useLanguage } from '../contexts/LanguageContext';
-import { Building2, ChevronRight, LogOut, Plus, X } from 'lucide-react';
-import { institutionsApi } from '../services/api';
 
 export const InstitutionPicker: React.FC = () => {
     const { user, selectInstitution, logout, token } = useAuth();
@@ -13,16 +13,44 @@ export const InstitutionPicker: React.FC = () => {
     const [isCreating, setIsCreating] = useState(false);
     const [newInstName, setNewInstName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isBootstrapping, setIsBootstrapping] = useState(false);
+
+    React.useEffect(() => {
+        if (!token || institutions.length > 0 || isCreating) return;
+
+        let cancelled = false;
+        setIsBootstrapping(true);
+
+        institutionsApi.getAll(token)
+            .then((fetched) => {
+                if (cancelled) return;
+                setInstitutions(fetched || []);
+            })
+            .catch((error) => {
+                if (!cancelled) {
+                    console.error('Failed to fetch institutions:', error);
+                }
+            })
+            .finally(() => {
+                if (!cancelled) {
+                    setIsBootstrapping(false);
+                }
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [token, institutions.length, isCreating]);
 
     // If only one institution and not creating, auto-select it
     React.useEffect(() => {
-        if (institutions.length === 1 && !isCreating) {
+        if (institutions.length === 1 && !isCreating && !isBootstrapping) {
             selectInstitution(institutions[0]);
         }
-    }, [institutions, selectInstitution, isCreating]);
+    }, [institutions, selectInstitution, isCreating, isBootstrapping]);
 
-    // While auto-selecting, show loading
-    if (institutions.length <= 1 && !isCreating) {
+    // While loading institutions from API or auto-selecting one institution
+    if ((isBootstrapping || (institutions.length === 1 && !isCreating)) && !isCreating) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
                 <div className="animate-spin w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full" />
@@ -104,6 +132,11 @@ export const InstitutionPicker: React.FC = () => {
                     </form>
                 ) : (
                     <div className="space-y-4">
+                        {institutions.length === 0 && (
+                            <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-4 py-3 text-sm">
+                                No hay instituciones asignadas para este usuario. Podés crear una nueva para continuar.
+                            </div>
+                        )}
                         <div className="space-y-3">
                             {institutions.map((inst) => (
                                 <button

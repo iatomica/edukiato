@@ -1,25 +1,25 @@
 
+import Aulas from '@/components/Aulas';
+import { Classroom } from '@/components/Classroom';
+import { Courses } from '@/components/Courses';
+import { Dashboard } from '@/components/Dashboard';
+import { ForcePasswordChange } from '@/components/ForcePasswordChange';
+import { InstitutionPicker } from '@/components/InstitutionPicker';
+import { Institutions } from '@/components/Institutions';
+import { Layout } from '@/components/Layout';
+import { Login } from '@/components/Login';
+import { Messages } from '@/components/Messages';
+import { Schedule } from '@/components/Schedule';
+import { Settings } from '@/components/Settings/Settings';
+import { Students } from '@/components/Students';
+import { Usuarios } from '@/components/Usuarios';
+import { AppStateProvider } from '@/contexts/AppStateContext';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
+import { PermissionsProvider } from '@/contexts/PermissionsContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { View } from '@/types';
 import React, { useState } from 'react';
-import { Layout } from './components/Layout';
-import { Dashboard } from './components/Dashboard';
-import { Courses } from './components/Courses';
-import { Students } from './components/Students';
-import { Schedule } from './components/Schedule';
-import { Classroom } from './components/Classroom';
-import { Messages } from './components/Messages';
-import { Login } from './components/Login';
-import { InstitutionPicker } from './components/InstitutionPicker';
-import { ForcePasswordChange } from './components/ForcePasswordChange';
-import { Usuarios } from './components/Usuarios';
-import { Institutions } from './components/Institutions';
-import Aulas from './components/Aulas';
-import { Settings } from './components/Settings/Settings';
-import { View } from './types';
-import { LanguageProvider } from './contexts/LanguageContext';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { PermissionsProvider } from './contexts/PermissionsContext';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { AppStateProvider } from './contexts/AppStateContext';
 
 // ── Main application flow ─────────────────────────────────────
 // Login → InstitutionPicker (if multi-tenant) → Dashboard

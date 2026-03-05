@@ -9,7 +9,7 @@
  *   inst-002 → Escuela de Música Moderna        (modern music focus)
  */
 
-import { Course, Student, CalendarEvent, FeedItem, Conversation, Message, Notification, Communication, UserRole, Aula, Nino, Payment } from '../types';
+import { Course, Student, CalendarEvent, FeedItem, Conversation, Message, Notification, Communication, Aula, Nino, Payment } from '@/types';
 
 // ── Institution IDs ──────────────────────────────────────────
 
@@ -709,11 +709,9 @@ export const MOCK_FEED: FeedItem[] = [
   }
 ];
 
-const storedNotifications = typeof window !== 'undefined' ? localStorage.getItem('MOCK_NOTIFICATIONS') : null;
-export const MOCK_NOTIFICATIONS: Notification[] = storedNotifications ? JSON.parse(storedNotifications) : [];
+export const MOCK_NOTIFICATIONS: Notification[] = [];
 export const MOCK_CONVERSATIONS: Conversation[] = [];
-const storedMessages = typeof window !== 'undefined' ? localStorage.getItem('MOCK_MESSAGES') : null;
-export const MOCK_MESSAGES: Record<string, Message[]> = storedMessages ? JSON.parse(storedMessages) : {};
+export const MOCK_MESSAGES: Record<string, Message[]> = {};
 export const MOCK_PAYMENTS: Payment[] = [];
 
 export const MOCK_REVENUE_DATA: Record<string, Array<{ name: string; value: number }>> = {
@@ -730,8 +728,7 @@ export const MOCK_ATTENDANCE_DATA: Record<string, Array<{ name: string; value: n
   ]
 };
 
-const storedCommunications = typeof window !== 'undefined' ? localStorage.getItem('MOCK_COMMUNICATIONS') : null;
-export const MOCK_COMMUNICATIONS: Communication[] = storedCommunications ? JSON.parse(storedCommunications) : [
+export const MOCK_COMMUNICATIONS: Communication[] = [
   {
     id: 'comm_vinculos_1',
     institutionId: INST_VINCULOS,

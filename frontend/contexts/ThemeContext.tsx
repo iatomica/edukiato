@@ -1,6 +1,6 @@
+import { useAuth } from '@/contexts/AuthContext';
+import { InstitutionTheme } from '@/types';
 import React, { createContext, useContext, useEffect, useMemo, ReactNode } from 'react';
-import { InstitutionTheme } from '../types';
-import { useAuth } from './AuthContext';
 
 // ── Defaults ──────────────────────────────────────────────────
 

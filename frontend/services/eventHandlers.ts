@@ -12,10 +12,10 @@
  * STUDENT_ENROLLED → enrollment count + payment + conversation + notification
  */
 
-import { eventBus } from './eventBus';
-import { courseTypeToCalendarType, courseTypeToCalendarColor } from './courseTypeConfig';
-import type { CalendarEvent, FeedItem, Notification, Conversation } from '../types';
-import type { ActivityEntry } from '../contexts/AppStateContext';
+import type { ActivityEntry } from '@/contexts/AppStateContext';
+import { courseTypeToCalendarType, courseTypeToCalendarColor } from '@/services/courseTypeConfig';
+import { eventBus } from '@/services/eventBus';
+import type { CalendarEvent, FeedItem, Notification, Conversation } from '@/types';
 
 type Dispatch = (action: any) => void;
 
@@ -184,8 +184,6 @@ function handleAttendanceTaken(dispatch: Dispatch) {
 
         // 1. Update each student's attendance rate
         records.forEach((rec: { studentId: string; status: string }) => {
-            // Simplified: adjust rate by a factor
-            const delta = rec.status === 'PRESENT' ? 1 : rec.status === 'LATE' ? 0.5 : -2;
             dispatch({
                 type: 'UPDATE_STUDENT',
                 payload: {
@@ -240,7 +238,7 @@ function handleContentPublished(dispatch: Dispatch) {
                 title: `📝 Entrega: ${item.title}`,
                 start: new Date(item.dueDate),
                 end: new Date(item.dueDate),
-                type: 'event',
+                type: 'EVENTOS_ESPECIALES',
                 color: 'bg-red-100 text-red-700 border-red-200',
             };
             dispatch({ type: 'ADD_EVENT', payload: calEvent });

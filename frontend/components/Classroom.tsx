@@ -1,10 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
-import { Video, FileText, Link as LinkIcon, Upload, MessageSquare, Clock, CheckCircle, ArrowRight, ArrowLeft, Plus, X } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTenantData } from '@/hooks/useTenantData';
+import { FeedItem, User } from '@/types';
 import { format } from 'date-fns';
-import { FeedItem, User, UserRole } from '../types';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useTenantData } from '../hooks/useTenantData';
+import { Video, FileText, Link as LinkIcon, Upload, MessageSquare, Clock, ArrowRight, ArrowLeft, Plus, X } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface FeedCardProps {
   item: FeedItem;
@@ -129,7 +129,7 @@ export const Classroom: React.FC<ClassroomProps> = ({ courseId, user, onBack }) 
   const [addDesc, setAddDesc] = useState('');
   const [addUrl, setAddUrl] = useState('');
 
-  const handleSubmit = (e: React.FormEvent, id: string) => {
+  const handleSubmit = (e: React.FormEvent, _id: string) => {
     e.preventDefault();
     setSubmittingId(null);
     setSubmissionText('');

@@ -1,12 +1,13 @@
+import { AnimatedAvatar } from '@/components/AnimatedAvatar';
+import Modal from '@/components/Modal';
+import { UserAvatar } from '@/components/UserAvatar';
+import { useAppState } from '@/contexts/AppStateContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { ninosApi, usersApi } from '@/services/api';
+import { User, UserRole, Nino } from '@/types';
+import { Search, UserPlus, X, Mail, Shield, Users as UsersIcon, GraduationCap, Edit, Key, User as UserIconLine, ShieldAlert, BookOpen, Award, MessageSquare } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { User, UserRole, Nino } from '../types';
-import { Search, Plus, UserPlus, X, Mail, Shield, Users as UsersIcon, GraduationCap, Edit, Key, Book, User as UserIconLine, ShieldAlert, BookOpen, Award, MessageSquare } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { useAppState } from '../contexts/AppStateContext';
-import { usersApi } from '../services/api';
-import Modal from './Modal';
-import { AnimatedAvatar } from './AnimatedAvatar';
-import { UserAvatar } from './UserAvatar';
+import { createPortal } from 'react-dom';
 
 export const Usuarios: React.FC = () => {
     const { user: currentUser, currentInstitution, token } = useAuth();
@@ -33,7 +34,6 @@ export const Usuarios: React.FC = () => {
 
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'INSTITUCIONAL' | 'PADRES' | 'ALUMNOS'>('INSTITUCIONAL');
-    const [addRole, setAddRole] = useState<UserRole>('DOCENTE');
 
     // Nino specific states
     const [isSavingNino, setIsSavingNino] = useState(false);
@@ -58,8 +58,10 @@ export const Usuarios: React.FC = () => {
         fetchUsers();
     }, [currentInstitution, token]);
 
-    const handleAddNino = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleAddNino = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (!token || !currentInstitution) return;
+
         const formData = new FormData(e.currentTarget);
         const name = formData.get('name') as string;
         const gender = formData.get('gender') as 'MASCULINO' | 'FEMENINO';
@@ -80,30 +82,35 @@ export const Usuarios: React.FC = () => {
 
         setIsSavingNino(true);
 
-        const newNino: Nino = {
-            id: `nino_${Date.now()}`,
-            institutionId: currentInstitution?.id || 'inst_1',
-            name,
-            gender,
-            birthDate,
-            allergies,
-            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
-            aulaId,
-            parentIds,
-            attendanceRate: 100
-        };
+        try {
+            const newNino = await ninosApi.create(
+                {
+                    name,
+                    gender,
+                    birthDate,
+                    allergies,
+                    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
+                    aulaId,
+                    parentIds,
+                    attendanceRate: 100,
+                },
+                currentInstitution.id,
+                token,
+            );
 
-        // Simulate network API delay
-        setTimeout(() => {
             dispatch({ type: 'ADD_NINO', payload: newNino });
-            setIsSavingNino(false);
             setCreatedNinoConfirmation(newNino);
-        }, 1200);
+        } catch (error) {
+            console.error('Error creating nino:', error);
+            alert('No se pudo inscribir al alumno. Intenta nuevamente.');
+        } finally {
+            setIsSavingNino(false);
+        }
     };
 
-    const handleEditNino = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleEditNino = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!editNino) return;
+        if (!token || !currentInstitution || !editNino) return;
 
         const formData = new FormData(e.currentTarget);
         const name = formData.get('name') as string;
@@ -121,24 +128,29 @@ export const Usuarios: React.FC = () => {
 
         setIsSavingNino(true);
 
-        const updatedNino: Nino = {
-            ...editNino,
-            name,
-            gender,
-            birthDate,
-            allergies,
-            aulaId,
-            parentIds,
-        };
+        try {
+            const updatedNino = await ninosApi.update(
+                editNino.id,
+                {
+                    name,
+                    gender,
+                    birthDate,
+                    allergies,
+                    aulaId,
+                    parentIds,
+                },
+                currentInstitution.id,
+                token,
+            );
 
-        // Simulate network API delay
-        setTimeout(() => {
-            dispatch({ type: 'UPDATE_NINO' as any, payload: updatedNino as any }); // Types need to support UPDATE_NINO globally, mock for now
-            // Update local state by forcing a mock until context is wired
-            state.ninos = state.ninos.map(n => n.id === updatedNino.id ? updatedNino : n);
-            setIsSavingNino(false);
+            dispatch({ type: 'UPDATE_NINO', payload: updatedNino });
             setEditNino(null);
-        }, 800);
+        } catch (error) {
+            console.error('Error updating nino:', error);
+            alert('No se pudo guardar los cambios del alumno. Intenta nuevamente.');
+        } finally {
+            setIsSavingNino(false);
+        }
     };
 
     const handleAddUser = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -470,7 +482,7 @@ export const Usuarios: React.FC = () => {
             )}
 
             {/* Edit User Modal */}
-            {isEditModalOpen && editUser && (
+            {isEditModalOpen && editUser && typeof document !== 'undefined' && createPortal(
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
                     <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-scale-in">
                         <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -531,7 +543,8 @@ export const Usuarios: React.FC = () => {
                             </div>
                         </form>
                     </div>
-                </div>
+                </div>,
+                document.body,
             )}
 
             {/* Edit Nino Modal */}

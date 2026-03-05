@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { UserAvatar } from '@/components/UserAvatar';
+import { useAuth } from '@/contexts/AuthContext';
 import { Lock, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { UserAvatar } from './UserAvatar';
+import React, { useState } from 'react';
 
 export const ForcePasswordChange: React.FC = () => {
     const { user, completePasswordChange } = useAuth();

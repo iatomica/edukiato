@@ -1,6 +1,6 @@
+import { AnimatedAvatar } from '@/components/AnimatedAvatar';
+import { UserRole } from '@/types';
 import React from 'react';
-import { AnimatedAvatar } from './AnimatedAvatar';
-import { UserRole } from '../types';
 
 interface UserAvatarProps {
     name: string;
@@ -12,7 +12,6 @@ interface UserAvatarProps {
 // Deterministic gender assignment based on name length or specific char for students
 const determineGender = (name: string): 'MASCULINO' | 'FEMENINO' => {
     if (!name) return 'MASCULINO';
-    const firstVowel = name.toLowerCase().match(/[aeiou]/);
     // Rough heuristic: names ending in 'a' or first vowel is 'a' slightly skew female, 
     // but a deterministic string code is safer to avoid changing mid-session.
     let charSum = 0;

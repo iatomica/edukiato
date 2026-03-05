@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { usersApi } from '../../services/api';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { usersApi } from '@/services/api';
 import { User, Mail, Save, AlertCircle, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 export const Settings: React.FC = () => {
     const { user, token, updateUser } = useAuth();

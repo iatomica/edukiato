@@ -22,8 +22,7 @@ export class InstitutionsController {
     @UseGuards(JwtAuthGuard)
     @Post()
     create(@Body() createInstitutionDto: CreateInstitutionDto, @Request() req) {
-        // The JWT guard injects the user payload into req.user
-        const userId = req.user.sub || 'unknown';
+        const userId = req.user.userId || req.user.id || req.user.sub || 'unknown';
         return this.institutionsService.create(createInstitutionDto, userId);
     }
 }

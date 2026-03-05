@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useCallback, useMemo, ReactNode } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import {
     PermissionAction,
     PermissionResource,
@@ -6,8 +6,8 @@ import {
     PermissionOverride,
     UserRole,
     resolveRolePermissions,
-} from '../types';
-import { useAuth } from './AuthContext';
+} from '@/types';
+import React, { createContext, useContext, useCallback, useMemo, ReactNode } from 'react';
 
 // ── Context Type ──────────────────────────────────────────────
 

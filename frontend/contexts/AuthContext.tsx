@@ -1,6 +1,6 @@
+import { authApi } from '@/services/api';
+import { User, Institution, UserInstitution, AuthState } from '@/types';
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
-import { User, Institution, UserInstitution, AuthState } from '../types';
-import { authApi } from '../services/api';
 
 // ── Context Type ──────────────────────────────────────────────
 

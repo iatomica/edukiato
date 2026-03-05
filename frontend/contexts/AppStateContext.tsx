@@ -6,16 +6,15 @@
  * Side-effects (cross-module) are handled by eventHandlers.ts.
  */
 
-import React, { createContext, useContext, useReducer, useCallback, useEffect, ReactNode } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { coursesApi, usersApi, messagesApi, communicationsApi, aulasApi, ninosApi, eventsApi } from '@/services/api';
+import { AppEvent, eventBus } from '@/services/eventBus';
+import { registerEventHandlers } from '@/services/eventHandlers';
 import {
     Course, Student, CalendarEvent, FeedItem,
     Payment, Notification, Conversation, Communication, Aula, Nino,
-} from '../types';
-import { useAuth } from './AuthContext';
-import { AppEvent, eventBus } from '../services/eventBus';
-import { registerEventHandlers } from '../services/eventHandlers';
-import { coursesApi, usersApi, messagesApi } from '../services/api';
-import { MOCK_COURSES, MOCK_FEED, MOCK_PAYMENTS, MOCK_NOTIFICATIONS, MOCK_CONVERSATIONS, MOCK_COMMUNICATIONS, MOCK_STUDENTS, MOCK_EVENTS, MOCK_AULAS, MOCK_NINOS } from '../services/mockData';
+} from '@/types';
+import React, { createContext, useContext, useReducer, useCallback, useEffect, ReactNode } from 'react';
 
 // ── State Shape ──────────────────────────────────────────────
 
@@ -50,6 +49,7 @@ type AppAction =
     | { type: 'SUSPEND_COURSE'; payload: { courseId: string } }
     | { type: 'ADD_STUDENT'; payload: Student }
     | { type: 'ADD_NINO'; payload: Nino }
+    | { type: 'UPDATE_NINO'; payload: Nino }
     | { type: 'UPDATE_STUDENT'; payload: Partial<Student> & { id: string } }
     | { type: 'MARK_COMMUNICATIONS_READ'; payload: { userId: string } }
     | { type: 'MARK_NOTIFICATIONS_READ'; payload: { userId: string } }
@@ -141,6 +141,14 @@ function appReducer(state: AppState, action: AppAction): AppState {
             const newNinos = [...state.ninos, action.payload];
 
             return { ...state, ninos: newNinos };
+        }
+
+        case 'UPDATE_NINO': {
+            const updatedNinos = state.ninos.map((n) =>
+                n.id === action.payload.id ? { ...n, ...action.payload } : n,
+            );
+
+            return { ...state, ninos: updatedNinos };
         }
 
         case 'UPDATE_STUDENT':
@@ -290,36 +298,24 @@ export const AppStateProvider: React.FC<{ children: ReactNode }> = ({ children }
     const [state, dispatch] = useReducer(appReducer, initialState);
     const { token, isAuthenticated, currentInstitution, user } = useAuth();
 
-    // Fetch real data when authenticated
+    // Initialize state when authenticated
     useEffect(() => {
         if (isAuthenticated && token) {
-            const hydrateAppData = async () => {
-                try {
-                    let baseData: Partial<AppState> = {
-                        courses: MOCK_COURSES,
-                        aulas: MOCK_AULAS,
-                        ninos: MOCK_NINOS,
-                        students: MOCK_STUDENTS,
-                        events: MOCK_EVENTS,
-                        feed: MOCK_FEED,
-                        payments: MOCK_PAYMENTS,
-                        notifications: MOCK_NOTIFICATIONS,
-                        conversations: MOCK_CONVERSATIONS,
-                        communications: MOCK_COMMUNICATIONS,
-                    };
-
-                    // Fetch courses
-                    // To fetch properly we'd want the first institution ID if current is not yet selected
-                    // The AppProvider doesn't know the selected inst yet directly, so we'll fetch all or just rely on the first
-                    // Alternatively, we use a separate effect for tenant-specific data
-
-                    dispatch({ type: 'HYDRATE_STATE', payload: baseData });
-                } catch (error) {
-                    console.error("Hydration Error:", error);
-                }
-            };
-
-            hydrateAppData();
+            dispatch({
+                type: 'HYDRATE_STATE',
+                payload: {
+                    courses: [],
+                    aulas: [],
+                    ninos: [],
+                    students: [],
+                    events: [],
+                    feed: [],
+                    payments: [],
+                    notifications: [],
+                    conversations: [],
+                    communications: [],
+                },
+            });
         }
     }, [isAuthenticated, token, dispatch]);
 
@@ -328,30 +324,36 @@ export const AppStateProvider: React.FC<{ children: ReactNode }> = ({ children }
         if (isAuthenticated && token && currentInstitution) {
             const fetchTenantData = async () => {
                 try {
-                    const [fetchedCourses, fetchedUsers] = await Promise.all([
+                    const [fetchedCourses, fetchedUsers, fetchedCommunications, fetchedAulas, fetchedNinos, fetchedEvents] = await Promise.all([
                         coursesApi.getAll(currentInstitution.id, token).catch(() => []),
-                        usersApi.getAll(currentInstitution.id, token).catch(() => [])
+                        usersApi.getAll(currentInstitution.id, token).catch(() => []),
+                        communicationsApi.getAll(currentInstitution.id, token).catch(() => []),
+                        aulasApi.getAll(currentInstitution.id, token).catch(() => []),
+                        ninosApi.getAll(currentInstitution.id, token).catch(() => []),
+                        eventsApi.getAll(currentInstitution.id, token).catch(() => []),
                     ]);
 
-                    if (fetchedCourses.length > 0 || fetchedUsers.length > 0) {
-                        dispatch({
-                            type: 'HYDRATE_STATE',
-                            payload: {
-                                courses: fetchedCourses.length > 0 ? fetchedCourses : state.courses,
-                                students: fetchedUsers.length > 0 ? fetchedUsers.map((u: any) => ({
-                                    id: u.id,
-                                    institutionId: currentInstitution.id,
-                                    name: u.name,
-                                    email: u.email,
-                                    program: 'General',
-                                    status: 'active',
-                                    avatar: u.avatar,
-                                    attendanceRate: 100,
-                                    role: u.role
-                                })) as Student[] : state.students
-                            }
-                        });
-                    }
+                    dispatch({
+                        type: 'HYDRATE_STATE',
+                        payload: {
+                            courses: fetchedCourses,
+                            students: fetchedUsers.map((u: any) => ({
+                                id: u.id,
+                                institutionId: currentInstitution.id,
+                                name: u.name,
+                                email: u.email,
+                                program: 'General',
+                                status: 'active',
+                                avatar: u.avatar,
+                                attendanceRate: 100,
+                                role: u.role
+                            })) as Student[],
+                            communications: fetchedCommunications,
+                            aulas: fetchedAulas,
+                            ninos: fetchedNinos,
+                            events: fetchedEvents,
+                        }
+                    });
                 } catch (error) {
                     console.error("Error fetching tenant data:", error);
                 }
@@ -368,7 +370,7 @@ export const AppStateProvider: React.FC<{ children: ReactNode }> = ({ children }
         };
     }, [dispatch]);
 
-    // Real-time Conversation Syncing (Mock WebSocket)
+    // Real-time conversation sync with backend polling
     useEffect(() => {
         if (!isAuthenticated || !token || !currentInstitution || !user) return;
 
@@ -390,13 +392,11 @@ export const AppStateProvider: React.FC<{ children: ReactNode }> = ({ children }
             } catch (err) { }
         };
 
-        window.addEventListener('MOCK_MESSAGES_UPDATED', syncConversations);
-        const interval = setInterval(syncConversations, 5000); // 5 sec poll fallback
+        const interval = setInterval(syncConversations, 5000);
 
-        syncConversations(); // Initial load
+        syncConversations();
 
         return () => {
-            window.removeEventListener('MOCK_MESSAGES_UPDATED', syncConversations);
             clearInterval(interval);
         };
     }, [isAuthenticated, token, currentInstitution, user]);

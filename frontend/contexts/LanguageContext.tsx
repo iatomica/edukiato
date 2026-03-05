@@ -1,6 +1,5 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { View } from '../types';
 
 export type Language = 'es' | 'en';
 

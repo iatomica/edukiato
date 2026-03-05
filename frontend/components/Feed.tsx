@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-import { FeedItem } from '../types';
+import { FeedItem } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { MessageSquare, FileText, Upload, Bell, Filter, Search, Megaphone, BookOpen } from 'lucide-react';
-import { useLanguage } from '../contexts/LanguageContext';
+import { MessageSquare, FileText, Upload, Bell, Search, Megaphone, BookOpen } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface FeedProps {
     items: FeedItem[];
@@ -11,9 +10,8 @@ interface FeedProps {
 }
 
 export const Feed: React.FC<FeedProps> = ({ items, className }) => {
-    const { t } = useLanguage();
-    const [filterType, setFilterType] = useState<'ALL' | 'ANNOUNCEMENT' | 'MATERIAL' | 'ASSIGNMENT'>('ALL');
-    const [filterScope, setFilterScope] = useState<'ALL' | 'INSTITUTION' | 'COURSE'>('ALL');
+    const [filterType] = useState<'ALL' | 'ANNOUNCEMENT' | 'MATERIAL' | 'ASSIGNMENT'>('ALL');
+    const [filterScope] = useState<'ALL' | 'INSTITUTION' | 'COURSE'>('ALL');
 
     const filteredItems = items.filter(item => {
         if (filterType !== 'ALL' && item.type !== filterType) return false;

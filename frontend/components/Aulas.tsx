@@ -1,17 +1,17 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useAppState } from '../contexts/AppStateContext';
-import { useAuth } from '../contexts/AuthContext';
-import { useTenantData } from '../hooks/useTenantData';
-import { Aula, Nino, User, Communication } from '../types';
-import { Users, LayoutGrid, List, MessageSquare, Info, ShieldAlert, ChevronRight, User as UserIcon, Settings, Plus, Search, Trash2, Send, BookOpen, Mail, Award, Paperclip, Calendar } from 'lucide-react';
+import AcademicReportsTab from '@/components/AcademicReportsTab';
+import { AnimatedAvatar } from '@/components/AnimatedAvatar';
+import Modal from '@/components/Modal';
+import { CommunicationsModal } from '@/components/Students';
+import { UserAvatar } from '@/components/UserAvatar';
+import { useAppState } from '@/contexts/AppStateContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenantData } from '@/hooks/useTenantData';
+import { aulasApi, communicationsApi, usersApi } from '@/services/api';
+import { Aula, Nino, User } from '@/types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import Modal from './Modal';
-import { usersApi } from '../services/api';
-import { AnimatedAvatar } from './AnimatedAvatar';
-import { UserAvatar } from './UserAvatar';
-import AcademicReportsTab from './AcademicReportsTab';
-import { CommunicationsModal } from './Students';
+import { Users, LayoutGrid, List, MessageSquare, Info, ShieldAlert, ChevronRight, User as UserIcon, Settings, Plus, Trash2, Send, BookOpen, Award, Calendar } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
 
 export default function Aulas({ onViewChange }: { onViewChange?: (view: any, params?: any) => void }) {
     const { state, dispatch } = useAppState();
@@ -93,25 +93,40 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
         });
     }, [communications, selectedNino]);
 
-    const handleSendCommunication = (data: any) => {
-        if (!currentInstitution) return;
+    const handleSendCommunication = async (data: any) => {
+        if (!currentInstitution || !token) return;
 
-        const newComm: Communication = {
-            id: `comm_${Date.now()}`,
-            institutionId: currentInstitution.id,
-            type: data.type,
-            title: data.title,
-            content: data.content,
-            senderId: user?.id || 'current_user',
-            senderName: user?.name || 'Administrador',
-            recipientId: data.recipientId,
-            courseId: data.courseId,
-            createdAt: new Date().toISOString(),
-            isRead: false
-        };
+        try {
+            const newComm = await communicationsApi.create(
+                {
+                    type: data.type,
+                    title: data.title,
+                    content: data.content,
+                    recipientId: data.recipientId,
+                    courseId: data.courseId,
+                },
+                currentInstitution.id,
+                token,
+            );
 
-        dispatch({ type: 'ADD_COMMUNICATION', payload: newComm });
-        emitEvent({ type: 'COMMUNICATION_SENT', payload: newComm });
+            dispatch({ type: 'ADD_COMMUNICATION', payload: newComm });
+            emitEvent({ type: 'COMMUNICATION_SENT', payload: newComm });
+            return newComm;
+        } catch (error) {
+            console.error('Failed to send communication from Aulas:', error);
+            throw error;
+        }
+    };
+
+    const handleOpenAula = (aulaId: string) => {
+        // Keep unassigned students flow in configuration, since detail view expects a concrete aula.
+        if (aulaId === 'unassigned') {
+            setConfigAulaId(aulaId);
+            setConfigTab('ALUMNOS');
+            return;
+        }
+
+        setSelectedAulaId(aulaId);
     };
 
     // No access
@@ -151,7 +166,16 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                         return (
                             <div
                                 key={aula.id}
-                                className={`bg-white rounded-2xl border-2 border-transparent shadow-sm hover:shadow-md hover:border-primary-100 transition-all overflow-hidden flex flex-col min-h-[220px] relative`}
+                                onClick={() => handleOpenAula(aula.id)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleOpenAula(aula.id);
+                                    }
+                                }}
+                                role="button"
+                                tabIndex={0}
+                                className={`bg-white rounded-2xl border-2 border-transparent shadow-sm hover:shadow-md hover:border-primary-100 transition-all overflow-hidden flex flex-col min-h-[220px] relative cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-200 focus:ring-offset-2`}
                             >
                                 <div className={`h-3 ${aula.color?.split(' ')[0] || 'bg-slate-200'}`} />
                                 <div className="p-6 flex-1 flex flex-col">
@@ -188,16 +212,7 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                if (isAdmin) {
-                                                    setConfigAulaId(aula.id);
-                                                    if (aula.id === 'unassigned') {
-                                                        setConfigTab('ALUMNOS');
-                                                    } else {
-                                                        setConfigTab('DETALLES');
-                                                    }
-                                                } else {
-                                                    setSelectedAulaId(aula.id);
-                                                }
+                                                handleOpenAula(aula.id);
                                             }}
                                             className="text-primary-600 bg-primary-50 px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-bold hover:bg-primary-100 transition-colors"
                                         >
@@ -244,20 +259,41 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                 <button
                                                     onClick={() => {
                                                         setIsProcessingTeacher(true);
-                                                        setTimeout(() => {
-                                                            const targetAulaC = state.aulas.find(a => a.id === teacherAssignConfirm.aulaId);
-                                                            if (targetAulaC) {
-                                                                let updatedTeachers = [...targetAulaC.teachers];
-                                                                if (teacherAssignConfirm.action === 'ASSIGN') {
-                                                                    updatedTeachers.push(teacherAssignConfirm.docente.id);
-                                                                } else {
-                                                                    updatedTeachers = updatedTeachers.filter(id => id !== teacherAssignConfirm.docente.id);
-                                                                }
-                                                                dispatch({ type: 'UPDATE_AULA', payload: { ...targetAulaC, teachers: updatedTeachers } });
+                                                        const persistTeacherChange = async () => {
+                                                            if (!currentInstitution || !token) {
+                                                                setIsProcessingTeacher(false);
+                                                                setTeacherAssignConfirm(null);
+                                                                return;
                                                             }
-                                                            setIsProcessingTeacher(false);
-                                                            setTeacherAssignConfirm(null);
-                                                        }, 1200);
+
+                                                            try {
+                                                                const targetAulaC = state.aulas.find(a => a.id === teacherAssignConfirm.aulaId);
+                                                                if (targetAulaC) {
+                                                                    let updatedTeachers = [...targetAulaC.teachers];
+                                                                    if (teacherAssignConfirm.action === 'ASSIGN') {
+                                                                        updatedTeachers.push(teacherAssignConfirm.docente.id);
+                                                                    } else {
+                                                                        updatedTeachers = updatedTeachers.filter(id => id !== teacherAssignConfirm.docente.id);
+                                                                    }
+
+                                                                    const updatedAula = await aulasApi.update(
+                                                                        teacherAssignConfirm.aulaId,
+                                                                        { teachers: updatedTeachers },
+                                                                        currentInstitution.id,
+                                                                        token,
+                                                                    );
+                                                                    dispatch({ type: 'UPDATE_AULA', payload: updatedAula });
+                                                                }
+                                                            } catch (error) {
+                                                                console.error('Error updating aula teachers:', error);
+                                                                alert('No se pudieron guardar los docentes asignados.');
+                                                            } finally {
+                                                                setIsProcessingTeacher(false);
+                                                                setTeacherAssignConfirm(null);
+                                                            }
+                                                        };
+
+                                                        persistTeacherChange();
                                                     }}
                                                     className={`px-4 py-2 text-sm font-bold text-white rounded-lg shadow-sm transition-colors ${teacherAssignConfirm.action === 'ASSIGN' ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200' : 'bg-rose-600 hover:bg-rose-700 shadow-rose-200'}`}
                                                 >
@@ -315,7 +351,14 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                     onChange={(e) => {
                                                         const aula = state.aulas.find(a => a.id === configAulaId);
                                                         if (aula) {
-                                                            dispatch({ type: 'UPDATE_AULA', payload: { ...aula, name: e.target.value } });
+                                                            const nextName = e.target.value;
+                                                            dispatch({ type: 'UPDATE_AULA', payload: { ...aula, name: nextName } });
+                                                            if (currentInstitution && token) {
+                                                                aulasApi.update(aula.id, { name: nextName }, currentInstitution.id, token)
+                                                                    .catch((error) => {
+                                                                        console.error('Error updating aula name:', error);
+                                                                    });
+                                                            }
                                                         }
                                                     }}
                                                 />
@@ -328,7 +371,14 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                                     onChange={(e) => {
                                                         const aula = state.aulas.find(a => a.id === configAulaId);
                                                         if (aula) {
-                                                            dispatch({ type: 'UPDATE_AULA', payload: { ...aula, color: e.target.value } });
+                                                            const nextColor = e.target.value;
+                                                            dispatch({ type: 'UPDATE_AULA', payload: { ...aula, color: nextColor } });
+                                                            if (currentInstitution && token) {
+                                                                aulasApi.update(aula.id, { color: nextColor }, currentInstitution.id, token)
+                                                                    .catch((error) => {
+                                                                        console.error('Error updating aula color:', error);
+                                                                    });
+                                                            }
                                                         }
                                                     }}
                                                 >
@@ -481,19 +531,27 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                 <AddAulaModal
                     isOpen={isAddAulaModalOpen}
                     onClose={() => setIsAddAulaModalOpen(false)}
-                    onAdd={(newAula: Partial<Aula>) => {
-                        if (!currentInstitution) return;
-                        const aula: Aula = {
-                            id: `aula_${Date.now()}`,
-                            institutionId: currentInstitution.id,
-                            name: newAula.name || 'Nueva Sala',
-                            capacity: 25,
-                            teachers: newAula.teachers || [],
-                            assistants: [],
-                            color: newAula.color || 'bg-slate-100 text-slate-700 border-slate-200'
-                        };
-                        dispatch({ type: 'ADD_AULA', payload: aula });
-                        setIsAddAulaModalOpen(false);
+                    onAdd={async (newAula: Partial<Aula>) => {
+                        if (!currentInstitution || !token) return;
+
+                        try {
+                            const createdAula = await aulasApi.create(
+                                {
+                                    name: newAula.name || 'Nueva Sala',
+                                    color: newAula.color || 'bg-slate-100 text-slate-700 border-slate-200',
+                                    capacity: 25,
+                                    teachers: newAula.teachers || [],
+                                },
+                                currentInstitution.id,
+                                token,
+                            );
+
+                            dispatch({ type: 'ADD_AULA', payload: createdAula });
+                            setIsAddAulaModalOpen(false);
+                        } catch (error) {
+                            console.error('Error creating aula:', error);
+                            alert('No se pudo crear la sala.');
+                        }
                     }}
                     allUsers={state.students as any}
                 />
@@ -519,10 +577,18 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        dispatch({ type: 'DELETE_AULA', payload: { id: deleteAulaConfirm } });
-                                        setDeleteAulaConfirm(null);
-                                        setConfigAulaId(null);
+                                    onClick={async () => {
+                                        if (!currentInstitution || !token) return;
+
+                                        try {
+                                            await aulasApi.remove(deleteAulaConfirm, currentInstitution.id, token);
+                                            dispatch({ type: 'DELETE_AULA', payload: { id: deleteAulaConfirm } });
+                                            setDeleteAulaConfirm(null);
+                                            setConfigAulaId(null);
+                                        } catch (error) {
+                                            console.error('Error deleting aula:', error);
+                                            alert('No se pudo eliminar la sala.');
+                                        }
                                     }}
                                     className="flex-1 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl transition-colors shadow-sm shadow-rose-200"
                                 >
@@ -857,7 +923,7 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
 }
 
 // Subcomponente de Crear Aula
-function AddAulaModal({ isOpen, onClose, onAdd, allUsers }: { isOpen: boolean, onClose: () => void, onAdd: (aula: Partial<Aula>) => void, allUsers: User[] }) {
+function AddAulaModal({ isOpen, onClose, onAdd, allUsers }: { isOpen: boolean, onClose: () => void, onAdd: (aula: Partial<Aula>) => Promise<void> | void, allUsers: User[] }) {
     const [name, setName] = useState('');
     const [color, setColor] = useState('bg-slate-100 text-slate-700 border-slate-200');
     const [teachers, setTeachers] = useState<string[]>([]);

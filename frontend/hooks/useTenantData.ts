@@ -6,9 +6,9 @@
  * should use to access entity data.
  */
 
+import { useAppState } from '@/contexts/AppStateContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useMemo } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useAppState } from '../contexts/AppStateContext';
 
 export function useTenantData() {
     const { currentInstitution } = useAuth();

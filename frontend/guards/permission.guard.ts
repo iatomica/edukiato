@@ -24,7 +24,7 @@ import {
     UserRole,
     resolveRolePermissions,
     PermissionOverride,
-} from '../types';
+} from '@/types';
 
 // ── Core Check (shared between NestJS and Express) ───────────
 

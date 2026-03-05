@@ -8,26 +8,11 @@
  * preparing for real multi-tenant API calls.
  */
 
-import { User, UserRole, UserInstitution, Course, Message, AcademicReport } from '../types';
-import { MOCK_COURSES, MOCK_PAYMENTS, INST_VINCULOS, MOCK_AULAS, MOCK_NINOS, MOCK_MESSAGES } from './mockData';
+import { User, UserInstitution, Course, Message, AcademicReport, Communication, Aula, Nino, CalendarEvent } from '@/types';
 
 // ── Config ────────────────────────────────────────────────────
 
 const API_BASE = '/api';
-
-// ── Mock Data for Auth ────────────────────────────────────────
-
-const MOCK_INSTITUTIONS: UserInstitution[] = [
-    {
-        institutionId: 'inst-vinculos',
-        institutionName: 'Vínculos de Libertad',
-        institutionSlug: 'vinculos-de-libertad',
-        role: 'ADMIN_INSTITUCION',
-        logoUrl: 'https://picsum.photos/seed/vinculos/200',
-        primaryColor: '#0ea5e9', // Lighter blue
-        secondaryColor: '#0369a1',
-    }
-];
 
 interface MockUser {
     emailPattern: string;
@@ -894,7 +879,7 @@ export const usersApi = {
 
     update: async (userId: string, data: Partial<User>, token: string): Promise<User> => {
         const response = await fetch(`${API_BASE}/users/${userId}`, {
-            method: 'PUT',
+            method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -974,12 +959,232 @@ export const coursesApi = {
     }
 };
 
+export const communicationsApi = {
+    getAll: async (institutionId: string, token: string): Promise<Communication[]> => {
+        const response = await fetch(`${API_BASE}/communications?institutionId=${institutionId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error('Error fetching communications');
+        return response.json();
+    },
+    create: async (
+        data: { type: Communication['type']; title: string; content: string; recipientId?: string | null; courseId?: string | null },
+        institutionId: string,
+        token: string,
+    ): Promise<Communication> => {
+        const response = await fetch(`${API_BASE}/communications?institutionId=${institutionId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) throw new Error('Error creating communication');
+        return response.json();
+    },
+};
+
+export const aulasApi = {
+    getAll: async (institutionId: string, token: string): Promise<Aula[]> => {
+        const response = await fetch(`${API_BASE}/classrooms?institutionId=${institutionId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error('Error fetching aulas');
+        return response.json();
+    },
+    create: async (
+        data: { name: string; color?: string; capacity?: number; teachers?: string[] },
+        institutionId: string,
+        token: string,
+    ): Promise<Aula> => {
+        const response = await fetch(`${API_BASE}/classrooms?institutionId=${institutionId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) throw new Error('Error creating aula');
+        return response.json();
+    },
+    update: async (
+        aulaId: string,
+        data: { name?: string; color?: string; capacity?: number; teachers?: string[] },
+        institutionId: string,
+        token: string,
+    ): Promise<Aula> => {
+        const response = await fetch(`${API_BASE}/classrooms/${aulaId}?institutionId=${institutionId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) throw new Error('Error updating aula');
+        return response.json();
+    },
+    remove: async (aulaId: string, institutionId: string, token: string): Promise<void> => {
+        const response = await fetch(`${API_BASE}/classrooms/${aulaId}?institutionId=${institutionId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (!response.ok) throw new Error('Error deleting aula');
+    },
+};
+
+export const ninosApi = {
+    getAll: async (institutionId: string, token: string): Promise<Nino[]> => {
+        const response = await fetch(`${API_BASE}/children?institutionId=${institutionId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error('Error fetching ninos');
+        return response.json();
+    },
+    create: async (
+        data: {
+            name: string;
+            gender?: 'MASCULINO' | 'FEMENINO';
+            birthDate?: string;
+            allergies?: string[];
+            avatar?: string;
+            aulaId: string;
+            parentIds: string[];
+            attendanceRate?: number;
+        },
+        institutionId: string,
+        token: string,
+    ): Promise<Nino> => {
+        const response = await fetch(`${API_BASE}/children?institutionId=${institutionId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) throw new Error('Error creating nino');
+        return response.json();
+    },
+    update: async (
+        ninoId: string,
+        data: {
+            name?: string;
+            gender?: 'MASCULINO' | 'FEMENINO';
+            birthDate?: string;
+            allergies?: string[];
+            avatar?: string;
+            aulaId?: string;
+            parentIds?: string[];
+            attendanceRate?: number;
+        },
+        institutionId: string,
+        token: string,
+    ): Promise<Nino> => {
+        const response = await fetch(`${API_BASE}/children/${ninoId}?institutionId=${institutionId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) throw new Error('Error updating nino');
+        return response.json();
+    },
+};
+
+export const eventsApi = {
+    getAll: async (institutionId: string, token: string): Promise<CalendarEvent[]> => {
+        const response = await fetch(`${API_BASE}/events?institutionId=${institutionId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error('Error fetching events');
+        const data = await response.json();
+
+        return (data || []).map((event: any) => ({
+            ...event,
+            start: event.start ? new Date(event.start) : event.start,
+            end: event.end ? new Date(event.end) : event.end,
+        }));
+    },
+    create: async (data: Partial<CalendarEvent>, institutionId: string, token: string): Promise<CalendarEvent> => {
+        const response = await fetch(`${API_BASE}/events?institutionId=${institutionId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) throw new Error('Error creating event');
+        const event = await response.json();
+        return {
+            ...event,
+            start: event.start ? new Date(event.start) : event.start,
+            end: event.end ? new Date(event.end) : event.end,
+        };
+    },
+    update: async (eventId: string, data: Partial<CalendarEvent>, institutionId: string, token: string): Promise<CalendarEvent> => {
+        const response = await fetch(`${API_BASE}/events/${eventId}?institutionId=${institutionId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) throw new Error('Error updating event');
+        const event = await response.json();
+        return {
+            ...event,
+            start: event.start ? new Date(event.start) : event.start,
+            end: event.end ? new Date(event.end) : event.end,
+        };
+    },
+    remove: async (eventId: string, institutionId: string, token: string): Promise<void> => {
+        const response = await fetch(`${API_BASE}/events/${eventId}?institutionId=${institutionId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error('Error deleting event');
+    }
+};
+
 // ── Messages API ──────────────────────────────────────────────
 
 // --- Utilities for cross-tab mock sync ---
 
 export const messagesApi = {
-    getMessages: async (userId: string, targetUserId: string, token: string): Promise<Message[]> => {
+    getMessages: async (_userId: string, targetUserId: string, token: string): Promise<Message[]> => {
         const response = await fetch(`${API_BASE}/messages/${targetUserId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -989,7 +1194,7 @@ export const messagesApi = {
         return response.json();
     },
 
-    sendMessage: async (senderId: string, recipientId: string, content: string, token: string, file?: Message['file']): Promise<Message> => {
+    sendMessage: async (_senderId: string, recipientId: string, content: string, token: string, file?: Message['file']): Promise<Message> => {
         const response = await fetch(`${API_BASE}/messages/${recipientId}`, {
             method: 'POST',
             headers: {
@@ -1002,7 +1207,7 @@ export const messagesApi = {
         return response.json();
     },
 
-    getConversations: async (userId: string, token: string): Promise<{ contactId: string, lastMessage: Message, unreadCount: number }[]> => {
+    getConversations: async (_userId: string, token: string): Promise<{ contactId: string, lastMessage: Message, unreadCount: number }[]> => {
         const response = await fetch(`${API_BASE}/messages/conversations`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -1012,7 +1217,7 @@ export const messagesApi = {
         return response.json();
     },
 
-    markAsRead: async (userId: string, targetUserId: string, token: string): Promise<void> => {
+    markAsRead: async (_userId: string, targetUserId: string, token: string): Promise<void> => {
         const response = await fetch(`${API_BASE}/messages/${targetUserId}/read`, {
             method: 'PUT',
             headers: {

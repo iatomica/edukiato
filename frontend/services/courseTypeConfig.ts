@@ -8,7 +8,7 @@
  * To add a new type: add an entry here. No if/else needed anywhere.
  */
 
-import type { CourseType, CourseTypeConfig, Course } from '../types';
+import type { CalendarEvent, CourseType, CourseTypeConfig, Course } from '@/types';
 
 // ── Built-in Type Definitions ────────────────────────────────
 
@@ -113,11 +113,14 @@ export function validateCourseByType(course: Course): CourseValidationResult {
 // ── Calendar Mapping ────────────────────────────────────────
 
 /** Map a CourseType to the CalendarEvent 'type' field */
-export function courseTypeToCalendarType(courseType: CourseType): 'class' | 'workshop' | 'event' {
+export function courseTypeToCalendarType(courseType: CourseType): CalendarEvent['type'] {
     switch (courseType) {
-        case 'WORKSHOP': return 'workshop';
-        case 'SEMINAR': return 'event';
-        default: return 'class';
+        case 'WORKSHOP':
+            return 'EVENTOS_ESPECIALES';
+        case 'SEMINAR':
+            return 'ACTOS';
+        default:
+            return 'EVENTO_DE_SALA';
     }
 }
 

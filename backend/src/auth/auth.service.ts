@@ -2,6 +2,8 @@ import { Injectable, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
+
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -25,7 +27,12 @@ export class AuthService {
     return null;
   }
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id, role: user.role };
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      role: user.role,
+      institutionId: user.institutions?.[0]?.institutionId,
+    };
     return {
       token: this.jwtService.sign(payload),
       user: {
@@ -47,7 +54,7 @@ export class AuthService {
   }
 
   async setInitialPassword(userId: string, newPassword: string) {
-    const user = this.usersService.findOne(userId) as any;
+    const user = await this.usersService.findOne(userId) as any;
     if (!user) {
       throw new ConflictException('User not found');
     }
