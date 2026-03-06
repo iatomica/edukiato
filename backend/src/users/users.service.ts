@@ -279,6 +279,20 @@ export class UsersService {
         return this.findOne(id);
     }
 
+    async updatePassword(id: string, passwordHash: string): Promise<void> {
+        await this.ensureTables();
+        await this.dbPool.query(
+            `
+            UPDATE users
+            SET password_hash = $1,
+                requires_password_change = FALSE,
+                updated_at = NOW()
+            WHERE id = $2
+            `,
+            [passwordHash, id],
+        );
+    }
+
     async resetPassword(id: string): Promise<{ success: boolean; message: string }> {
         const user = await this.findOne(id);
 

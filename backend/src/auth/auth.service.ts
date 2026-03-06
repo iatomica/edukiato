@@ -60,8 +60,8 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.passwordHash = hashedPassword;
-    user.requiresPasswordChange = false;
+    // Delegate the update to the persistence layer instead of just updating memory
+    await this.usersService.updatePassword(userId, hashedPassword);
 
     return { success: true };
   }
