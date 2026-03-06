@@ -28,7 +28,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
   const [feedFilter, setFeedFilter] = React.useState<'ALL' | 'ONLY_COMMUNICATIONS' | 'ONLY_EVENTS'>('ALL');
 
   const upcomingBirthdays = React.useMemo(() => {
-    if (!ninos || !['ADMIN_INSTITUCION', 'SUPER_ADMIN'].includes(user.role)) return { today: [], upcoming: [] };
+    if (!ninos || !['ADMIN_INSTITUCION', 'SUPER_ADMIN', 'DOCENTE', 'ESPECIALES'].includes(user.role)) return { today: [], upcoming: [] };
+
+    // Find classrooms assigned to this teacher/staff
+    const teacherAulasIds = aulas
+      .filter(a => a.teachers?.includes(user.id))
+      .map(a => a.id);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -37,7 +42,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
     const bdaysUpcoming: any[] = [];
 
     ninos.forEach(nino => {
+      // Directives see everyone. Teachers/Staff only see their assigned students
+      const isDirective = ['ADMIN_INSTITUCION', 'SUPER_ADMIN'].includes(user.role);
+      const isTeacherOfStudent = ['DOCENTE', 'ESPECIALES'].includes(user.role) && teacherAulasIds.includes(nino.aulaId);
+
+      if (!isDirective && !isTeacherOfStudent) return;
       if (!nino.birthDate) return;
+
       const bDate = new Date(nino.birthDate);
       bDate.setMinutes(bDate.getMinutes() + bDate.getTimezoneOffset());
 
@@ -59,7 +70,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
 
     bdaysUpcoming.sort((a, b) => a.diffDays - b.diffDays);
     return { today: bdaysToday, upcoming: bdaysUpcoming };
-  }, [ninos, user.role]);
+  }, [ninos, aulas, user]);
 
   const [totalUnreadMessages, setTotalUnreadMessages] = React.useState(0);
 
@@ -224,7 +235,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
           </div>
         </div>
 
-        {['ADMIN_INSTITUCION', 'SUPER_ADMIN'].includes(user.role) && upcomingBirthdays.today.length > 0 && (
+        {['ADMIN_INSTITUCION', 'SUPER_ADMIN', 'DOCENTE', 'ESPECIALES'].includes(user.role) && upcomingBirthdays.today.length > 0 && (
           <div className="bg-gradient-to-r from-amber-400 to-orange-500 rounded-3xl p-6 shadow-lg text-white flex items-center gap-5 animate-scale-in relative overflow-hidden">
             <div className="absolute right-0 top-0 opacity-10 transform scale-150 -translate-y-1/4 translate-x-1/4 pointer-events-none">
               <Gift size={160} />
