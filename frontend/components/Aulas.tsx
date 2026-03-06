@@ -416,7 +416,7 @@ export default function Aulas({ onViewChange }: { onViewChange?: (view: any, par
                                             <p className="text-sm text-slate-500 mb-4">Selecciona qué maestros tienen acceso a esta sala.</p>
                                         </div>
                                         <div className="bg-slate-50 rounded-xl border border-slate-200 p-2 max-h-[300px] overflow-y-auto space-y-1">
-                                            {allUsers.filter(u => u.role === 'DOCENTE').map(docente => {
+                                            {allUsers.filter(u => u.role === 'DOCENTE' || u.role === 'ESPECIALES').map(docente => {
                                                 const targetAula = accessibleAulas.find(a => a.id === configAulaId);
                                                 const isAssigned = targetAula?.teachers.includes(docente.id);
 
@@ -1009,7 +1009,7 @@ function AddAulaModal({ isOpen, onClose, onAdd, allUsers }: { isOpen: boolean, o
                                     <p className="text-sm text-slate-500 mb-4">Selecciona qué maestros tendrán acceso a esta sala.</p>
                                 </div>
                                 <div className="bg-slate-50 rounded-xl border border-slate-200 p-2 max-h-[300px] overflow-y-auto space-y-1">
-                                    {allUsers.filter(u => u.role === 'DOCENTE').map(docente => {
+                                    {allUsers.filter(u => u.role === 'DOCENTE' || u.role === 'ESPECIALES').map(docente => {
                                         const isAssigned = teachers.includes(docente.id);
                                         return (
                                             <label key={docente.id} className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-lg hover:border-primary-200 cursor-pointer transition-colors shadow-sm">
@@ -1037,7 +1037,7 @@ function AddAulaModal({ isOpen, onClose, onAdd, allUsers }: { isOpen: boolean, o
                                             </label>
                                         )
                                     })}
-                                    {allUsers.filter(u => u.role === 'DOCENTE').length === 0 && (
+                                    {allUsers.filter(u => u.role === 'DOCENTE' || u.role === 'ESPECIALES').length === 0 && (
                                         <div className="p-4 text-center text-slate-500 text-sm">
                                             No hay docentes registrados en la institución aún.
                                         </div>
