@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTenantData } from '@/hooks/useTenantData';
 import { FeedItem, View, User } from '@/types';
-import { BookOpen, MessageSquare, Calendar } from 'lucide-react';
+import { BookOpen, MessageSquare, Calendar, Gift } from 'lucide-react';
 import React, { useEffect } from 'react';
 
 interface DashboardProps {
@@ -26,6 +26,40 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
   }, [user]);
 
   const [feedFilter, setFeedFilter] = React.useState<'ALL' | 'ONLY_COMMUNICATIONS' | 'ONLY_EVENTS'>('ALL');
+
+  const upcomingBirthdays = React.useMemo(() => {
+    if (!ninos || !['ADMIN_INSTITUCION', 'SUPER_ADMIN'].includes(user.role)) return { today: [], upcoming: [] };
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const currentYear = today.getFullYear();
+    const bdaysToday: any[] = [];
+    const bdaysUpcoming: any[] = [];
+
+    ninos.forEach(nino => {
+      if (!nino.birthDate) return;
+      const bDate = new Date(nino.birthDate);
+      bDate.setMinutes(bDate.getMinutes() + bDate.getTimezoneOffset());
+
+      let nextBirthday = new Date(currentYear, bDate.getMonth(), bDate.getDate());
+
+      if (nextBirthday.getTime() < today.getTime()) {
+        nextBirthday.setFullYear(currentYear + 1);
+      }
+
+      const diffTime = nextBirthday.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) {
+        bdaysToday.push(nino);
+      } else if (diffDays > 0 && diffDays <= 21) {
+        bdaysUpcoming.push({ nino, diffDays, nextBirthday });
+      }
+    });
+
+    bdaysUpcoming.sort((a, b) => a.diffDays - b.diffDays);
+    return { today: bdaysToday, upcoming: bdaysUpcoming };
+  }, [ninos, user.role]);
 
   const [totalUnreadMessages, setTotalUnreadMessages] = React.useState(0);
 
@@ -190,6 +224,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
           </div>
         </div>
 
+        {['ADMIN_INSTITUCION', 'SUPER_ADMIN'].includes(user.role) && upcomingBirthdays.today.length > 0 && (
+          <div className="bg-gradient-to-r from-amber-400 to-orange-500 rounded-3xl p-6 shadow-lg text-white flex items-center gap-5 animate-scale-in relative overflow-hidden">
+            <div className="absolute right-0 top-0 opacity-10 transform scale-150 -translate-y-1/4 translate-x-1/4 pointer-events-none">
+              <Gift size={160} />
+            </div>
+            <div className="bg-white/20 p-4 rounded-2xl shrink-0 backdrop-blur-sm border border-white/30 hidden sm:block">
+              <Gift className="w-8 h-8 text-white" />
+            </div>
+            <div className="relative z-10">
+              <h3 className="font-bold text-2xl tracking-tight leading-tight">¡Hoy es el cumpleaños de {upcomingBirthdays.today.map(n => n.name.split(' ')[0]).join(', ')}! 🎂</h3>
+              <p className="text-amber-50 font-medium text-lg mt-1 opacity-90">No te olvides de enviarles un saludo especial en su día.</p>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content Area */}
@@ -256,6 +304,34 @@ export const Dashboard: React.FC<DashboardProps> = ({ onViewChange, user }) => {
                 </button>
               </div>
             </div>
+
+            {/* Upcoming Birthdays (Admins only) */}
+            {['ADMIN_INSTITUCION', 'SUPER_ADMIN'].includes(user.role) && (
+              <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                  <Gift size={18} className="text-amber-500" /> Próximos Cumpleaños
+                </h3>
+                {upcomingBirthdays.upcoming.length === 0 ? (
+                  <p className="text-sm text-slate-500 text-center py-4 bg-slate-50 rounded-lg border border-dashed border-slate-200">No hay cumpleaños en las próximas 3 semanas.</p>
+                ) : (
+                  <div className="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                    {upcomingBirthdays.upcoming.map(({ nino, diffDays, nextBirthday }) => (
+                      <div key={nino.id} className="flex items-center justify-between p-3 bg-amber-50/50 rounded-xl border border-amber-100 mt-3">
+                        <div>
+                          <p className="text-sm font-bold text-slate-800">{nino.name}</p>
+                          <p className="text-xs font-bold text-amber-600 capitalize">
+                            {nextBirthday.toLocaleDateString('es-AR', { day: 'numeric', month: 'long' })}
+                          </p>
+                        </div>
+                        <span className="text-[10px] font-bold bg-white text-amber-700 px-2.5 py-1 rounded-lg border border-amber-200 shadow-sm shrink-0 whitespace-nowrap">
+                          {diffDays === 1 ? 'Mañana' : `En ${diffDays} días`}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
