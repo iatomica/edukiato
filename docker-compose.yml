@@ -9,8 +9,6 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       PORT: 3000
       JWT_SECRET: ${JWT_SECRET}
-    networks:
-      - edukiato-network
 
   # --- Frontend (Web App) ---
   frontend:
@@ -22,9 +20,3 @@ services:
       - "80"
     depends_on:
       - backend
-    networks:
-      - edukiato-network
-
-networks:
-  edukiato-network:
-    driver: bridge
