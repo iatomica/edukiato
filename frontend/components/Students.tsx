@@ -717,10 +717,12 @@ export const Students: React.FC<{ initialViewMode?: 'LIST' | 'NOTEBOOK', initial
 
   // Mark all relevant communications as read when opening the Notebook
   React.useEffect(() => {
-    if (viewMode === 'NOTEBOOK' && user) {
+    if (viewMode === 'NOTEBOOK' && user && currentInstitution && token) {
       dispatch({ type: 'MARK_COMMUNICATIONS_READ', payload: { userId: user.id } });
+      // Persist to backend so it doesn't reappear on reload
+      communicationsApi.markAsRead(currentInstitution.id, token).catch(console.error);
     }
-  }, [viewMode, user, dispatch]);
+  }, [viewMode, user, currentInstitution, token, dispatch]);
 
   // If user is student, default to showing their notebook (or allow toggling if they want to see "classmates" - usually restricted)
   // For this demo, we assume Students section for Admin is "Management", and for Student is "My Notebook"

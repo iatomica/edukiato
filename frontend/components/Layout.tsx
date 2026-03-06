@@ -113,9 +113,23 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
     const isUpcoming = new Date(e.start) >= new Date(new Date().setHours(0, 0, 0, 0));
     if (!isUpcoming) return false;
 
-    if (lastSeenCalendar === 0) return true;
+    // Apply privacy filter
+    let canView = false;
+    if (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN_INSTITUCION' || e.creatorId === user.id) {
+      canView = true;
+    } else if (!e.sharedWith || e.sharedWith.scope === 'ALL') {
+      canView = true;
+    } else if (e.sharedWith.scope === 'AULA' && e.sharedWith.targetIds) {
+      if (user.role === 'DOCENTE' || user.role === 'ESPECIALES') {
+        canView = aulas.some(a => e.sharedWith!.targetIds!.includes(a.id) && a.teachers?.includes(user.id));
+      } else if (user.role === 'PADRE') {
+        canView = ninos.some(n => e.sharedWith!.targetIds!.includes(n.aulaId) && n.parentIds?.includes(user.id));
+      }
+    }
+
+    if (lastSeenCalendar === 0) return canView;
     const eventTimestamp = e.createdAt ? new Date(e.createdAt).getTime() : new Date(e.start).getTime();
-    return eventTimestamp > lastSeenCalendar;
+    return eventTimestamp > lastSeenCalendar && canView;
   });
 
   const hasUnreadMessages = unreadMessagesCount > 0;

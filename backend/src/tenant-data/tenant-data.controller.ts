@@ -5,7 +5,7 @@ import { TenantDataService } from './tenant-data.service';
 @Controller()
 @UseGuards(JwtAuthGuard)
 export class TenantDataController {
-    constructor(private readonly tenantDataService: TenantDataService) {}
+    constructor(private readonly tenantDataService: TenantDataService) { }
 
     private resolveInstitutionId(req: any, queryInstitutionId?: string): string {
         const institutionId = req.user?.institutionId || queryInstitutionId;
@@ -18,7 +18,15 @@ export class TenantDataController {
     @Get('communications')
     async getCommunications(@Req() req: any, @Query('institutionId') institutionId?: string) {
         const resolvedInstitutionId = this.resolveInstitutionId(req, institutionId);
-        return this.tenantDataService.getCommunications(resolvedInstitutionId);
+        const userId = req.user?.userId || req.user?.id || req.user?.sub;
+        return this.tenantDataService.getCommunications(resolvedInstitutionId, userId);
+    }
+
+    @Put('communications/read')
+    async markCommunicationsAsRead(@Req() req: any, @Query('institutionId') institutionId?: string) {
+        const resolvedInstitutionId = this.resolveInstitutionId(req, institutionId);
+        const userId = req.user?.userId || req.user?.id || req.user?.sub;
+        return this.tenantDataService.markCommunicationsAsRead(resolvedInstitutionId, userId);
     }
 
     @Post('communications')

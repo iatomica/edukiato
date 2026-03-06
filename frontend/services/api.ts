@@ -997,6 +997,16 @@ export const communicationsApi = {
         if (!response.ok) throw new Error('Error creating communication');
         return response.json();
     },
+    markAsRead: async (institutionId: string, token: string): Promise<void> => {
+        const response = await fetch(`${API_BASE}/communications/read?institutionId=${institutionId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error('Error marking communications as read');
+    }
 };
 
 export const aulasApi = {

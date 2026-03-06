@@ -13,6 +13,7 @@ type CommunicationRow = {
     course_id?: string | null;
     created_at: string;
     is_read: boolean;
+    read_by?: string[];
 };
 
 type AulaRow = {
@@ -40,7 +41,7 @@ type NinoRow = {
 
 @Injectable()
 export class TenantDataService {
-    constructor(@Inject('DB_POOL') private readonly pool: Pool) {}
+    constructor(@Inject('DB_POOL') private readonly pool: Pool) { }
 
     private async ensureAulasSchema(): Promise<void> {
         await this.pool.query(`
@@ -130,15 +131,17 @@ export class TenantDataService {
                 recipient_id VARCHAR(80),
                 course_id VARCHAR(80),
                 created_at TIMESTAMP DEFAULT NOW(),
-                is_read BOOLEAN DEFAULT FALSE
+                is_read BOOLEAN DEFAULT FALSE,
+                read_by TEXT[] DEFAULT '{}'
             );
         `);
 
         await this.pool.query('ALTER TABLE communications ADD COLUMN IF NOT EXISTS recipient_id VARCHAR(80)');
         await this.pool.query('ALTER TABLE communications ADD COLUMN IF NOT EXISTS course_id VARCHAR(80)');
+        await this.pool.query('ALTER TABLE communications ADD COLUMN IF NOT EXISTS read_by TEXT[] DEFAULT ARRAY[]::TEXT[]');
     }
 
-    async getCommunications(institutionId: string) {
+    async getCommunications(institutionId: string, userId: string) {
         await this.ensureCommunicationsSchema();
 
         const query = `
@@ -153,7 +156,8 @@ export class TenantDataService {
                 recipient_id,
                 course_id,
                 created_at,
-                is_read
+                is_read,
+                read_by
             FROM communications
             WHERE institution_id = $1
             ORDER BY created_at DESC;
@@ -171,9 +175,25 @@ export class TenantDataService {
             recipientId: row.recipient_id ?? undefined,
             courseId: row.course_id ?? undefined,
             createdAt: row.created_at,
-            isRead: row.is_read,
+            isRead: row.read_by ? row.read_by.includes(userId) : false,
             attachments: [],
         }));
+    }
+
+    async markCommunicationsAsRead(institutionId: string, userId: string) {
+        await this.ensureCommunicationsSchema();
+
+        await this.pool.query(
+            `
+            UPDATE communications
+            SET read_by = array_append(read_by, $2)
+            WHERE institution_id = $1
+              AND ($2 = ANY(read_by)) IS NOT TRUE
+            `,
+            [institutionId, userId]
+        );
+
+        return { success: true };
     }
 
     async createCommunication(
