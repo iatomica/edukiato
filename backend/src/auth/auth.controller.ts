@@ -5,10 +5,14 @@ import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { Roles } from './decorators/roles.decorator';
+import { UsersService } from '../users/users.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(
+    private authService: AuthService,
+    private usersService: UsersService
+  ) { }
 
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
@@ -33,7 +37,8 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  getProfile(@Request() req) {
-    return req.user;
+  async getProfile(@Request() req) {
+    const id = req.user.userId || req.user.id || req.user.sub;
+    return this.usersService.findOne(id);
   }
 }

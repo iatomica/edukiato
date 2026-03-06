@@ -8,6 +8,13 @@ export class InstitutionsController {
     constructor(private readonly institutionsService: InstitutionsService) { }
 
     @UseGuards(JwtAuthGuard)
+    @Get('my')
+    findAllForUser(@Request() req) {
+        const userId = req.user.userId || req.user.id || req.user.sub || 'unknown';
+        return this.institutionsService.findAllForUser(userId);
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Get()
     findAll() {
         return this.institutionsService.findAll();

@@ -747,7 +747,16 @@ export const authApi = {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!response.ok) throw new Error('Sesión expirada o inválida');
-        return response.json();
+        const data = await response.json();
+        return {
+            id: data.id || 'unknown',
+            name: data.full_name || data.name || 'Usuario',
+            email: data.email,
+            role: data.role || 'ESTUDIANTE',
+            avatar: data.avatar,
+            requiresPasswordChange: data.requiresPasswordChange || data.requires_password_change || false,
+            institutions: data.institutions || [],
+        };
     },
     login: async (email: string, _password: string): Promise<{ user: User; token: string }> => {
         const response = await fetch(`${API_BASE}/auth/login`, {
@@ -769,6 +778,7 @@ export const authApi = {
             email: data.user?.email || email,
             role: data.user?.role || 'ESTUDIANTE',
             avatar: data.user?.avatar,
+            requiresPasswordChange: data.user?.requiresPasswordChange || false,
             institutions: data.user?.institutions || [],
         };
 
@@ -796,7 +806,7 @@ export const authApi = {
 
 export const institutionsApi = {
     getAll: async (token: string): Promise<UserInstitution[]> => {
-        const response = await fetch(`${API_BASE}/institutions`, {
+        const response = await fetch(`${API_BASE}/institutions/my`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -809,7 +819,7 @@ export const institutionsApi = {
             institutionId: inst.id,
             institutionName: inst.name,
             institutionSlug: inst.slug,
-            role: 'ADMIN_INSTITUCION', // Temporarily hardcoded until we fetch from user_institution_roles
+            role: inst.role, // the role is now coming from the backend endpoint
             logoUrl: inst.logoUrl,
             primaryColor: inst.primaryColor,
             secondaryColor: inst.secondaryColor

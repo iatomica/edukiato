@@ -55,6 +55,36 @@ export class InstitutionsService {
         `);
     }
 
+    async findAllForUser(userId: string) {
+        await this.ensureTables();
+        const rows = await this.dbPool.query(
+            `
+            SELECT 
+                i.id, i.name, i.slug, i.logo_url, i.primary_color, i.secondary_color, 
+                i.plan, i.is_active, i.created_at, i.updated_at, ui.role
+            FROM institutions i
+            INNER JOIN user_institutions ui ON i.id = ui.institution_id
+            WHERE ui.user_id = $1
+            ORDER BY i.created_at DESC
+            `,
+            [userId]
+        );
+
+        return rows.rows.map((row) => ({
+            id: row.id,
+            name: row.name,
+            slug: row.slug,
+            logoUrl: row.logo_url,
+            primaryColor: row.primary_color,
+            secondaryColor: row.secondary_color,
+            plan: row.plan,
+            isActive: row.is_active,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
+            role: row.role, // Include the user's role in this institution
+        }));
+    }
+
     async findAll() {
         await this.ensureTables();
         const rows = await this.dbPool.query(
