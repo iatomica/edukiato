@@ -606,7 +606,7 @@ export const Usuarios: React.FC = () => {
                                         <input
                                             type="date"
                                             name="birthDate"
-                                            defaultValue={editNino.birthDate}
+                                            defaultValue={editNino.birthDate ? editNino.birthDate.substring(0, 10) : ''}
                                             required
                                             className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 transition-all outline-none font-medium text-slate-600"
                                         />
@@ -924,13 +924,34 @@ export const Usuarios: React.FC = () => {
                         <div className="p-6 md:p-8 flex-1 overflow-y-auto space-y-6 max-h-[60vh] custom-scrollbar bg-slate-50">
                             {activeDetailTab === 'INFO' && (
                                 <div className="space-y-6 animate-fade-in">
-                                    <div className="bg-rose-50 border border-rose-100 rounded-xl p-5 shadow-sm">
-                                        <h3 className="text-rose-800 font-black mb-2 flex items-center gap-2 tracking-tight">
-                                            <ShieldAlert size={18} /> Historial Médico y Alergias
-                                        </h3>
-                                        <p className="text-rose-700 text-sm leading-relaxed font-medium">
-                                            {selectedNinoProfile.allergies?.join(', ') || 'No se registraron condiciones médicas particulares o alergias.'}
-                                        </p>
+                                    <div className="flex flex-col sm:flex-row gap-6">
+                                        <div className="flex-1 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+                                            <h3 className="text-slate-800 font-black mb-4 flex items-center gap-2 tracking-tight">
+                                                <UserIconLine size={18} className="text-primary-500" /> Información Personal
+                                            </h3>
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                                                    <span className="text-slate-500 text-sm font-medium">Fecha de Nacimiento</span>
+                                                    <span className="text-slate-800 font-bold text-sm">
+                                                        {selectedNinoProfile.birthDate ? new Date(selectedNinoProfile.birthDate).toLocaleDateString('es-AR', { timeZone: 'UTC' }) : 'No especificada'}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between items-center py-2">
+                                                    <span className="text-slate-500 text-sm font-medium">Género</span>
+                                                    <span className="text-slate-800 font-bold text-sm">
+                                                        {selectedNinoProfile.gender === 'MASCULINO' ? 'Masculino' : selectedNinoProfile.gender === 'FEMENINO' ? 'Femenino' : 'No especificado'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex-1 bg-rose-50 border border-rose-100 rounded-2xl p-5 shadow-sm">
+                                            <h3 className="text-rose-800 font-black mb-2 flex items-center gap-2 tracking-tight">
+                                                <ShieldAlert size={18} /> Historial Médico y Alergias
+                                            </h3>
+                                            <p className="text-rose-700 text-sm leading-relaxed font-medium mt-2">
+                                                {selectedNinoProfile.allergies?.filter(Boolean).length > 0 ? selectedNinoProfile.allergies.join(', ') : 'No se registraron condiciones médicas particulares o alergias.'}
+                                            </p>
+                                        </div>
                                     </div>
                                     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                                         <h3 className="font-black text-slate-800 p-5 border-b border-slate-100 flex items-center gap-2 tracking-tight text-lg bg-slate-50">
