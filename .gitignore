@@ -25,3 +25,14 @@ dist-ssr
 
 # Env
 .env
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# PostgreSQL backup artifacts
+*.backup
+*.dump
+*.tar
+db/*.backup
+db/*.dump
+db/*.tar
