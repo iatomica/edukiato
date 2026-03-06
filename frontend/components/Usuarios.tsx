@@ -234,7 +234,7 @@ export const Usuarios: React.FC = () => {
             return ['SUPER_ADMIN', 'ADMIN_INSTITUCION', 'DOCENTE', 'ESPECIALES'].includes(u.role);
         }
         if (activeTab === 'PADRES') {
-            return u.role === 'PADRE' || u.role === 'ESTUDIANTE' || !u.role;
+            return u.role === 'PADRE' || !u.role;
         }
         return false;
     });
