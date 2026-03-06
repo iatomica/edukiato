@@ -90,7 +90,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
     fetchMessages();
   }, [selectedUserId, currentUser, token]);
 
-  // Real-time synchronization
+  // Real-time synchronization (Polling & Events)
   useEffect(() => {
     const handleUpdate = () => {
       fetchConversations();
@@ -103,12 +103,20 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
         messagesApi.markAsRead(currentUser.id, selectedUserId, token);
       }
     };
+
     window.addEventListener('APP_MESSAGES_UPDATED', handleUpdate);
     const handleMessagesUpdated = () => fetchConversations();
     window.addEventListener('APP_MESSAGES_UPDATED', handleMessagesUpdated);
+
+    // Long Polling interval (Fetching every 3 seconds for real-time feel)
+    const intervalId = setInterval(() => {
+      handleUpdate();
+    }, 3000);
+
     return () => {
       window.removeEventListener('APP_MESSAGES_UPDATED', handleUpdate);
       window.removeEventListener('APP_MESSAGES_UPDATED', handleMessagesUpdated);
+      clearInterval(intervalId);
     };
   }, [selectedUserId, currentUser, token]);
 
