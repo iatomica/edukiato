@@ -15,6 +15,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
   const [users, setUsers] = useState<User[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Sidebar Tab State
@@ -26,6 +27,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
   const [inputText, setInputText] = useState('');
   const [messagesState, setMessagesState] = useState<Record<string, any[]>>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isSending, setIsSending] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const isSuperAdmin = currentUser?.role === 'SUPER_ADMIN';
@@ -78,7 +80,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
         await messagesApi.markAsRead(currentUser.id, selectedUserId, token);
 
         // Notify other components (like Layout sidebar) that messages were read
-        window.dispatchEvent(new CustomEvent('MOCK_MESSAGES_UPDATED'));
+        window.dispatchEvent(new CustomEvent('APP_MESSAGES_UPDATED'));
 
         fetchConversations();
       } catch (error) {
@@ -101,8 +103,13 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
         messagesApi.markAsRead(currentUser.id, selectedUserId, token);
       }
     };
-    window.addEventListener('MOCK_MESSAGES_UPDATED', handleUpdate);
-    return () => window.removeEventListener('MOCK_MESSAGES_UPDATED', handleUpdate);
+    window.addEventListener('APP_MESSAGES_UPDATED', handleUpdate);
+    const handleMessagesUpdated = () => fetchConversations();
+    window.addEventListener('APP_MESSAGES_UPDATED', handleMessagesUpdated);
+    return () => {
+      window.removeEventListener('APP_MESSAGES_UPDATED', handleUpdate);
+      window.removeEventListener('APP_MESSAGES_UPDATED', handleMessagesUpdated);
+    };
   }, [selectedUserId, currentUser, token]);
 
   // 2. Filter Visible Users Based on Rules
@@ -169,6 +176,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
     const role = formData.get('role') as UserRole;
 
     try {
+      setIsCreatingUser(true);
       const newUser = await usersApi.create(
         { name, email, role },
         currentInstitution.id,
@@ -178,6 +186,8 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
       setIsAddModalOpen(false);
     } catch (error) {
       console.error("Error creating user:", error);
+    } finally {
+      setIsCreatingUser(false);
     }
   };
 
@@ -196,55 +206,67 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
     setSelectedFile(file);
   };
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if ((!inputText.trim() && !selectedFile) || !selectedUserId || !currentUser || !token) return;
-
-    const tempText = inputText;
-    const fileToSend = selectedFile;
-
-    setInputText('');
-    setSelectedFile(null);
-    if (fileInputRef.current) fileInputRef.current.value = '';
+  const handleSend = async () => {
+    if ((!inputText.trim() && !selectedFile) || !currentUser || !selectedUserId || !token) return;
+    if (isSending) return; // Prevent multiple sends
 
     try {
+      setIsSending(true);
       let fileData = undefined;
+      let fileType = undefined;
 
-      if (fileToSend) {
-        // In a real app we would upload the file to a server/S3 and get a URL.
-        // For the mock, we create a generic URL or use objectURL if you want preview
-        const fakeUrl = URL.createObjectURL(fileToSend);
-        fileData = {
-          name: fileToSend.name,
-          url: fakeUrl,
-          type: fileToSend.type,
-          size: fileToSend.size
-        };
+      if (selectedFile) {
+        // Read file as Base64 for simplicity
+        const reader = new FileReader();
+        reader.readAsDataURL(selectedFile);
+
+        await new Promise<void>((resolve, reject) => {
+          reader.onload = async () => {
+            fileData = reader.result as string; // Will include data:image/jpeg;base64,...
+            fileType = selectedFile.type;
+
+            try {
+              const msg = await messagesApi.sendMessage(
+                currentUser.id,
+                selectedUserId,
+                inputText.trim() || "Archivo adjunto",
+                token,
+                {
+                  name: selectedFile.name,
+                  url: fileData as string,
+                  type: fileType as string,
+                  size: selectedFile.size
+                }
+              );
+
+              setMessagesState(prev => ({
+                ...prev,
+                [selectedUserId]: [...(prev[selectedUserId] || []), msg]
+              }));
+              setInputText('');
+              setSelectedFile(null);
+              if (fileInputRef.current) fileInputRef.current.value = '';
+              fetchConversations();
+              window.dispatchEvent(new CustomEvent('APP_MESSAGES_UPDATED'));
+              resolve();
+            } catch (e) { reject(e); }
+          };
+          reader.onerror = error => reject(error);
+        });
+      } else {
+        const msg = await messagesApi.sendMessage(currentUser.id, selectedUserId, inputText.trim(), token);
+        setMessagesState(prev => ({
+          ...prev,
+          [selectedUserId]: [...(prev[selectedUserId] || []), msg]
+        }));
+        setInputText('');
+        fetchConversations();
+        window.dispatchEvent(new CustomEvent('APP_MESSAGES_UPDATED'));
       }
-
-      const newMessage = await messagesApi.sendMessage(
-        currentUser.id,
-        selectedUserId,
-        fileData && !tempText ? `\uD83D\uDCCE Archivo adjunto: ${fileData.name}` : tempText,
-        token,
-        fileData
-      );
-
-      setMessagesState(prev => ({
-        ...prev,
-        [selectedUserId]: [...(prev[selectedUserId] || []), newMessage]
-      }));
-
-      // Refresh conversations list to update order and last message, and handle new chats
-      fetchConversations();
-
-      // If we were in 'contacts' tab and started talking, auto-switch to 'chats' tab
-      if (sidebarTab === 'contacts') {
-        setSidebarTab('chats');
-      }
-
     } catch (error) {
-      console.error("Failed to send message", error);
+      console.error("Error sending message:", error);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -343,7 +365,7 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
               conversations.map(conv => {
                 // Find full user details
                 const contact = users.find(u => u.id === conv.contactId);
-                // Si la persona de ese chat ya no es visible por permisos, no deberíamos mostrarlo o se muestra sin rol context. 
+                // Si la persona de ese chat ya no es visible por permisos, no deberíamos mostrarlo o se muestra sin rol context.
                 // Optemos por mostrar siempre los chats históricos, pero si un admin le quita permisos, que quede claro.
                 if (!contact) return null;
 
@@ -484,46 +506,41 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-white border-t border-slate-100 flex flex-col gap-2">
-            {selectedFile && (
-              <div className="flex items-center p-2 bg-slate-100 rounded-lg w-fit text-sm">
-                <Paperclip size={14} className="text-primary-600 mr-2" />
-                <span className="truncate max-w-[200px] font-medium mr-2">{selectedFile.name}</span>
-                <span className="text-slate-500 text-xs mr-3">({Math.round(selectedFile.size / 1024)} KB)</span>
-                <button type="button" onClick={() => { setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }} className="p-1 hover:bg-slate-200 rounded-full text-slate-500">
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-            <form onSubmit={handleSend} className="flex items-center space-x-2 bg-slate-50 p-2 rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-primary-100 focus-within:border-primary-300 transition-all">
+          <div className="p-4 bg-white border-t border-slate-200 shrink-0">
+            <div className="flex items-center gap-3">
               <input
                 type="file"
                 ref={fileInputRef}
-                onChange={handleFileChange}
+                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                 className="hidden"
+                id="file-upload"
               />
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className={`p-2 rounded-lg transition-colors ${selectedFile ? 'text-primary-600 bg-primary-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-200/50'}`}
+              <label
+                htmlFor="file-upload"
+                className={`p-3 rounded-full hover:bg-slate-100 transition-colors cursor-pointer shrink-0 ${selectedFile ? 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100' : 'text-slate-400'}`}
               >
-                <Paperclip size={20} />
-              </button>
+                <Paperclip className="w-5 h-5" />
+              </label>
               <input
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder={`Enviar mensaje a ${selectedUser.name.split(' ')[0]}...`}
-                className="flex-1 bg-transparent border-none focus:ring-0 text-sm text-slate-700 placeholder:text-slate-400 outline-none"
+                onKeyPress={(e) => e.key === 'Enter' && !isSending && handleSend()}
+                placeholder={selectedFile ? `Archivo: ${selectedFile.name}` : "Escribe un mensaje..."}
+                className="flex-1 bg-slate-100 px-5 py-3 rounded-full text-slate-800 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300 transition-all font-medium"
               />
               <button
-                type="submit"
-                disabled={!inputText.trim() && !selectedFile}
-                className="p-2 md:p-3 bg-slate-900 text-white rounded-lg hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0"
+                onClick={handleSend}
+                disabled={(!inputText.trim() && !selectedFile) || isSending}
+                className="p-3 bg-slate-900 text-white rounded-full hover:bg-black transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed shrink-0 flex items-center justify-center w-12 h-12"
               >
-                <Send size={18} />
+                {isSending ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Send className="w-5 h-5 translate-x-px translate-y-px" />
+                )}
               </button>
-            </form>
+            </div>
           </div>
         </div>
       ) : (
@@ -550,51 +567,41 @@ export const Messages: React.FC<{ initialUserId?: string | null }> = ({ initialU
               </button>
             </div>
 
-            <form onSubmit={handleAddUser} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Nombre Completo</label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  className="w-full text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 p-3 outline-none"
-                  placeholder="Ej. Juan Pérez"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Correo Electrónico</label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  className="w-full text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 p-3 outline-none"
-                  placeholder="juan@ejemplo.com"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Rol</label>
-                <select
-                  name="role"
-                  required
-                  className="w-full text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary-100 focus:border-primary-400 p-3 outline-none bg-white font-medium"
-                >
-                  <option value="PADRE">Familia / Padre</option>
-                  <option value="DOCENTE">Docente</option>
-                  <option value="ESPECIALES">Profesor Especial / Staff</option>
-                  <option value="ADMIN_INSTITUCION">Administrador Institucional</option>
-                  {isSuperAdmin && (
-                    <option value="SUPER_ADMIN">Super Administrador (Dueño)</option>
-                  )}
-                </select>
-              </div>
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+              <form onSubmit={handleAddUser} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Nombre Completo</label>
+                  <input type="text" name="name" required className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all placeholder:text-slate-400" placeholder="Ej: Juan Pérez" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                  <input type="email" name="email" required className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all placeholder:text-slate-400" placeholder="juan@ejemplo.com" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Rol</label>
+                  <select name="role" required className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all bg-white text-slate-700">
+                    <option value="">Seleccionar rol...</option>
+                    {isSuperAdmin && <option value="SUPER_ADMIN">⚙️ Super Admin</option>}
+                    {isAdmin && <option value="ADMIN_INSTITUCION">🏢 Admin Institución</option>}
+                    <option value="DOCENTE">👨‍🏫 Docente</option>
+                    <option value="ESPECIALES">🎨 Especiales</option>
+                    <option value="PADRE">👨‍👩‍👧 Padre/Madre</option>
+                  </select>
+                </div>
 
-              <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700 transition-colors">Cancelar</button>
-                <button type="submit" className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-md">
-                  Crear Usuario
-                </button>
-              </div>
-            </form>
+                <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
+                  <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700 transition-colors" disabled={isCreatingUser}>Cancelar</button>
+                  <button type="submit" disabled={isCreatingUser} className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-lg flex items-center justify-center min-w-[150px] disabled:opacity-50 disabled:cursor-not-allowed">
+                    {isCreatingUser ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      "Crear Contacto"
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

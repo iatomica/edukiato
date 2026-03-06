@@ -14,11 +14,13 @@ export const Usuarios: React.FC = () => {
     const { state, dispatch } = useAppState();
     const [users, setUsers] = useState<User[]>([]);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isCreatingUser, setIsCreatingUser] = useState(false);
     const [isAddNinoModalOpen, setIsAddNinoModalOpen] = useState(false);
 
     // User Edit State
     const [editUser, setEditUser] = useState<User | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isSavingUser, setIsSavingUser] = useState(false);
 
     // Alumno Edit/Profile State
     const [editNino, setEditNino] = useState<Nino | null>(null);
@@ -163,6 +165,7 @@ export const Usuarios: React.FC = () => {
         const role = formData.get('role') as UserRole;
 
         try {
+            setIsCreatingUser(true);
             const newUser = await usersApi.create(
                 { name, email, role },
                 currentInstitution.id,
@@ -172,6 +175,8 @@ export const Usuarios: React.FC = () => {
             setIsAddModalOpen(false);
         } catch (error) {
             console.error("Error creating user:", error);
+        } finally {
+            setIsCreatingUser(false);
         }
     };
 
@@ -186,6 +191,7 @@ export const Usuarios: React.FC = () => {
         const avatar = formData.get('avatar') as string;
 
         try {
+            setIsSavingUser(true);
             const updatedUser = await usersApi.update(
                 editUser.id,
                 { name, email, role, avatar },
@@ -196,6 +202,8 @@ export const Usuarios: React.FC = () => {
             setEditUser(null);
         } catch (error) {
             console.error("Error updating user:", error);
+        } finally {
+            setIsSavingUser(false);
         }
     };
 
@@ -471,9 +479,13 @@ export const Usuarios: React.FC = () => {
                             </div>
 
                             <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
-                                <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700 transition-colors">Cancelar</button>
-                                <button type="submit" className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-lg">
-                                    Crear Usuario
+                                <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700 transition-colors" disabled={isCreatingUser}>Cancelar</button>
+                                <button type="submit" disabled={isCreatingUser} className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-lg flex items-center justify-center min-w-[140px] disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {isCreatingUser ? (
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    ) : (
+                                        "Crear Usuario"
+                                    )}
                                 </button>
                             </div>
                         </form>
@@ -536,9 +548,13 @@ export const Usuarios: React.FC = () => {
                             </div>
 
                             <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
-                                <button type="button" onClick={() => { setIsEditModalOpen(false); setEditUser(null); }} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700 transition-colors">Cancelar</button>
-                                <button type="submit" className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-lg">
-                                    Guardar Cambios
+                                <button type="button" onClick={() => { setIsEditModalOpen(false); setEditUser(null); }} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700 transition-colors" disabled={isSavingUser}>Cancelar</button>
+                                <button type="submit" disabled={isSavingUser} className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-lg flex items-center justify-center min-w-[170px] disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {isSavingUser ? (
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    ) : (
+                                        "Guardar Cambios"
+                                    )}
                                 </button>
                             </div>
                         </form>
