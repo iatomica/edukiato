@@ -39,8 +39,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     restart: always
-    ports:
-      - "${PORT:-8000}:80"
+    expose:
+      - "80"
     depends_on:
       - backend
     networks:
