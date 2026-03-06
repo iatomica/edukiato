@@ -6,9 +6,9 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-edukiato_db}
+      DATABASE_URL: ${DATABASE_URL}
       PORT: 3000
-      JWT_SECRET: ${JWT_SECRET:-please_change_this_secret_in_prod}
+      JWT_SECRET: ${JWT_SECRET}
     networks:
       - edukiato-network
 
@@ -24,9 +24,6 @@ services:
       - backend
     networks:
       - edukiato-network
-
-volumes:
-  postgres_data:
 
 networks:
   edukiato-network:
