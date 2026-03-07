@@ -1245,6 +1245,26 @@ export const messagesApi = {
             }
         });
         if (!response.ok) throw new Error('Error marking messages as read');
+    },
+
+    getAdminConversations: async (targetUserId: string, token: string): Promise<{ contactId: string, lastMessage: Message, unreadCount: number }[]> => {
+        const response = await fetch(`${API_BASE}/messages/admin/conversations/${targetUserId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok) throw new Error('Error fetching admin conversations');
+        return response.json();
+    },
+
+    getAdminMessages: async (userId: string, targetUserId: string, token: string): Promise<Message[]> => {
+        const response = await fetch(`${API_BASE}/messages/admin/messages/${userId}/${targetUserId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok) throw new Error('Error fetching admin messages');
+        return response.json();
     }
 };
 

@@ -5,7 +5,7 @@ import { MessagesService } from './messages.service';
 @Controller('messages')
 @UseGuards(JwtAuthGuard)
 export class MessagesController {
-    constructor(private readonly messagesService: MessagesService) {}
+    constructor(private readonly messagesService: MessagesService) { }
 
     private resolveInstitutionId(req: any): string {
         const institutionId = req.user?.institutionId || req.query?.institutionId;
@@ -59,5 +59,27 @@ export class MessagesController {
         const institutionId = this.resolveInstitutionId(req);
         const currentUserId = this.resolveUserId(req);
         return this.messagesService.markAsRead(institutionId, currentUserId, targetUserId);
+    }
+
+    @Get('admin/conversations/:userId')
+    async getAdminConversations(@Param('userId') targetUserId: string, @Req() req: any) {
+        const institutionId = this.resolveInstitutionId(req);
+        if (req.user?.role !== 'SUPER_ADMIN') {
+            throw new BadRequestException('Acceso denegado: Solo Super Admin');
+        }
+        return this.messagesService.getConversations(institutionId, targetUserId);
+    }
+
+    @Get('admin/messages/:userId/:targetUserId')
+    async getAdminMessages(
+        @Param('userId') userId: string,
+        @Param('targetUserId') targetUserId: string,
+        @Req() req: any
+    ) {
+        const institutionId = this.resolveInstitutionId(req);
+        if (req.user?.role !== 'SUPER_ADMIN') {
+            throw new BadRequestException('Acceso denegado: Solo Super Admin');
+        }
+        return this.messagesService.getMessages(institutionId, userId, targetUserId);
     }
 }

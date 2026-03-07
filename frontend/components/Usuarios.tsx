@@ -1,5 +1,6 @@
 import { AnimatedAvatar } from '@/components/AnimatedAvatar';
 import Modal from '@/components/Modal';
+import { SuperAdminMessagesModal } from '@/components/SuperAdminMessagesModal';
 import { UserAvatar } from '@/components/UserAvatar';
 import { useAppState } from '@/contexts/AppStateContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,6 +22,10 @@ export const Usuarios: React.FC = () => {
     const [editUser, setEditUser] = useState<User | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isSavingUser, setIsSavingUser] = useState(false);
+
+    // SuperAdmin Messages State
+    const [selectedUserForMessages, setSelectedUserForMessages] = useState<User | null>(null);
+    const [isMessagesModalOpen, setIsMessagesModalOpen] = useState(false);
 
     // Alumno Edit/Profile State
     const [editNino, setEditNino] = useState<Nino | null>(null);
@@ -381,9 +386,24 @@ export const Usuarios: React.FC = () => {
                                         )}
 
                                         <td className="px-6 py-4 text-right">
-                                            <button className="text-slate-400 p-2 rounded-full hover:bg-slate-100 hover:text-primary-600 transition-colors">
-                                                <Edit size={18} />
-                                            </button>
+                                            <div className="flex items-center justify-end gap-2">
+                                                {isSuperAdmin && activeTab === 'INSTITUCIONAL' && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSelectedUserForMessages(u);
+                                                            setIsMessagesModalOpen(true);
+                                                        }}
+                                                        className="text-slate-400 p-2 rounded-full hover:bg-amber-100 hover:text-amber-600 transition-colors"
+                                                        title="Ver Historial de Mensajes"
+                                                    >
+                                                        <MessageSquare size={18} />
+                                                    </button>
+                                                )}
+                                                <button className="text-slate-400 p-2 rounded-full hover:bg-slate-100 hover:text-primary-600 transition-colors">
+                                                    <Edit size={18} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 );
@@ -1004,6 +1024,16 @@ export const Usuarios: React.FC = () => {
                     </div>
                 )}
             </Modal>
+
+            {isMessagesModalOpen && selectedUserForMessages && (
+                <SuperAdminMessagesModal
+                    targetUser={selectedUserForMessages}
+                    onClose={() => {
+                        setIsMessagesModalOpen(false);
+                        setSelectedUserForMessages(null);
+                    }}
+                />
+            )}
         </div>
     );
 };
