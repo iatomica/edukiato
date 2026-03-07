@@ -21,16 +21,16 @@ export class UsersController {
     @Post()
     async create(@Body() createUserDto: CreateUserDto, @Request() req) {
         const targetInstitutionId = createUserDto.institutionId || 'inst-001';
-        return this.usersService.create(createUserDto, targetInstitutionId);
+        return this.usersService.create(createUserDto, targetInstitutionId, req.user?.role);
     }
 
     @Patch(':id')
-    async update(@Param('id') id: string, @Body() updateData: Partial<CreateUserDto>) {
-        return this.usersService.update(id, updateData);
+    async update(@Param('id') id: string, @Body() updateData: Partial<CreateUserDto>, @Request() req) {
+        return this.usersService.update(id, updateData, req.user?.role);
     }
 
     @Post(':id/reset-password')
-    async resetPassword(@Param('id') id: string) {
-        return this.usersService.resetPassword(id);
+    async resetPassword(@Param('id') id: string, @Request() req) {
+        return this.usersService.resetPassword(id, req.user?.role);
     }
 }

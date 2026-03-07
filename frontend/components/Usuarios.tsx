@@ -400,9 +400,18 @@ export const Usuarios: React.FC = () => {
                                                         <MessageSquare size={18} />
                                                     </button>
                                                 )}
-                                                <button className="text-slate-400 p-2 rounded-full hover:bg-slate-100 hover:text-primary-600 transition-colors">
-                                                    <Edit size={18} />
-                                                </button>
+                                                {!(u.role === 'SUPER_ADMIN' && !isSuperAdmin) && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setEditUser(u);
+                                                            setIsEditModalOpen(true);
+                                                        }}
+                                                        className="text-slate-400 p-2 rounded-full hover:bg-slate-100 hover:text-primary-600 transition-colors"
+                                                    >
+                                                        <Edit size={18} />
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
@@ -555,17 +564,19 @@ export const Usuarios: React.FC = () => {
                                 </div>
                             )}
 
-                            <div className="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-bold text-slate-700 flex items-center mb-0.5">
-                                        <Key size={14} className="mr-1.5" /> Seguridad
-                                    </p>
-                                    <p className="text-xs text-slate-500">Restablecer la clave por defecto ("vinculos")</p>
+                            {!(editUser.role === 'SUPER_ADMIN' && !isSuperAdmin) && (
+                                <div className="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-bold text-slate-700 flex items-center mb-0.5">
+                                            <Key size={14} className="mr-1.5" /> Seguridad
+                                        </p>
+                                        <p className="text-xs text-slate-500">Restablecer la clave por defecto ("vinculos")</p>
+                                    </div>
+                                    <button type="button" onClick={handleResetPassword} className="px-4 py-2 bg-white text-rose-600 text-sm font-bold rounded-lg border border-rose-200 hover:bg-rose-50 transition-colors">
+                                        Restablecer
+                                    </button>
                                 </div>
-                                <button type="button" onClick={handleResetPassword} className="px-4 py-2 bg-white text-rose-600 text-sm font-bold rounded-lg border border-rose-200 hover:bg-rose-50 transition-colors">
-                                    Restablecer
-                                </button>
-                            </div>
+                            )}
 
                             <div className="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
                                 <button type="button" onClick={() => { setIsEditModalOpen(false); setEditUser(null); }} className="px-4 py-2 text-slate-500 font-medium hover:text-slate-700 transition-colors" disabled={isSavingUser}>Cancelar</button>

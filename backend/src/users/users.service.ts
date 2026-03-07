@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as crypto from 'crypto';
 import type { User, UserInstitution, UserRole } from '../types';
@@ -209,8 +209,12 @@ export class UsersService {
         return this.mapRowsToUsers(rows.rows)[0];
     }
 
-    async create(createUserDto: CreateUserDto, institutionId: string): Promise<User> {
+    async create(createUserDto: CreateUserDto, institutionId: string, currentUserRole?: string): Promise<User> {
         await this.ensureTables();
+
+        if (createUserDto.role === 'SUPER_ADMIN' && currentUserRole !== 'SUPER_ADMIN') {
+            throw new ForbiddenException('Only SuperAdmins can create other SuperAdmins.');
+        }
 
         const newId = `usr_${crypto.randomUUID()}`;
         const role = (createUserDto.role as UserRole) || 'ESTUDIANTE';
@@ -245,10 +249,19 @@ export class UsersService {
         return this.findOne(newId);
     }
 
-    async update(id: string, updateData: Partial<CreateUserDto>): Promise<User> {
+    async update(id: string, updateData: Partial<CreateUserDto>, currentUserRole?: string): Promise<User> {
         await this.ensureTables();
 
         const existing = await this.findOne(id);
+
+        if (existing.role === 'SUPER_ADMIN' && currentUserRole !== 'SUPER_ADMIN') {
+            throw new ForbiddenException('Only SuperAdmins can edit other SuperAdmins.');
+        }
+
+        if (updateData.role === 'SUPER_ADMIN' && existing.role !== 'SUPER_ADMIN' && currentUserRole !== 'SUPER_ADMIN') {
+            throw new ForbiddenException('Only SuperAdmins can promote a user to SuperAdmin.');
+        }
+
         const updatedName = updateData.name ?? existing.name;
         const updatedEmail = updateData.email ?? existing.email;
         const updatedAvatar = updateData.avatar ?? existing.avatar;
@@ -293,8 +306,12 @@ export class UsersService {
         );
     }
 
-    async resetPassword(id: string): Promise<{ success: boolean; message: string }> {
+    async resetPassword(id: string, currentUserRole?: string): Promise<{ success: boolean; message: string }> {
         const user = await this.findOne(id);
+
+        if (user.role === 'SUPER_ADMIN' && currentUserRole !== 'SUPER_ADMIN') {
+            throw new ForbiddenException('Only SuperAdmins can reset passwords for other SuperAdmins.');
+        }
 
         await this.dbPool.query(
             `
