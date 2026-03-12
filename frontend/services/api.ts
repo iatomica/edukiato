@@ -1006,6 +1006,19 @@ export const communicationsApi = {
             }
         });
         if (!response.ok) throw new Error('Error marking communications as read');
+    },
+    delete: async (communicationId: string, institutionId: string, token: string): Promise<void> => {
+        const response = await fetch(`${API_BASE}/communications/${communicationId}?institutionId=${institutionId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error deleting communication');
+        }
     }
 };
 

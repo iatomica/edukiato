@@ -67,7 +67,8 @@ type AppAction =
     | { type: 'ENROLL_STUDENT'; payload: { courseId: string; studentId: string } }
     | { type: 'ADD_AULA'; payload: Aula }
     | { type: 'UPDATE_AULA'; payload: Partial<Aula> & { id: string } }
-    | { type: 'DELETE_AULA'; payload: { id: string } };
+    | { type: 'DELETE_AULA'; payload: { id: string } }
+    | { type: 'DELETE_COMMUNICATION'; payload: { id: string } };
 
 // ── Reducer ──────────────────────────────────────────────────
 
@@ -210,6 +211,13 @@ function appReducer(state: AppState, action: AppAction): AppState {
             const newComms = [action.payload, ...state.communications];
 
             return { ...state, communications: newComms };
+        }
+
+        case 'DELETE_COMMUNICATION': {
+            return {
+                ...state,
+                communications: state.communications.filter(c => c.id !== action.payload.id),
+            };
         }
 
         case 'MARK_COMMUNICATIONS_READ': {

@@ -9,7 +9,7 @@ import { useTenantData } from '@/hooks/useTenantData';
 import { communicationsApi, usersApi } from '@/services/api';
 import type { Student, Communication, CommunicationType, Aula, Nino } from '@/types';
 import { format } from 'date-fns';
-import { Search, Mail, Award, X, Printer, ArrowLeft, Send, Paperclip, User as UserIcon, Users, BookOpen, MessageSquare, GraduationCap } from 'lucide-react';
+import { Search, Mail, Award, X, Printer, ArrowLeft, Send, Paperclip, User as UserIcon, Users, BookOpen, MessageSquare, GraduationCap, Trash2 } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -398,6 +398,36 @@ const AddStudentModal = ({ onClose, onAdd }: { onClose: () => void, onAdd: (data
 };
 
 const NotebookView = ({ communications }: { communications: Communication[] }) => {
+  const { user, currentInstitution, token } = useAuth();
+  const { dispatch, emitEvent } = useTenantData();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+
+  const handleDelete = async (commId: string) => {
+    if (!currentInstitution || !token) return;
+    try {
+      await communicationsApi.delete(commId, currentInstitution.id, token);
+      dispatch({ type: 'DELETE_COMMUNICATION', payload: { id: commId } });
+      emitEvent({
+        type: 'NOTIFICATION_CREATED', payload: {
+          id: `sys_${Date.now()}`,
+          institutionId: currentInstitution.id,
+          type: 'SYSTEM',
+          title: 'Comunicado Eliminado',
+          message: `El comunicado se ha eliminado correctamente.`,
+          time: 'Ahora',
+          isRead: true
+        }
+      });
+    } catch (error) {
+      console.error('Error deleting communication:', error);
+      alert('Hubo un error al intentar eliminar el comunicado.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {communications.length === 0 ? (
@@ -407,8 +437,18 @@ const NotebookView = ({ communications }: { communications: Communication[] }) =
         </div>
       ) : (
         communications.map(comm => (
-          <div key={comm.id} className={`bg-white p-5 rounded-xl border ${comm.isRead ? 'border-slate-200' : 'border-primary-200 shadow-sm'} transition-all`}>
-            <div className="flex justify-between items-start mb-2">
+          <div key={comm.id} className={`group bg-white p-5 rounded-xl border ${comm.isRead ? 'border-slate-200' : 'border-primary-200 shadow-sm'} transition-all relative`}>
+            {isSuperAdmin && (
+              <button
+                onClick={() => setDeletingId(comm.id)}
+                className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all"
+                title="Eliminar comunicado"
+              >
+                <Trash2 size={16} />
+              </button>
+            )}
+
+            <div className="flex justify-between items-start mb-2 pr-8">
               <div className="flex items-center space-x-2">
                 <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide
                   ${comm.type === 'NOTIFICACION_INDIVIDUAL' ? 'bg-rose-100 text-rose-700' :
@@ -417,7 +457,7 @@ const NotebookView = ({ communications }: { communications: Communication[] }) =
                 </span>
                 <span className="text-xs text-slate-500">{format(new Date(comm.createdAt), 'dd MMM yyyy, HH:mm')}</span>
               </div>
-              {!comm.isRead && <span className="w-2 h-2 bg-primary-500 rounded-full"></span>}
+              {!comm.isRead && <span className="w-2 h-2 bg-primary-500 rounded-full mt-1.5 shrink-0"></span>}
             </div>
             <h4 className="font-bold text-slate-800 text-lg mb-2">{comm.title}</h4>
             <p className="text-slate-600 text-sm leading-relaxed mb-4">{comm.content}</p>
@@ -439,6 +479,34 @@ const NotebookView = ({ communications }: { communications: Communication[] }) =
             </div>
           </div>
         ))
+      )}
+
+      {deletingId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 animate-scale-in text-center">
+            <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={24} />
+            </div>
+            <h3 className="font-bold text-slate-900 text-lg mb-2">¿Eliminar comunicado?</h3>
+            <p className="text-slate-500 text-sm mb-6">
+              Esta acción es permanente. El comunicado desaparecerá del cuaderno de todos los destinatarios.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeletingId(null)}
+                className="flex-1 px-4 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 font-medium"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleDelete(deletingId)}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 font-bold"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

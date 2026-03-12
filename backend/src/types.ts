@@ -21,4 +21,5 @@ export interface User {
     institutions?: UserInstitution[];
     requiresPasswordChange?: boolean;
     passwordHash?: string;
+    birthDate?: Date | string;
 }

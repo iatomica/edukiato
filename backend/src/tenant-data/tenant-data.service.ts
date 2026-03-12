@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Pool } from 'pg';
 
 type CommunicationRow = {
@@ -241,6 +241,25 @@ export class TenantDataService {
             isRead: row.is_read,
             attachments: [],
         };
+    }
+
+    async deleteCommunication(institutionId: string, commId: string, role?: string) {
+        if (role !== 'SUPER_ADMIN') {
+            throw new ForbiddenException('Only SuperAdmins can delete communications.');
+        }
+
+        await this.ensureCommunicationsSchema();
+
+        const result = await this.pool.query(
+            `DELETE FROM communications WHERE id = $1 AND institution_id = $2 RETURNING id`,
+            [commId, institutionId]
+        );
+
+        if (result.rowCount === 0) {
+            throw new NotFoundException('Communication not found or already deleted');
+        }
+
+        return { success: true, message: 'Communication deleted successfully' };
     }
 
     async getAulas(institutionId: string) {

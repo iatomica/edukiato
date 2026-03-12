@@ -41,6 +41,17 @@ export class TenantDataController {
         return this.tenantDataService.createCommunication(resolvedInstitutionId, senderId, senderName, body);
     }
 
+    @Delete('communications/:id')
+    async deleteCommunication(
+        @Req() req: any,
+        @Param('id') commId: string,
+        @Query('institutionId') institutionId?: string,
+    ) {
+        const resolvedInstitutionId = this.resolveInstitutionId(req, institutionId);
+        const userRole = req.user?.role;
+        return this.tenantDataService.deleteCommunication(resolvedInstitutionId, commId, userRole);
+    }
+
     @Get('classrooms')
     async getAulas(@Req() req: any, @Query('institutionId') institutionId?: string) {
         const resolvedInstitutionId = this.resolveInstitutionId(req, institutionId);

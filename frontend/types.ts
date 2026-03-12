@@ -36,6 +36,7 @@ export interface User {
   avatar: string;
   institutions?: UserInstitution[];
   requiresPasswordChange?: boolean;
+  birthDate?: Date | string;
 }
 
 export interface UserInstitution {

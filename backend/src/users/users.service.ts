@@ -41,6 +41,7 @@ export class UsersService {
                 role VARCHAR(50) NOT NULL,
                 avatar VARCHAR(500),
                 requires_password_change BOOLEAN DEFAULT FALSE,
+                birth_date DATE,
                 created_at TIMESTAMP DEFAULT NOW(),
                 updated_at TIMESTAMP DEFAULT NOW()
             );
@@ -48,6 +49,7 @@ export class UsersService {
 
         await this.dbPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255)`);
         await this.dbPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS requires_password_change BOOLEAN DEFAULT FALSE`);
+        await this.dbPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS birth_date DATE`);
         await this.dbPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW()`);
         await this.dbPool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW()`);
 
@@ -124,6 +126,7 @@ export class UsersService {
                     avatar: row.avatar,
                     passwordHash: row.password_hash,
                     requiresPasswordChange: row.requires_password_change,
+                    birthDate: row.birth_date,
                     institutions: institution ? [institution] : [],
                 });
                 return;
