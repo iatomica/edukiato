@@ -84,6 +84,37 @@ export const Login: React.FC = () => {
               )}
             </button>
           </form>
+
+          {/* Quick Demo Access */}
+          <div className="mt-8 pt-6 border-t border-slate-100">
+            <p className="text-xs font-bold text-slate-400 text-center mb-4 uppercase tracking-wider">Acceso Demo Rápido</p>
+            <div className="grid grid-cols-2 gap-3">
+              <button 
+                onClick={(e) => { e.preventDefault(); login('rushayala87@gmail.com', 'vinculos'); }} 
+                className="py-2 px-3 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-xl font-medium text-sm transition-colors border border-purple-200"
+              >
+                Super Admin
+              </button>
+              <button 
+                onClick={(e) => { e.preventDefault(); login('lore0377@gmail.com', 'vinculos'); }} 
+                className="py-2 px-3 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl font-medium text-sm transition-colors border border-blue-200"
+              >
+                Admin
+              </button>
+              <button 
+                onClick={(e) => { e.preventDefault(); login('fiorelasotelo63@gmail.com', 'vinculos'); }} 
+                className="py-2 px-3 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-xl font-medium text-sm transition-colors border border-emerald-200"
+              >
+                Docente
+              </button>
+              <button 
+                onClick={(e) => { e.preventDefault(); login('avendanosancha@gmail.com', 'vinculos'); }} 
+                className="py-2 px-3 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-xl font-medium text-sm transition-colors border border-amber-200"
+              >
+                Padre
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

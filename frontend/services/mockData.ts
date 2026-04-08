@@ -735,6 +735,30 @@ export const MOCK_EVENTS: CalendarEvent[] = [
     creatorId: 'u_staff_3',
     description: 'Acto general con participación de todas las salas.',
     sharedWith: { scope: 'ALL' }
+  },
+  {
+    id: 'e_vinculos_2',
+    institutionId: INST_VINCULOS,
+    title: 'Reunión de Padres',
+    start: new Date(new Date().setDate(new Date().getDate() + 2)),
+    end: new Date(new Date().setDate(new Date().getDate() + 2)),
+    type: 'REUNION_DE_SALA',
+    color: 'bg-blue-100 text-blue-700 border-blue-200',
+    creatorId: 'u_staff_3',
+    description: 'Reunión informativa de avance grupal.',
+    sharedWith: { scope: 'ALL' }
+  },
+  {
+    id: 'e_vinculos_3',
+    institutionId: INST_VINCULOS,
+    title: 'Taller de Arte',
+    start: new Date(new Date().setDate(new Date().getDate() + 5)),
+    end: new Date(new Date().setDate(new Date().getDate() + 5)),
+    type: 'EVENTOS_ESPECIALES',
+    color: 'bg-purple-100 text-purple-700 border-purple-200',
+    creatorId: 'u_staff_2',
+    description: 'Taller especial de plástica para los alumnos.',
+    sharedWith: { scope: 'AULA', targetIds: ['aula_libertad'] }
   }
 ];
 
@@ -752,15 +776,28 @@ export const MOCK_FEED: FeedItem[] = [
     description: 'Enlace a YouTube con la charla inicial.',
     postedAt: new Date(Date.now() - 3600000), author: 'Romina Ayala',
     materialType: 'LINK', url: 'https://youtube.com'
+  },
+  {
+    id: 'f3', institutionId: INST_VINCULOS, type: 'ANNOUNCEMENT', scope: 'INSTITUTION',
+    title: 'Nuevos Recursos de Biblioteca',
+    description: 'Se han incorporado nuevos recursos para la sala de juegos.',
+    postedAt: new Date(), author: 'Lorena Mori'
   }
 ];
 
 const storedNotifications = typeof window !== 'undefined' ? localStorage.getItem('MOCK_NOTIFICATIONS') : null;
-export const MOCK_NOTIFICATIONS: Notification[] = storedNotifications ? JSON.parse(storedNotifications) : [];
+export const MOCK_NOTIFICATIONS: Notification[] = storedNotifications ? JSON.parse(storedNotifications) : [
+  { id: 'n1', institutionId: INST_VINCULOS, userId: 'rushayala87@gmail.com', title: 'Aviso del Sistema', message: 'Bienvenida al panel Demo.', type: 'SYSTEM', isRead: false, time: new Date().toISOString() },
+  { id: 'n2', institutionId: INST_VINCULOS, userId: 'lore0377@gmail.com', title: 'Nueva Tarea Asignada', message: 'Revisar inscripciones.', type: 'SYSTEM', isRead: false, time: new Date().toISOString() }
+];
 export const MOCK_CONVERSATIONS: Conversation[] = [];
 const storedMessages = typeof window !== 'undefined' ? localStorage.getItem('MOCK_MESSAGES') : null;
 export const MOCK_MESSAGES: Record<string, Message[]> = storedMessages ? JSON.parse(storedMessages) : {};
-export const MOCK_PAYMENTS: Payment[] = [];
+export const MOCK_PAYMENTS: Payment[] = [
+  { id: 'p1', institutionId: INST_VINCULOS, studentId: 'u_estudiante_0', amount: 15000, status: 'PAID', dueDate: new Date(), date: new Date(), description: 'Cuota Marzo' },
+  { id: 'p2', institutionId: INST_VINCULOS, studentId: 'u_estudiante_0', amount: 15000, status: 'PENDING', dueDate: new Date(Date.now() + 86400000 * 15), date: new Date(), description: 'Cuota Abril' },
+  { id: 'p3', institutionId: INST_VINCULOS, studentId: 'u_estudiante_1', amount: 15000, status: 'PAID', dueDate: new Date(), date: new Date(), description: 'Cuota Marzo' }
+];
 
 export const MOCK_REVENUE_DATA: Record<string, Array<{ name: string; value: number }>> = {
   [INST_VINCULOS]: [
