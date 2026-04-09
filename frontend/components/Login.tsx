@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { ArrowRight, Lock, Mail, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowRight, Lock, Mail, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 
-export const Login: React.FC = () => {
+export interface LoginProps {
+  onBack?: () => void;
+}
+
+export const Login: React.FC<LoginProps> = ({ onBack }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, isLoading, error } = useAuth();
@@ -20,9 +24,18 @@ export const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-      <div className="max-w-md w-full">
+      <div className="max-w-md w-full relative">
         {/* Logo Section */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-10 relative">
+          {onBack && (
+            <button 
+              onClick={onBack} 
+              className="absolute -top-4 -left-4 text-slate-400 hover:text-slate-900 hover:bg-slate-100 p-2 rounded-xl transition-all flex items-center justify-center z-10"
+              title="Volver"
+            >
+              <ArrowLeft size={22} strokeWidth={2.5} />
+            </button>
+          )}
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-900 text-white shadow-xl shadow-slate-900/20 mb-6">
             <span className="text-3xl font-bold">E</span>
           </div>

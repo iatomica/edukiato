@@ -8,6 +8,7 @@ import { Schedule } from './components/Schedule';
 import { Classroom } from './components/Classroom';
 import { Messages } from './components/Messages';
 import { Login } from './components/Login';
+import { LandingPage } from './components/LandingPage';
 import { InstitutionPicker } from './components/InstitutionPicker';
 import { ForcePasswordChange } from './components/ForcePasswordChange';
 import { Usuarios } from './components/Usuarios';
@@ -27,6 +28,7 @@ import { AppStateProvider } from './contexts/AppStateContext';
 const AppContent: React.FC = () => {
   const { user, isAuthenticated, currentInstitution, isLoading, logout } = useAuth();
   const [currentView, setCurrentView] = useState<View>('dashboard');
+  const [showLogin, setShowLogin] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [targetUserId, setTargetUserId] = useState<string | null>(null);
   const [commParams, setCommParams] = useState<any>(null);
@@ -113,7 +115,10 @@ const AppContent: React.FC = () => {
 
   // Step 1: Login
   if (!isAuthenticated || !user) {
-    return <Login />;
+    if (!showLogin) {
+      return <LandingPage onLoginClick={() => setShowLogin(true)} />;
+    }
+    return <Login onBack={() => setShowLogin(false)} />;
   }
 
   // Step 1.5: Force Password Change if required

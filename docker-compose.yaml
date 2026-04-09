@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "${PORT:-9090}:80"
+      - "${PORT:-9092}:80"
     # depends_on:
     #   - backend
     networks:
