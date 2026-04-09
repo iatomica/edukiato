@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext';
 // ── Defaults ──────────────────────────────────────────────────
 
 const DEFAULT_THEME: InstitutionTheme = {
-    institutionName: 'Edukatio',
+    institutionName: 'Edukiato',
     logoUrl: undefined,
     primaryColor: '#14b8a6',
     secondaryColor: '#0f766e',

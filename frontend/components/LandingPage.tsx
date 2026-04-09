@@ -15,7 +15,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
             <div className="w-12 h-12 rounded-[1.5rem] bg-gradient-to-br from-rose-400 to-amber-400 text-white flex items-center justify-center font-black text-2xl shadow-lg shadow-rose-400/30 -rotate-3">
               E
             </div>
-            <span className="text-2xl font-black text-slate-800 tracking-tight">Edukatio</span>
+            <span className="text-2xl font-black text-slate-800 tracking-tight">Edukiato</span>
           </div>
           <div className="flex items-center gap-5">
             <button 
@@ -179,7 +179,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
 
       {/* Footer */}
       <footer className="bg-[#FDFBF7] text-slate-400 py-12 text-center text-base font-bold border-t-2 border-slate-100">
-        <p>&copy; {new Date().getFullYear()} Edukatio Demo. Creado con ❤️ por Artis.</p>
+        <p>&copy; {new Date().getFullYear()} Edukiato Demo. Creado con ❤️ por <a href="https://www.iatomica.com" target="_blank" rel="noopener noreferrer" className="hover:text-slate-600 transition-colors">IATOMICA</a>.</p>
       </footer>
     </div>
   );

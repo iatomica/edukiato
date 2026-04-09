@@ -27,9 +27,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // Hydrate from localStorage on mount
     useEffect(() => {
-        const storedToken = localStorage.getItem('edukatio_token');
-        const storedUser = localStorage.getItem('edukatio_user');
-        const storedInstitution = localStorage.getItem('edukatio_institution');
+        const storedToken = localStorage.getItem('edukiato_token');
+        const storedUser = localStorage.getItem('edukiato_user');
+        const storedInstitution = localStorage.getItem('edukiato_institution');
 
         if (storedToken && storedUser) {
             try {
@@ -40,9 +40,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 }
             } catch (e) {
                 console.error('Failed to hydrate auth state', e);
-                localStorage.removeItem('edukatio_token');
-                localStorage.removeItem('edukatio_user');
-                localStorage.removeItem('edukatio_institution');
+                localStorage.removeItem('edukiato_token');
+                localStorage.removeItem('edukiato_user');
+                localStorage.removeItem('edukiato_institution');
             }
         }
         setIsLoading(false);
@@ -55,8 +55,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const result = await authApi.login(email, password);
             setUser(result.user);
             setToken(result.token);
-            localStorage.setItem('edukatio_token', result.token);
-            localStorage.setItem('edukatio_user', JSON.stringify(result.user));
+            localStorage.setItem('edukiato_token', result.token);
+            localStorage.setItem('edukiato_user', JSON.stringify(result.user));
         } catch (err: any) {
             setError(err.message || 'Error de autenticación');
             throw err;
@@ -69,15 +69,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(null);
         setToken(null);
         setCurrentInstitution(null);
-        localStorage.removeItem('edukatio_token');
-        localStorage.removeItem('edukatio_institution');
+        localStorage.removeItem('edukiato_token');
+        localStorage.removeItem('edukiato_institution');
     }, []);
 
     const updateUser = useCallback((newData: Partial<User>) => {
         setUser(prev => {
             if (!prev) return null;
             const updated = { ...prev, ...newData };
-            localStorage.setItem('edukatio_user', JSON.stringify(updated));
+            localStorage.setItem('edukiato_user', JSON.stringify(updated));
             return updated;
         });
     }, []);
@@ -113,12 +113,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // Update user's active role based on selected institution
         setUser(prev => prev ? { ...prev, role: inst.role } : null);
         setCurrentInstitution(institution);
-        localStorage.setItem('edukatio_institution', JSON.stringify(institution));
+        localStorage.setItem('edukiato_institution', JSON.stringify(institution));
     }, []);
 
     const clearInstitution = useCallback(() => {
         setCurrentInstitution(null);
-        localStorage.removeItem('edukatio_institution');
+        localStorage.removeItem('edukiato_institution');
     }, []);
 
     const value: AuthContextType = {
