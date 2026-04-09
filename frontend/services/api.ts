@@ -38,708 +38,708 @@ interface MockUser {
 
 export const defaultMockUsers: any[] = [
     {
-        emailPattern: 'porisilva92',
-        user: { id: 'u_staff_0', name: `Gabriel Silva`, email: 'porisilva92@gmail.com', role: 'ESPECIALES', avatar: 'https://ui-avatars.com/api/?name=Gabriel%20Silva&background=random' },
+        emailPattern: 'joaquin.martinez.garcia',
+        user: { id: 'u_staff_0', name: `Joaquin Martinez Garcia`, email: 'joaquin.martinez.garcia@demo.edu', role: 'ESPECIALES', avatar: 'https://ui-avatars.com/api/?name=Joaquin%20Martinez%20Garcia&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESPECIALES' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'leonardovidela86',
-        user: { id: 'u_staff_1', name: `Leonardo Videla`, email: 'leonardovidela86@gmail.com', role: 'ESPECIALES', avatar: 'https://ui-avatars.com/api/?name=Leonardo%20Videla&background=random' },
+        emailPattern: 'camila.ruiz.sosa',
+        user: { id: 'u_staff_1', name: `Camila Ruiz Sosa`, email: 'camila.ruiz.sosa@demo.edu', role: 'ESPECIALES', avatar: 'https://ui-avatars.com/api/?name=Camila%20Ruiz%20Sosa&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESPECIALES' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'fiorelasotelo63',
-        user: { id: 'u_staff_2', name: `Fiorela Sotelo`, email: 'fiorelasotelo63@gmail.com', role: 'DOCENTE', avatar: 'https://ui-avatars.com/api/?name=Fiorela%20Sotelo&background=random' },
+        emailPattern: 'mia.molina.castro',
+        user: { id: 'u_staff_2', name: `Mia Molina Castro`, email: 'mia.molina.castro@demo.edu', role: 'DOCENTE', avatar: 'https://ui-avatars.com/api/?name=Mia%20Molina%20Castro&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'DOCENTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'lore0377',
-        user: { id: 'u_staff_3', name: `Lorena Mori`, email: 'lore0377@gmail.com', role: 'ADMIN_INSTITUCION', avatar: 'https://ui-avatars.com/api/?name=Lorena%20Mori&background=random' },
+        emailPattern: 'martina.gimenez.ramos',
+        user: { id: 'u_staff_3', name: `Martina Gimenez Ramos`, email: 'martina.gimenez.ramos@demo.edu', role: 'ADMIN_INSTITUCION', avatar: 'https://ui-avatars.com/api/?name=Martina%20Gimenez%20Ramos&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ADMIN_INSTITUCION' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'romieng16',
-        user: { id: 'u_staff_4', name: `Romina Engel`, email: 'romieng16@outlook.com', role: 'DOCENTE', avatar: 'https://ui-avatars.com/api/?name=Romina%20Engel&background=random' },
+        emailPattern: 'lucas.molina.alvarez',
+        user: { id: 'u_staff_4', name: `Lucas Molina Alvarez`, email: 'lucas.molina.alvarez@demo.edu', role: 'DOCENTE', avatar: 'https://ui-avatars.com/api/?name=Lucas%20Molina%20Alvarez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'DOCENTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'alvarengarominaf',
-        user: { id: 'u_staff_5', name: `Romina Alvarenga`, email: 'alvarengarominaf@gmail.com', role: 'DOCENTE', avatar: 'https://ui-avatars.com/api/?name=Romina%20Alvarenga&background=random' },
+        emailPattern: 'valeria.alvarez.sanchez',
+        user: { id: 'u_staff_5', name: `Valeria Alvarez Sanchez`, email: 'valeria.alvarez.sanchez@demo.edu', role: 'DOCENTE', avatar: 'https://ui-avatars.com/api/?name=Valeria%20Alvarez%20Sanchez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'DOCENTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'antomiche49',
-        user: { id: 'u_staff_6', name: `Antonela Michelena`, email: 'antomiche49@gmail.com', role: 'DOCENTE', avatar: 'https://ui-avatars.com/api/?name=Antonela%20Michelena&background=random' },
+        emailPattern: 'emma.romero.diaz',
+        user: { id: 'u_staff_6', name: `Emma Romero Diaz`, email: 'emma.romero.diaz@demo.edu', role: 'DOCENTE', avatar: 'https://ui-avatars.com/api/?name=Emma%20Romero%20Diaz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'DOCENTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'nellyfigue168',
-        user: { id: 'u_staff_7', name: `Nellida Figueroa`, email: 'nellyfigue168@gmail.com', role: 'DOCENTE', avatar: 'https://ui-avatars.com/api/?name=Nellida%20Figueroa&background=random' },
+        emailPattern: 'diego.fernandez.gomez',
+        user: { id: 'u_staff_7', name: `Diego Fernandez Gomez`, email: 'diego.fernandez.gomez@demo.edu', role: 'DOCENTE', avatar: 'https://ui-avatars.com/api/?name=Diego%20Fernandez%20Gomez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'DOCENTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'stefaniabhl',
-        user: { id: 'u_staff_8', name: `Stefanía Bahl`, email: 'stefaniabhl@gmail.com', role: 'DOCENTE', avatar: 'https://ui-avatars.com/api/?name=Stefan%C3%ADa%20Bahl&background=random' },
+        emailPattern: 'martina.sanchez.torres',
+        user: { id: 'u_staff_8', name: `Martina Sanchez Torres`, email: 'martina.sanchez.torres@demo.edu', role: 'DOCENTE', avatar: 'https://ui-avatars.com/api/?name=Martina%20Sanchez%20Torres&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'DOCENTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'lalastamponi',
-        user: { id: 'u_staff_9', name: `María Laura Stamponi`, email: 'lalastamponi@gmail.com', role: 'ADMIN_INSTITUCION', avatar: 'https://ui-avatars.com/api/?name=Mar%C3%ADa%20Laura%20Stamponi&background=random' },
+        emailPattern: 'valeria.sanchez.castro',
+        user: { id: 'u_staff_9', name: `Valeria Sanchez Castro`, email: 'valeria.sanchez.castro@demo.edu', role: 'ADMIN_INSTITUCION', avatar: 'https://ui-avatars.com/api/?name=Valeria%20Sanchez%20Castro&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ADMIN_INSTITUCION' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'solduarte55',
-        user: { id: 'u_staff_10', name: `Sol Duarte`, email: 'solduarte55@gmail.com', role: 'ESPECIALES', avatar: 'https://ui-avatars.com/api/?name=Sol%20Duarte&background=random' },
+        emailPattern: 'emma.ruiz.garcia',
+        user: { id: 'u_staff_10', name: `Emma Ruiz Garcia`, email: 'emma.ruiz.garcia@demo.edu', role: 'ESPECIALES', avatar: 'https://ui-avatars.com/api/?name=Emma%20Ruiz%20Garcia&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESPECIALES' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'guillecandombe',
-        user: { id: 'u_staff_11', name: `Guillermo Peirano`, email: 'guillecandombe@gmail.com', role: 'ESPECIALES', avatar: 'https://ui-avatars.com/api/?name=Guillermo%20Peirano&background=random' },
+        emailPattern: 'alejandro.martinez.lopez',
+        user: { id: 'u_staff_11', name: `Alejandro Martinez Lopez`, email: 'alejandro.martinez.lopez@demo.edu', role: 'ESPECIALES', avatar: 'https://ui-avatars.com/api/?name=Alejandro%20Martinez%20Lopez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESPECIALES' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'seilarg',
-        user: { id: 'u_staff_12', name: `Seila Ramos González`, email: 'seilarg@hotmail.com', role: 'SUPER_ADMIN', avatar: 'https://ui-avatars.com/api/?name=Seila%20Ramos%20Gonz%C3%A1lez&background=random' },
+        emailPattern: 'laura.lopez.fernandez',
+        user: { id: 'u_staff_12', name: `Laura Lopez Fernandez`, email: 'laura.lopez.fernandez@demo.edu', role: 'SUPER_ADMIN', avatar: 'https://ui-avatars.com/api/?name=Laura%20Lopez%20Fernandez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'SUPER_ADMIN' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'rushayala87',
-        user: { id: 'u_staff_13', name: `Romina Ayala`, email: 'rushayala87@gmail.com', role: 'SUPER_ADMIN', avatar: 'https://ui-avatars.com/api/?name=Romina%20Ayala&background=random' },
+        emailPattern: 'julia.ramos.lopez',
+        user: { id: 'u_staff_13', name: `Julia Ramos Lopez`, email: 'julia.ramos.lopez@demo.edu', role: 'SUPER_ADMIN', avatar: 'https://ui-avatars.com/api/?name=Julia%20Ramos%20Lopez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'SUPER_ADMIN' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'avendanosancha',
-        user: { id: 'u_padre_0', name: `Avendaño Sancha Gisel Ximena`, email: 'avendanosancha@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Avenda%C3%B1o%20Sancha%20Gisel%20Ximena&background=random' },
+        emailPattern: 'emma.castro.gimenez',
+        user: { id: 'u_padre_0', name: `Emma Castro Gimenez`, email: 'emma.castro.gimenez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Emma%20Castro%20Gimenez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'd.alvarez77',
-        user: { id: 'u_padre_1', name: `Álvarez Diego Matías`, email: 'd.alvarez77@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=%C3%81lvarez%20Diego%20Mat%C3%ADas&background=random' },
+        emailPattern: 'mia.ruiz.garcia',
+        user: { id: 'u_padre_1', name: `Mia Ruiz Garcia`, email: 'mia.ruiz.garcia@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Mia%20Ruiz%20Garcia&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'alvarez.nina',
-        user: { id: 'u_estudiante_0', name: `Álvarez Nina`, email: 'alvarez.nina@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=%C3%81lvarez%20Nina&background=random' },
+        emailPattern: 'martina.ruiz.garcia',
+        user: { id: 'u_estudiante_0', name: `Martina Ruiz Garcia`, email: 'martina.ruiz.garcia@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Martina%20Ruiz%20Garcia&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'micalamarquee',
-        user: { id: 'u_padre_2', name: `Micaela Lamarque`, email: 'micalamarquee@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Micaela%20Lamarque&background=random' },
+        emailPattern: 'martina.garcia.rodriguez',
+        user: { id: 'u_padre_2', name: `Martina Garcia Rodriguez`, email: 'martina.garcia.rodriguez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Martina%20Garcia%20Rodriguez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'nicolasbattini',
-        user: { id: 'u_padre_3', name: `Nicolás Battini`, email: 'nicolasbattini@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Nicol%C3%A1s%20Battini&background=random' },
+        emailPattern: 'alejandro.ramos.ruiz',
+        user: { id: 'u_padre_3', name: `Alejandro Ramos Ruiz`, email: 'alejandro.ramos.ruiz@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Alejandro%20Ramos%20Ruiz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'battini.lamarque.manuel',
-        user: { id: 'u_estudiante_1', name: `Battini Lamarque Manuel`, email: 'battini.lamarque.manuel@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Battini%20Lamarque%20Manuel&background=random' },
+        emailPattern: 'camila.castro.castro',
+        user: { id: 'u_estudiante_1', name: `Camila Castro Castro`, email: 'camila.castro.castro@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Camila%20Castro%20Castro&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'agostinarinaldi',
-        user: { id: 'u_padre_4', name: `Rinaldi Agostina`, email: 'agostinarinaldi@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Rinaldi%20Agostina&background=random' },
+        emailPattern: 'sofia.garcia.vazquez',
+        user: { id: 'u_padre_4', name: `Sofia Garcia Vazquez`, email: 'sofia.garcia.vazquez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Sofia%20Garcia%20Vazquez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'ndcisneros',
-        user: { id: 'u_padre_5', name: `Cisneros Néstor David`, email: 'ndcisneros@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Cisneros%20N%C3%A9stor%20David&background=random' },
+        emailPattern: 'valeria.gomez.sanchez',
+        user: { id: 'u_padre_5', name: `Valeria Gomez Sanchez`, email: 'valeria.gomez.sanchez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Valeria%20Gomez%20Sanchez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'cisneros.rinaldi.anna',
-        user: { id: 'u_estudiante_2', name: `Cisneros Rinaldi Anna`, email: 'cisneros.rinaldi.anna@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Cisneros%20Rinaldi%20Anna&background=random' },
+        emailPattern: 'camila.martinez.perez',
+        user: { id: 'u_estudiante_2', name: `Camila Martinez Perez`, email: 'camila.martinez.perez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Camila%20Martinez%20Perez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'sanromanm25',
-        user: { id: 'u_padre_6', name: `San Román Micaela`, email: 'sanromanm25@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=San%20Rom%C3%A1n%20Micaela&background=random' },
+        emailPattern: 'julia.ruiz.alvarez',
+        user: { id: 'u_padre_6', name: `Julia Ruiz Alvarez`, email: 'julia.ruiz.alvarez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Julia%20Ruiz%20Alvarez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'nicoespi099',
-        user: { id: 'u_padre_7', name: `Espinoza Aron Nicolás Gabriel`, email: 'nicoespi099@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Espinoza%20Aron%20Nicol%C3%A1s%20Gabriel&background=random' },
+        emailPattern: 'emma.perez.garcia',
+        user: { id: 'u_padre_7', name: `Emma Perez Garcia`, email: 'emma.perez.garcia@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Emma%20Perez%20Garcia&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'espinosa.san.roman.alaia',
-        user: { id: 'u_estudiante_3', name: `Espinosa San Román Alaia`, email: 'espinosa.san.roman.alaia@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Espinosa%20San%20Rom%C3%A1n%20Alaia&background=random' },
+        emailPattern: 'mateo.vazquez.alvarez',
+        user: { id: 'u_estudiante_3', name: `Mateo Vazquez Alvarez`, email: 'mateo.vazquez.alvarez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Mateo%20Vazquez%20Alvarez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'eric1994hughes',
-        user: { id: 'u_padre_8', name: `Hughes John Eric`, email: 'eric1994hughes@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Hughes%20John%20Eric&background=random' },
+        emailPattern: 'joaquin.rodriguez.torres',
+        user: { id: 'u_padre_8', name: `Joaquin Rodriguez Torres`, email: 'joaquin.rodriguez.torres@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Joaquin%20Rodriguez%20Torres&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'hughes.sotelo.lisandro',
-        user: { id: 'u_estudiante_4', name: `Hughes Sotelo Lisandro`, email: 'hughes.sotelo.lisandro@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Hughes%20Sotelo%20Lisandro&background=random' },
+        emailPattern: 'valentina.torres.martinez',
+        user: { id: 'u_estudiante_4', name: `Valentina Torres Martinez`, email: 'valentina.torres.martinez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Valentina%20Torres%20Martinez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'persicocandela',
-        user: { id: 'u_padre_9', name: `Pérsico María Candela`, email: 'persicocandela@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=P%C3%A9rsico%20Mar%C3%ADa%20Candela&background=random' },
+        emailPattern: 'lucia.gimenez.perez',
+        user: { id: 'u_padre_9', name: `Lucia Gimenez Perez`, email: 'lucia.gimenez.perez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Lucia%20Gimenez%20Perez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'juan.more.no.est',
-        user: { id: 'u_padre_10', name: `Moreno Juan Andrés`, email: 'juan.more.no.est@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Moreno%20Juan%20Andr%C3%A9s&background=random' },
+        emailPattern: 'alvaro.molina.sosa',
+        user: { id: 'u_padre_10', name: `Alvaro Molina Sosa`, email: 'alvaro.molina.sosa@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Alvaro%20Molina%20Sosa&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'moreno.persico.valentin',
-        user: { id: 'u_estudiante_5', name: `Moreno Pérsico Valentín`, email: 'moreno.persico.valentin@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Moreno%20P%C3%A9rsico%20Valent%C3%ADn&background=random' },
+        emailPattern: 'lucas.sanchez.gomez',
+        user: { id: 'u_estudiante_5', name: `Lucas Sanchez Gomez`, email: 'lucas.sanchez.gomez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Lucas%20Sanchez%20Gomez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'salome.diaz982015',
-        user: { id: 'u_padre_11', name: `Diaz María Salomé`, email: 'salome.diaz982015@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Diaz%20Mar%C3%ADa%20Salom%C3%A9&background=random' },
+        emailPattern: 'camila.ruiz.torres',
+        user: { id: 'u_padre_11', name: `Camila Ruiz Torres`, email: 'camila.ruiz.torres@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Camila%20Ruiz%20Torres&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'pablorocha94',
-        user: { id: 'u_padre_12', name: `Rocha Juan Pablo`, email: 'pablorocha94@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Rocha%20Juan%20Pablo&background=random' },
+        emailPattern: 'mateo.fernandez.molina',
+        user: { id: 'u_padre_12', name: `Mateo Fernandez Molina`, email: 'mateo.fernandez.molina@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Mateo%20Fernandez%20Molina&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'rocha.bruno',
-        user: { id: 'u_estudiante_6', name: `Rocha Bruno`, email: 'rocha.bruno@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Rocha%20Bruno&background=random' },
+        emailPattern: 'mateo.ramos.garcia',
+        user: { id: 'u_estudiante_6', name: `Mateo Ramos Garcia`, email: 'mateo.ramos.garcia@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Mateo%20Ramos%20Garcia&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'yaninapellegrino',
-        user: { id: 'u_padre_13', name: `Pérez Pellegrino Yanina`, email: 'yaninapellegrino@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=P%C3%A9rez%20Pellegrino%20Yanina&background=random' },
+        emailPattern: 'carlos.gomez.lopez',
+        user: { id: 'u_padre_13', name: `Carlos Gomez Lopez`, email: 'carlos.gomez.lopez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Carlos%20Gomez%20Lopez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'licob2003',
-        user: { id: 'u_padre_14', name: `Sánchez María Laura`, email: 'licob2003@yahoo.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=S%C3%A1nchez%20Mar%C3%ADa%20Laura&background=random' },
+        emailPattern: 'valeria.alvarez.gomez',
+        user: { id: 'u_padre_14', name: `Valeria Alvarez Gomez`, email: 'valeria.alvarez.gomez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Valeria%20Alvarez%20Gomez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'sanchez.felipe',
-        user: { id: 'u_estudiante_7', name: `Sánchez Felipe`, email: 'sanchez.felipe@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=S%C3%A1nchez%20Felipe&background=random' },
+        emailPattern: 'emma.romero.castro',
+        user: { id: 'u_estudiante_7', name: `Emma Romero Castro`, email: 'emma.romero.castro@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Emma%20Romero%20Castro&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'angieg.suarez',
-        user: { id: 'u_padre_15', name: `Angie Guadalupe Suarez`, email: 'angieg.suarez@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Angie%20Guadalupe%20Suarez&background=random' },
+        emailPattern: 'emma.gomez.diaz',
+        user: { id: 'u_padre_15', name: `Emma Gomez Diaz`, email: 'emma.gomez.diaz@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Emma%20Gomez%20Diaz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'guillermosegatti',
-        user: { id: 'u_padre_16', name: `Segatti Guillermo Andrés`, email: 'guillermosegatti@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Segatti%20Guillermo%20Andr%C3%A9s&background=random' },
+        emailPattern: 'santiago.torres.alvarez',
+        user: { id: 'u_padre_16', name: `Santiago Torres Alvarez`, email: 'santiago.torres.alvarez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Santiago%20Torres%20Alvarez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'segatti.suarez.stefano',
-        user: { id: 'u_estudiante_8', name: `Segatti Suarez Stefano`, email: 'segatti.suarez.stefano@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Segatti%20Suarez%20Stefano&background=random' },
+        emailPattern: 'camila.ramos.martinez',
+        user: { id: 'u_estudiante_8', name: `Camila Ramos Martinez`, email: 'camila.ramos.martinez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Camila%20Ramos%20Martinez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'lucybogado55',
-        user: { id: 'u_padre_17', name: `Bogado Bustos Lucy del Pilar`, email: 'lucybogado55@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Bogado%20Bustos%20Lucy%20del%20Pilar&background=random' },
+        emailPattern: 'martina.rodriguez.sanchez',
+        user: { id: 'u_padre_17', name: `Martina Rodriguez Sanchez`, email: 'martina.rodriguez.sanchez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Martina%20Rodriguez%20Sanchez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'lucasr.pm',
-        user: { id: 'u_padre_18', name: `Ríos Hernández Lucas Emanuel`, email: 'lucasr.pm@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=R%C3%ADos%20Hern%C3%A1ndez%20Lucas%20Emanuel&background=random' },
+        emailPattern: 'lucas.martinez.arias',
+        user: { id: 'u_padre_18', name: `Lucas Martinez Arias`, email: 'lucas.martinez.arias@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Lucas%20Martinez%20Arias&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'bogado.rios.coco',
-        user: { id: 'u_estudiante_9', name: `Bogado Ríos Coco`, email: 'bogado.rios.coco@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Bogado%20R%C3%ADos%20Coco&background=random' },
+        emailPattern: 'alejandro.alvarez.perez',
+        user: { id: 'u_estudiante_9', name: `Alejandro Alvarez Perez`, email: 'alejandro.alvarez.perez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Alejandro%20Alvarez%20Perez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'antonelamartelli',
-        user: { id: 'u_padre_19', name: `Martelli Antonela`, email: 'antonelamartelli@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Martelli%20Antonela&background=random' },
+        emailPattern: 'alvaro.rodriguez.gimenez',
+        user: { id: 'u_padre_19', name: `Alvaro Rodriguez Gimenez`, email: 'alvaro.rodriguez.gimenez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Alvaro%20Rodriguez%20Gimenez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'fernandocevoli',
-        user: { id: 'u_padre_20', name: `Cevoli Fernando`, email: 'fernandocevoli@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Cevoli%20Fernando&background=random' },
+        emailPattern: 'alvaro.garcia.alvarez',
+        user: { id: 'u_padre_20', name: `Alvaro Garcia Alvarez`, email: 'alvaro.garcia.alvarez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Alvaro%20Garcia%20Alvarez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'cevoli.charo',
-        user: { id: 'u_estudiante_10', name: `Cevoli Charo`, email: 'cevoli.charo@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Cevoli%20Charo&background=random' },
+        emailPattern: 'valeria.molina.ruiz',
+        user: { id: 'u_estudiante_10', name: `Valeria Molina Ruiz`, email: 'valeria.molina.ruiz@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Valeria%20Molina%20Ruiz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'raiantkd94',
-        user: { id: 'u_padre_21', name: `Scmidtchen Carrasco Raian Roxana Millaray`, email: 'raiantkd94@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Scmidtchen%20Carrasco%20Raian%20Roxana%20Millaray&background=random' },
+        emailPattern: 'joaquin.gimenez.molina',
+        user: { id: 'u_padre_21', name: `Joaquin Gimenez Molina`, email: 'joaquin.gimenez.molina@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Joaquin%20Gimenez%20Molina&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'estacionballenera42',
-        user: { id: 'u_padre_22', name: `Catalán Giaroli Luis Alberto`, email: 'estacionballenera42@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Catal%C3%A1n%20Giaroli%20Luis%20Alberto&background=random' },
+        emailPattern: 'hugo.castro.perez',
+        user: { id: 'u_padre_22', name: `Hugo Castro Perez`, email: 'hugo.castro.perez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Hugo%20Castro%20Perez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'catalan.scmidtchen.luis.octavio',
-        user: { id: 'u_estudiante_11', name: `Catalán Scmidtchen Luis Octavio`, email: 'catalan.scmidtchen.luis.octavio@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Catal%C3%A1n%20Scmidtchen%20Luis%20Octavio&background=random' },
+        emailPattern: 'julia.castro.perez',
+        user: { id: 'u_estudiante_11', name: `Julia Castro Perez`, email: 'julia.castro.perez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Julia%20Castro%20Perez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'rocha.victorino',
-        user: { id: 'u_estudiante_12', name: `Rocha Victorino`, email: 'rocha.victorino@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Rocha%20Victorino&background=random' },
+        emailPattern: 'diego.gimenez.torres',
+        user: { id: 'u_estudiante_12', name: `Diego Gimenez Torres`, email: 'diego.gimenez.torres@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Diego%20Gimenez%20Torres&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'melisadcuesta',
-        user: { id: 'u_padre_23', name: `Cuesta Melisa Daniela`, email: 'melisadcuesta@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Cuesta%20Melisa%20Daniela&background=random' },
+        emailPattern: 'alejandro.molina.gomez',
+        user: { id: 'u_padre_23', name: `Alejandro Molina Gomez`, email: 'alejandro.molina.gomez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Alejandro%20Molina%20Gomez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'gero_14',
-        user: { id: 'u_padre_24', name: `Rodríguez Conte Grand Gerónimo`, email: 'gero_14@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Rodr%C3%ADguez%20Conte%20Grand%20Ger%C3%B3nimo&background=random' },
+        emailPattern: 'alejandro.rodriguez.garcia',
+        user: { id: 'u_padre_24', name: `Alejandro Rodriguez Garcia`, email: 'alejandro.rodriguez.garcia@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Alejandro%20Rodriguez%20Garcia&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'rodriguez.cuesta.nazareno',
-        user: { id: 'u_estudiante_13', name: `Rodriguez Cuesta Nazareno`, email: 'rodriguez.cuesta.nazareno@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Rodriguez%20Cuesta%20Nazareno&background=random' },
+        emailPattern: 'mia.alvarez.ruiz',
+        user: { id: 'u_estudiante_13', name: `Mia Alvarez Ruiz`, email: 'mia.alvarez.ruiz@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Mia%20Alvarez%20Ruiz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'emmaromina155',
-        user: { id: 'u_padre_25', name: `Melgarejo Emma Romina`, email: 'emmaromina155@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Melgarejo%20Emma%20Romina&background=random' },
+        emailPattern: 'emma.diaz.ruiz',
+        user: { id: 'u_padre_25', name: `Emma Diaz Ruiz`, email: 'emma.diaz.ruiz@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Emma%20Diaz%20Ruiz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'biasuttifederico',
-        user: { id: 'u_padre_26', name: `Biasutti Federico Eduardo`, email: 'biasuttifederico@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Biasutti%20Federico%20Eduardo&background=random' },
+        emailPattern: 'valentina.sanchez.gimenez',
+        user: { id: 'u_padre_26', name: `Valentina Sanchez Gimenez`, email: 'valentina.sanchez.gimenez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Valentina%20Sanchez%20Gimenez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'biasutti.ciro.eduardo',
-        user: { id: 'u_estudiante_14', name: `Biasutti Ciro Eduardo`, email: 'biasutti.ciro.eduardo@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Biasutti%20Ciro%20Eduardo&background=random' },
+        emailPattern: 'camila.romero.perez',
+        user: { id: 'u_estudiante_14', name: `Camila Romero Perez`, email: 'camila.romero.perez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Camila%20Romero%20Perez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'cisneros.rinaldi.facundo',
-        user: { id: 'u_estudiante_15', name: `Cisneros Rinaldi Facundo`, email: 'cisneros.rinaldi.facundo@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Cisneros%20Rinaldi%20Facundo&background=random' },
+        emailPattern: 'camila.lopez.diaz',
+        user: { id: 'u_estudiante_15', name: `Camila Lopez Diaz`, email: 'camila.lopez.diaz@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Camila%20Lopez%20Diaz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'marielacristal',
-        user: { id: 'u_padre_27', name: `Cristaldo Mariela`, email: 'marielacristal@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Cristaldo%20Mariela&background=random' },
+        emailPattern: 'camila.martinez.vazquez',
+        user: { id: 'u_padre_27', name: `Camila Martinez Vazquez`, email: 'camila.martinez.vazquez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Camila%20Martinez%20Vazquez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'guille-eltucu',
-        user: { id: 'u_padre_28', name: `Córdoba Guillermo Sebastián`, email: 'guille-eltucu@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=C%C3%B3rdoba%20Guillermo%20Sebasti%C3%A1n&background=random' },
+        emailPattern: 'julia.alvarez.sanchez',
+        user: { id: 'u_padre_28', name: `Julia Alvarez Sanchez`, email: 'julia.alvarez.sanchez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Julia%20Alvarez%20Sanchez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'cordoba.sol.fiorella',
-        user: { id: 'u_estudiante_16', name: `Córdoba Sol Fiorella`, email: 'cordoba.sol.fiorella@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=C%C3%B3rdoba%20Sol%20Fiorella&background=random' },
+        emailPattern: 'daniel.gomez.diaz',
+        user: { id: 'u_estudiante_16', name: `Daniel Gomez Diaz`, email: 'daniel.gomez.diaz@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Daniel%20Gomez%20Diaz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'virmangiapane',
-        user: { id: 'u_padre_29', name: `Mangiapane Virginia`, email: 'virmangiapane@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Mangiapane%20Virginia&background=random' },
+        emailPattern: 'hugo.garcia.ramos',
+        user: { id: 'u_padre_29', name: `Hugo Garcia Ramos`, email: 'hugo.garcia.ramos@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Hugo%20Garcia%20Ramos&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'billydummig',
-        user: { id: 'u_padre_30', name: `Dümmig Guillermo Federico`, email: 'billydummig@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=D%C3%BCmmig%20Guillermo%20Federico&background=random' },
+        emailPattern: 'emma.fernandez.perez',
+        user: { id: 'u_padre_30', name: `Emma Fernandez Perez`, email: 'emma.fernandez.perez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Emma%20Fernandez%20Perez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'dummig.clara',
-        user: { id: 'u_estudiante_17', name: `Dümmig Clara`, email: 'dummig.clara@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=D%C3%BCmmig%20Clara&background=random' },
+        emailPattern: 'mateo.sanchez.sanchez',
+        user: { id: 'u_estudiante_17', name: `Mateo Sanchez Sanchez`, email: 'mateo.sanchez.sanchez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Mateo%20Sanchez%20Sanchez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'guada1825',
-        user: { id: 'u_padre_31', name: `Torres María Guadalupe`, email: 'guada1825@yahoo.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Torres%20Mar%C3%ADa%20Guadalupe&background=random' },
+        emailPattern: 'daniel.rodriguez.arias',
+        user: { id: 'u_padre_31', name: `Daniel Rodriguez Arias`, email: 'daniel.rodriguez.arias@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Daniel%20Rodriguez%20Arias&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'julisf40',
-        user: { id: 'u_padre_32', name: `Fernández Julio`, email: 'julisf40@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Fern%C3%A1ndez%20Julio&background=random' },
+        emailPattern: 'valentina.perez.molina',
+        user: { id: 'u_padre_32', name: `Valentina Perez Molina`, email: 'valentina.perez.molina@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Valentina%20Perez%20Molina&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'fernandez.torres.juana',
-        user: { id: 'u_estudiante_18', name: `Fernandez Torres Juana`, email: 'fernandez.torres.juana@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Fernandez%20Torres%20Juana&background=random' },
+        emailPattern: 'sofia.fernandez.alvarez',
+        user: { id: 'u_estudiante_18', name: `Sofia Fernandez Alvarez`, email: 'sofia.fernandez.alvarez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Sofia%20Fernandez%20Alvarez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'silvinainestorres',
-        user: { id: 'u_padre_33', name: `Torres Silvina Ines`, email: 'silvinainestorres@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Torres%20Silvina%20Ines&background=random' },
+        emailPattern: 'carlos.gomez.ramos',
+        user: { id: 'u_padre_33', name: `Carlos Gomez Ramos`, email: 'carlos.gomez.ramos@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Carlos%20Gomez%20Ramos&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'mangabale',
-        user: { id: 'u_padre_34', name: `Manzi Gabriel Alejandro`, email: 'mangabale@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Manzi%20Gabriel%20Alejandro&background=random' },
+        emailPattern: 'emma.torres.sosa',
+        user: { id: 'u_padre_34', name: `Emma Torres Sosa`, email: 'emma.torres.sosa@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Emma%20Torres%20Sosa&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'manzi.lautaro.andres',
-        user: { id: 'u_estudiante_19', name: `Manzi Lautaro Andrés`, email: 'manzi.lautaro.andres@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Manzi%20Lautaro%20Andr%C3%A9s&background=random' },
+        emailPattern: 'carlos.lopez.gomez',
+        user: { id: 'u_estudiante_19', name: `Carlos Lopez Gomez`, email: 'carlos.lopez.gomez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Carlos%20Lopez%20Gomez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'pierattinimregina',
-        user: { id: 'u_padre_35', name: `Pierattini Martínez Regina`, email: 'pierattinimregina@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Pierattini%20Mart%C3%ADnez%20Regina&background=random' },
+        emailPattern: 'martina.perez.sanchez',
+        user: { id: 'u_padre_35', name: `Martina Perez Sanchez`, email: 'martina.perez.sanchez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Martina%20Perez%20Sanchez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'ostanelloleonardog',
-        user: { id: 'u_padre_36', name: `Ostanello Leonardo`, email: 'ostanelloleonardog@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Ostanello%20Leonardo&background=random' },
+        emailPattern: 'mia.castro.gimenez',
+        user: { id: 'u_padre_36', name: `Mia Castro Gimenez`, email: 'mia.castro.gimenez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Mia%20Castro%20Gimenez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'ostanello.pierattini.luna',
-        user: { id: 'u_estudiante_20', name: `Ostanello Pierattini Luna`, email: 'ostanello.pierattini.luna@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Ostanello%20Pierattini%20Luna&background=random' },
+        emailPattern: 'valeria.ramos.gomez',
+        user: { id: 'u_estudiante_20', name: `Valeria Ramos Gomez`, email: 'valeria.ramos.gomez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Valeria%20Ramos%20Gomez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'alvarez.lola.milagros',
-        user: { id: 'u_estudiante_21', name: `Álvarez Lola Milagros`, email: 'alvarez.lola.milagros@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=%C3%81lvarez%20Lola%20Milagros&background=random' },
+        emailPattern: 'sofia.gimenez.molina',
+        user: { id: 'u_estudiante_21', name: `Sofia Gimenez Molina`, email: 'sofia.gimenez.molina@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Sofia%20Gimenez%20Molina&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'anaymartinypedro',
-        user: { id: 'u_padre_37', name: `Familia de Arriagada Breppe Enzo Luka`, email: 'anaymartinypedro@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Breppe%20Ana%20Carla&background=random' },
+        emailPattern: 'hugo.sanchez.fernandez',
+        user: { id: 'u_padre_37', name: `Hugo Sanchez Fernandez`, email: 'hugo.sanchez.fernandez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Hugo%20Sanchez%20Fernandez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'arriagada.breppe.enzo.luka',
-        user: { id: 'u_estudiante_22', name: `Arriagada Breppe Enzo Luka`, email: 'arriagada.breppe.enzo.luka@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Arriagada%20Breppe%20Enzo%20Luka&background=random' },
+        emailPattern: 'sofia.arias.molina',
+        user: { id: 'u_estudiante_22', name: `Sofia Arias Molina`, email: 'sofia.arias.molina@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Sofia%20Arias%20Molina&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'flopavalen2',
-        user: { id: 'u_padre_38', name: `Esteche Florencia Ayelen`, email: 'flopavalen2@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Esteche%20Florencia%20Ayelen&background=random' },
+        emailPattern: 'joaquin.diaz.castro',
+        user: { id: 'u_padre_38', name: `Joaquin Diaz Castro`, email: 'joaquin.diaz.castro@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Joaquin%20Diaz%20Castro&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'barrientosnicolas426',
-        user: { id: 'u_padre_39', name: `Barrientos Claudio Nicolas`, email: 'barrientosnicolas426@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Barrientos%20Claudio%20Nicolas&background=random' },
+        emailPattern: 'carlos.ruiz.ruiz',
+        user: { id: 'u_padre_39', name: `Carlos Ruiz Ruiz`, email: 'carlos.ruiz.ruiz@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Carlos%20Ruiz%20Ruiz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'barrientos.alejo',
-        user: { id: 'u_estudiante_23', name: `Barrientos Alejo`, email: 'barrientos.alejo@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Barrientos%20Alejo&background=random' },
+        emailPattern: 'julia.ruiz.garcia',
+        user: { id: 'u_estudiante_23', name: `Julia Ruiz Garcia`, email: 'julia.ruiz.garcia@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Julia%20Ruiz%20Garcia&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'villagramalena7',
-        user: { id: 'u_padre_40', name: `Villagra Malena Maite`, email: 'villagramalena7@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Villagra%20Malena%20Maite&background=random' },
+        emailPattern: 'valentina.vazquez.ramos',
+        user: { id: 'u_padre_40', name: `Valentina Vazquez Ramos`, email: 'valentina.vazquez.ramos@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Valentina%20Vazquez%20Ramos&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'cemanueld',
-        user: { id: 'u_padre_41', name: `Díaz Claudio Emanuel`, email: 'cemanueld@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=D%C3%ADaz%20Claudio%20Emanuel&background=random' },
+        emailPattern: 'diego.gimenez.lopez',
+        user: { id: 'u_padre_41', name: `Diego Gimenez Lopez`, email: 'diego.gimenez.lopez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Diego%20Gimenez%20Lopez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'diaz.enzo.joaquin',
-        user: { id: 'u_estudiante_24', name: `Díaz Enzo Joaquín`, email: 'diaz.enzo.joaquin@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=D%C3%ADaz%20Enzo%20Joaqu%C3%ADn&background=random' },
+        emailPattern: 'daniel.arias.torres',
+        user: { id: 'u_estudiante_24', name: `Daniel Arias Torres`, email: 'daniel.arias.torres@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Daniel%20Arias%20Torres&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'vasaro1312',
-        user: { id: 'u_padre_42', name: `Asaro Verónica`, email: 'vasaro1312@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Asaro%20Ver%C3%B3nica&background=random' },
+        emailPattern: 'daniel.romero.ruiz',
+        user: { id: 'u_padre_42', name: `Daniel Romero Ruiz`, email: 'daniel.romero.ruiz@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Daniel%20Romero%20Ruiz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'diegoevans',
-        user: { id: 'u_padre_43', name: `Evans Diego`, email: 'diegoevans@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Evans%20Diego&background=random' },
+        emailPattern: 'sofia.lopez.sosa',
+        user: { id: 'u_padre_43', name: `Sofia Lopez Sosa`, email: 'sofia.lopez.sosa@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Sofia%20Lopez%20Sosa&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'evans.asaro.justina',
-        user: { id: 'u_estudiante_25', name: `Evans Asaro Justina`, email: 'evans.asaro.justina@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Evans%20Asaro%20Justina&background=random' },
+        emailPattern: 'mateo.garcia.vazquez',
+        user: { id: 'u_estudiante_25', name: `Mateo Garcia Vazquez`, email: 'mateo.garcia.vazquez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Mateo%20Garcia%20Vazquez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'amigraciav',
-        user: { id: 'u_padre_44', name: `Amira Gracia Villalobos`, email: 'amigraciav@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Amira%20Gracia%20Villalobos&background=random' },
+        emailPattern: 'martina.garcia.sanchez',
+        user: { id: 'u_padre_44', name: `Martina Garcia Sanchez`, email: 'martina.garcia.sanchez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Martina%20Garcia%20Sanchez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'nicolasmarchesani',
-        user: { id: 'u_padre_45', name: `Marchesani Nicolas`, email: 'nicolasmarchesani@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Marchesani%20Nicolas&background=random' },
+        emailPattern: 'lucia.alvarez.diaz',
+        user: { id: 'u_padre_45', name: `Lucia Alvarez Diaz`, email: 'lucia.alvarez.diaz@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Lucia%20Alvarez%20Diaz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'marchesani.franccesca',
-        user: { id: 'u_estudiante_26', name: `Marchesani Franccesca`, email: 'marchesani.franccesca@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Marchesani%20Franccesca&background=random' },
+        emailPattern: 'hugo.ramos.gomez',
+        user: { id: 'u_estudiante_26', name: `Hugo Ramos Gomez`, email: 'hugo.ramos.gomez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Hugo%20Ramos%20Gomez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'curanga',
-        user: { id: 'u_padre_46', name: `Carlos Ignacio Marciano Uranga Castro`, email: 'curanga@live.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Carlos%20Ignacio%20Marciano%20Uranga%20Castro&background=random' },
+        emailPattern: 'mateo.castro.arias',
+        user: { id: 'u_padre_46', name: `Mateo Castro Arias`, email: 'mateo.castro.arias@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Mateo%20Castro%20Arias&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'marciano.uranga.castro.sara',
-        user: { id: 'u_estudiante_27', name: `Marciano Uranga Castro Sara`, email: 'marciano.uranga.castro.sara@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Marciano%20Uranga%20Castro%20Sara&background=random' },
+        emailPattern: 'diego.alvarez.molina',
+        user: { id: 'u_estudiante_27', name: `Diego Alvarez Molina`, email: 'diego.alvarez.molina@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Diego%20Alvarez%20Molina&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'paula621',
-        user: { id: 'u_padre_47', name: `Pereyra Paula`, email: 'paula621@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Pereyra%20Paula&background=random' },
+        emailPattern: 'julia.romero.gimenez',
+        user: { id: 'u_padre_47', name: `Julia Romero Gimenez`, email: 'julia.romero.gimenez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Julia%20Romero%20Gimenez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'mieresmaxi',
-        user: { id: 'u_padre_48', name: `Mieres Maximiliano`, email: 'mieresmaxi@outlook.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Mieres%20Maximiliano&background=random' },
+        emailPattern: 'daniel.gimenez.sanchez',
+        user: { id: 'u_padre_48', name: `Daniel Gimenez Sanchez`, email: 'daniel.gimenez.sanchez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Daniel%20Gimenez%20Sanchez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'mieres.martiniano',
-        user: { id: 'u_estudiante_28', name: `Mieres Martiniano`, email: 'mieres.martiniano@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Mieres%20Martiniano&background=random' },
+        emailPattern: 'lucia.diaz.alvarez',
+        user: { id: 'u_estudiante_28', name: `Lucia Diaz Alvarez`, email: 'lucia.diaz.alvarez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Lucia%20Diaz%20Alvarez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'ruthviera_10',
-        user: { id: 'u_padre_49', name: `Viera Ruth`, email: 'ruthviera_10@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Viera%20Ruth&background=random' },
+        emailPattern: 'mia.fernandez.vazquez',
+        user: { id: 'u_padre_49', name: `Mia Fernandez Vazquez`, email: 'mia.fernandez.vazquez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Mia%20Fernandez%20Vazquez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'gerardo.maximiliano.olmedo',
-        user: { id: 'u_padre_50', name: `Olmedo Gerardo Maximiliano`, email: 'gerardo.maximiliano.olmedo@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Olmedo%20Gerardo%20Maximiliano&background=random' },
+        emailPattern: 'julia.arias.gomez',
+        user: { id: 'u_padre_50', name: `Julia Arias Gomez`, email: 'julia.arias.gomez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Julia%20Arias%20Gomez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'olmedo.julieta',
-        user: { id: 'u_estudiante_29', name: `Olmedo Julieta`, email: 'olmedo.julieta@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Olmedo%20Julieta&background=random' },
+        emailPattern: 'lucia.ruiz.garcia',
+        user: { id: 'u_estudiante_29', name: `Lucia Ruiz Garcia`, email: 'lucia.ruiz.garcia@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Lucia%20Ruiz%20Garcia&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'yesi.domingorena',
-        user: { id: 'u_padre_51', name: `Yesica Yanina Domingorena`, email: 'yesi.domingorena@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Yesica%20Yanina%20Domingorena&background=random' },
+        emailPattern: 'laura.vazquez.ramos',
+        user: { id: 'u_padre_51', name: `Laura Vazquez Ramos`, email: 'laura.vazquez.ramos@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Laura%20Vazquez%20Ramos&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'mgreimondez',
-        user: { id: 'u_padre_52', name: `Martín Guillermo Reimondez`, email: 'mgreimondez@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Mart%C3%ADn%20Guillermo%20Reimondez&background=random' },
+        emailPattern: 'mateo.molina.martinez',
+        user: { id: 'u_padre_52', name: `Mateo Molina Martinez`, email: 'mateo.molina.martinez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Mateo%20Molina%20Martinez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'reimondez.oliver.luciano',
-        user: { id: 'u_estudiante_30', name: `Reimondez Oliver Luciano`, email: 'reimondez.oliver.luciano@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Reimondez%20Oliver%20Luciano&background=random' },
+        emailPattern: 'valentina.romero.garcia',
+        user: { id: 'u_estudiante_30', name: `Valentina Romero Garcia`, email: 'valentina.romero.garcia@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Valentina%20Romero%20Garcia&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'montero.natalia.soledad',
-        user: { id: 'u_padre_53', name: `Piedrabuena Montero Natalia Soledad`, email: 'montero.natalia.soledad@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Piedrabuena%20Montero%20Natalia%20Soledad&background=random' },
+        emailPattern: 'martina.rodriguez.ruiz',
+        user: { id: 'u_padre_53', name: `Martina Rodriguez Ruiz`, email: 'martina.rodriguez.ruiz@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Martina%20Rodriguez%20Ruiz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'renericardodanielsalinas',
-        user: { id: 'u_padre_54', name: `Salinas René Ricardo Daniel`, email: 'renericardodanielsalinas@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Salinas%20Ren%C3%A9%20Ricardo%20Daniel&background=random' },
+        emailPattern: 'hugo.sanchez.romero',
+        user: { id: 'u_padre_54', name: `Hugo Sanchez Romero`, email: 'hugo.sanchez.romero@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Hugo%20Sanchez%20Romero&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'salinas.piedrabuena.francisco.rene',
-        user: { id: 'u_estudiante_31', name: `Salinas Piedrabuena Francisco René`, email: 'salinas.piedrabuena.francisco.rene@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Salinas%20Piedrabuena%20Francisco%20Ren%C3%A9&background=random' },
+        emailPattern: 'laura.vazquez.sosa',
+        user: { id: 'u_estudiante_31', name: `Laura Vazquez Sosa`, email: 'laura.vazquez.sosa@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Laura%20Vazquez%20Sosa&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'natysegovia20',
-        user: { id: 'u_padre_55', name: `Segovia Natalia`, email: 'natysegovia20@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Segovia%20Natalia&background=random' },
+        emailPattern: 'mia.torres.gimenez',
+        user: { id: 'u_padre_55', name: `Mia Torres Gimenez`, email: 'mia.torres.gimenez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Mia%20Torres%20Gimenez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'guillermolopezservate',
-        user: { id: 'u_padre_56', name: `Guillermo López Servate`, email: 'guillermolopezservate@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Guillermo%20L%C3%B3pez%20Servate&background=random' },
+        emailPattern: 'mia.romero.gomez',
+        user: { id: 'u_padre_56', name: `Mia Romero Gomez`, email: 'mia.romero.gomez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Mia%20Romero%20Gomez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'tomas.segovia.ian',
-        user: { id: 'u_estudiante_32', name: `Tomás Segovia Ian`, email: 'tomas.segovia.ian@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Tom%C3%A1s%20Segovia%20Ian&background=random' },
+        emailPattern: 'alejandro.castro.ruiz',
+        user: { id: 'u_estudiante_32', name: `Alejandro Castro Ruiz`, email: 'alejandro.castro.ruiz@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Alejandro%20Castro%20Ruiz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'magaliterraza1',
-        user: { id: 'u_padre_57', name: `Terraza Magali`, email: 'magaliterraza1@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Terraza%20Magali&background=random' },
+        emailPattern: 'alejandro.gomez.sosa',
+        user: { id: 'u_padre_57', name: `Alejandro Gomez Sosa`, email: 'alejandro.gomez.sosa@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Alejandro%20Gomez%20Sosa&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'adrianvan08',
-        user: { id: 'u_padre_58', name: `Van Autenboer Adrián Horacio`, email: 'adrianvan08@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Van%20Autenboer%20Adri%C3%A1n%20Horacio&background=random' },
+        emailPattern: 'santiago.martinez.vazquez',
+        user: { id: 'u_padre_58', name: `Santiago Martinez Vazquez`, email: 'santiago.martinez.vazquez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Santiago%20Martinez%20Vazquez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'van.autenboer.terraza.mae',
-        user: { id: 'u_estudiante_33', name: `Van Autenboer Terraza Mae`, email: 'van.autenboer.terraza.mae@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Van%20Autenboer%20Terraza%20Mae&background=random' },
+        emailPattern: 'sofia.ruiz.ruiz',
+        user: { id: 'u_estudiante_33', name: `Sofia Ruiz Ruiz`, email: 'sofia.ruiz.ruiz@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Sofia%20Ruiz%20Ruiz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'conchillosuyay',
-        user: { id: 'u_padre_59', name: `Suyay Conchillo`, email: 'conchillosuyay@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Suyay%20Conchillo&background=random' },
+        emailPattern: 'valentina.garcia.alvarez',
+        user: { id: 'u_padre_59', name: `Valentina Garcia Alvarez`, email: 'valentina.garcia.alvarez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Valentina%20Garcia%20Alvarez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'dveron678',
-        user: { id: 'u_padre_60', name: `Diego Veron`, email: 'dveron678@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Diego%20Veron&background=random' },
+        emailPattern: 'lucas.castro.torres',
+        user: { id: 'u_padre_60', name: `Lucas Castro Torres`, email: 'lucas.castro.torres@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Lucas%20Castro%20Torres&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'veron.conchillo.blas',
-        user: { id: 'u_estudiante_34', name: `Verón Conchillo Blas`, email: 'veron.conchillo.blas@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Ver%C3%B3n%20Conchillo%20Blas&background=random' },
+        emailPattern: 'julia.ruiz.molina',
+        user: { id: 'u_estudiante_34', name: `Julia Ruiz Molina`, email: 'julia.ruiz.molina@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Julia%20Ruiz%20Molina&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'faus_ti',
-        user: { id: 'u_padre_61', name: `Familia de Altuna Filomena`, email: 'faus_ti@cloud.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Paez%20Candela&background=random' },
+        emailPattern: 'alvaro.ruiz.gomez',
+        user: { id: 'u_padre_61', name: `Alvaro Ruiz Gomez`, email: 'alvaro.ruiz.gomez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Alvaro%20Ruiz%20Gomez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'altuna.filomena',
-        user: { id: 'u_estudiante_35', name: `Altuna Filomena`, email: 'altuna.filomena@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Altuna%20Filomena&background=random' },
+        emailPattern: 'daniel.fernandez.lopez',
+        user: { id: 'u_estudiante_35', name: `Daniel Fernandez Lopez`, email: 'daniel.fernandez.lopez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Daniel%20Fernandez%20Lopez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'mariel.walser',
-        user: { id: 'u_padre_62', name: `Walser Mariel Ivonne`, email: 'mariel.walser@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Walser%20Mariel%20Ivonne&background=random' },
+        emailPattern: 'mia.gimenez.arias',
+        user: { id: 'u_padre_62', name: `Mia Gimenez Arias`, email: 'mia.gimenez.arias@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Mia%20Gimenez%20Arias&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'brianbengoa07',
-        user: { id: 'u_padre_63', name: `Bengoa Brian Andrés`, email: 'brianbengoa07@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Bengoa%20Brian%20Andr%C3%A9s&background=random' },
+        emailPattern: 'julia.romero.arias',
+        user: { id: 'u_padre_63', name: `Julia Romero Arias`, email: 'julia.romero.arias@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Julia%20Romero%20Arias&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'bengoa.walser.emma',
-        user: { id: 'u_estudiante_36', name: `Bengoa Walser Emma`, email: 'bengoa.walser.emma@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Bengoa%20Walser%20Emma&background=random' },
+        emailPattern: 'lucas.arias.fernandez',
+        user: { id: 'u_estudiante_36', name: `Lucas Arias Fernandez`, email: 'lucas.arias.fernandez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Lucas%20Arias%20Fernandez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'rominamoon1',
-        user: { id: 'u_padre_64', name: `Méndez Romina Soledad`, email: 'rominamoon1@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=M%C3%A9ndez%20Romina%20Soledad&background=random' },
+        emailPattern: 'daniel.sosa.alvarez',
+        user: { id: 'u_padre_64', name: `Daniel Sosa Alvarez`, email: 'daniel.sosa.alvarez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Daniel%20Sosa%20Alvarez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'eboviez',
-        user: { id: 'u_padre_65', name: `Boviez Edgardo Andrés`, email: 'eboviez@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Boviez%20Edgardo%20Andr%C3%A9s&background=random' },
+        emailPattern: 'julia.torres.ramos',
+        user: { id: 'u_padre_65', name: `Julia Torres Ramos`, email: 'julia.torres.ramos@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Julia%20Torres%20Ramos&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'boviez.mendez.felipe',
-        user: { id: 'u_estudiante_37', name: `Boviez Méndez Felipe`, email: 'boviez.mendez.felipe@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Boviez%20M%C3%A9ndez%20Felipe&background=random' },
+        emailPattern: 'alvaro.romero.rodriguez',
+        user: { id: 'u_estudiante_37', name: `Alvaro Romero Rodriguez`, email: 'alvaro.romero.rodriguez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Alvaro%20Romero%20Rodriguez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'karilopezr24',
-        user: { id: 'u_padre_66', name: `López Rueda Karina`, email: 'karilopezr24@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=L%C3%B3pez%20Rueda%20Karina&background=random' },
+        emailPattern: 'laura.molina.ruiz',
+        user: { id: 'u_padre_66', name: `Laura Molina Ruiz`, email: 'laura.molina.ruiz@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Laura%20Molina%20Ruiz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'maximobrendel',
-        user: { id: 'u_padre_67', name: `Brendel Máximo`, email: 'maximobrendel@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Brendel%20M%C3%A1ximo&background=random' },
+        emailPattern: 'carlos.molina.molina',
+        user: { id: 'u_padre_67', name: `Carlos Molina Molina`, email: 'carlos.molina.molina@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Carlos%20Molina%20Molina&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'brendel.lopez.matheo',
-        user: { id: 'u_estudiante_38', name: `Brendel López Matheo`, email: 'brendel.lopez.matheo@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Brendel%20L%C3%B3pez%20Matheo&background=random' },
+        emailPattern: 'alvaro.rodriguez.sosa',
+        user: { id: 'u_estudiante_38', name: `Alvaro Rodriguez Sosa`, email: 'alvaro.rodriguez.sosa@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Alvaro%20Rodriguez%20Sosa&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'ailen.basualto',
-        user: { id: 'u_padre_68', name: `Basualto Cobos Ailen Fernanda`, email: 'ailen.basualto@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Basualto%20Cobos%20Ailen%20Fernanda&background=random' },
+        emailPattern: 'diego.ramos.romero',
+        user: { id: 'u_padre_68', name: `Diego Ramos Romero`, email: 'diego.ramos.romero@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Diego%20Ramos%20Romero&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'guille28_82',
-        user: { id: 'u_padre_69', name: `Coronel Félix Guillermo`, email: 'guille28_82@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Coronel%20F%C3%A9lix%20Guillermo&background=random' },
+        emailPattern: 'emma.sosa.castro',
+        user: { id: 'u_padre_69', name: `Emma Sosa Castro`, email: 'emma.sosa.castro@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Emma%20Sosa%20Castro&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'coronel.emma',
-        user: { id: 'u_estudiante_39', name: `Coronel Emma`, email: 'coronel.emma@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Coronel%20Emma&background=random' },
+        emailPattern: 'mateo.molina.romero',
+        user: { id: 'u_estudiante_39', name: `Mateo Molina Romero`, email: 'mateo.molina.romero@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Mateo%20Molina%20Romero&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'lncancelarich',
-        user: { id: 'u_padre_70', name: `Cancelarich Lorena`, email: 'lncancelarich@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Cancelarich%20Lorena&background=random' },
+        emailPattern: 'diego.sanchez.torres',
+        user: { id: 'u_padre_70', name: `Diego Sanchez Torres`, email: 'diego.sanchez.torres@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Diego%20Sanchez%20Torres&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'jefuentesrios',
-        user: { id: 'u_padre_71', name: `Fuentes Rios Javier`, email: 'jefuentesrios@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Fuentes%20Rios%20Javier&background=random' },
+        emailPattern: 'emma.alvarez.arias',
+        user: { id: 'u_padre_71', name: `Emma Alvarez Arias`, email: 'emma.alvarez.arias@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Emma%20Alvarez%20Arias&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'fuentes.cancelarich.vera',
-        user: { id: 'u_estudiante_40', name: `Fuentes Cancelarich Vera`, email: 'fuentes.cancelarich.vera@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Fuentes%20Cancelarich%20Vera&background=random' },
+        emailPattern: 'diego.fernandez.fernandez',
+        user: { id: 'u_estudiante_40', name: `Diego Fernandez Fernandez`, email: 'diego.fernandez.fernandez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Diego%20Fernandez%20Fernandez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'danielaramirez1887',
-        user: { id: 'u_padre_72', name: `Daniela Marite Ramirez`, email: 'danielaramirez1887@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Daniela%20Marite%20Ramirez&background=random' },
+        emailPattern: 'alejandro.sosa.lopez',
+        user: { id: 'u_padre_72', name: `Alejandro Sosa Lopez`, email: 'alejandro.sosa.lopez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Alejandro%20Sosa%20Lopez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'gonzalez.ramirez.alexis.gaston',
-        user: { id: 'u_estudiante_41', name: `González Ramirez Alexis Gastón`, email: 'gonzalez.ramirez.alexis.gaston@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Gonz%C3%A1lez%20Ramirez%20Alexis%20Gast%C3%B3n&background=random' },
+        emailPattern: 'alejandro.diaz.diaz',
+        user: { id: 'u_estudiante_41', name: `Alejandro Diaz Diaz`, email: 'alejandro.diaz.diaz@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Alejandro%20Diaz%20Diaz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'romiboloqui',
-        user: { id: 'u_padre_73', name: `Boloqui Romina`, email: 'romiboloqui@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Boloqui%20Romina&background=random' },
+        emailPattern: 'martina.fernandez.garcia',
+        user: { id: 'u_padre_73', name: `Martina Fernandez Garcia`, email: 'martina.fernandez.garcia@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Martina%20Fernandez%20Garcia&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'fmehrbald',
-        user: { id: 'u_padre_74', name: `Mehrbald Facundo`, email: 'fmehrbald@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Mehrbald%20Facundo&background=random' },
+        emailPattern: 'daniel.vazquez.romero',
+        user: { id: 'u_padre_74', name: `Daniel Vazquez Romero`, email: 'daniel.vazquez.romero@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Daniel%20Vazquez%20Romero&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'mehrbald.boloqui.victoria',
-        user: { id: 'u_estudiante_42', name: `Mehrbald Boloqui Victoria`, email: 'mehrbald.boloqui.victoria@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Mehrbald%20Boloqui%20Victoria&background=random' },
+        emailPattern: 'laura.romero.castro',
+        user: { id: 'u_estudiante_42', name: `Laura Romero Castro`, email: 'laura.romero.castro@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Laura%20Romero%20Castro&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'sabrinatristanpm',
-        user: { id: 'u_padre_75', name: `Tristán Nidia Sabrina`, email: 'sabrinatristanpm@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Trist%C3%A1n%20Nidia%20Sabrina&background=random' },
+        emailPattern: 'julia.torres.alvarez',
+        user: { id: 'u_padre_75', name: `Julia Torres Alvarez`, email: 'julia.torres.alvarez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Julia%20Torres%20Alvarez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'estudiosaenz',
-        user: { id: 'u_padre_76', name: `Sáenz Martín Damian`, email: 'estudiosaenz@hotmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=S%C3%A1enz%20Mart%C3%ADn%20Damian&background=random' },
+        emailPattern: 'martina.castro.alvarez',
+        user: { id: 'u_padre_76', name: `Martina Castro Alvarez`, email: 'martina.castro.alvarez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Martina%20Castro%20Alvarez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'saenz.ariana',
-        user: { id: 'u_estudiante_43', name: `Saenz Ariana`, email: 'saenz.ariana@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Saenz%20Ariana&background=random' },
+        emailPattern: 'alvaro.sanchez.molina',
+        user: { id: 'u_estudiante_43', name: `Alvaro Sanchez Molina`, email: 'alvaro.sanchez.molina@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Alvaro%20Sanchez%20Molina&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'noelas',
-        user: { id: 'u_padre_77', name: `Sanchez Carnero Noela`, email: 'noelas@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Sanchez%20Carnero%20Noela&background=random' },
+        emailPattern: 'carlos.gimenez.castro',
+        user: { id: 'u_padre_77', name: `Carlos Gimenez Castro`, email: 'carlos.gimenez.castro@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Carlos%20Gimenez%20Castro&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'caminante109',
-        user: { id: 'u_padre_78', name: `Fernandez Miranda Magaña Álvaro`, email: 'caminante109@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Fernandez%20Miranda%20Maga%C3%B1a%20%C3%81lvaro&background=random' },
+        emailPattern: 'diego.diaz.sosa',
+        user: { id: 'u_padre_78', name: `Diego Diaz Sosa`, email: 'diego.diaz.sosa@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Diego%20Diaz%20Sosa&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'sanchez.fernandez.miranda.xairo',
-        user: { id: 'u_estudiante_44', name: `Sánchez Fernández Miranda Xairo`, email: 'sanchez.fernandez.miranda.xairo@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=S%C3%A1nchez%20Fern%C3%A1ndez%20Miranda%20Xairo&background=random' },
+        emailPattern: 'camila.vazquez.diaz',
+        user: { id: 'u_estudiante_44', name: `Camila Vazquez Diaz`, email: 'camila.vazquez.diaz@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Camila%20Vazquez%20Diaz&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'deboratorres1991',
-        user: { id: 'u_padre_79', name: `Torres Débora`, email: 'deboratorres1991@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Torres%20D%C3%A9bora&background=random' },
+        emailPattern: 'julia.arias.martinez',
+        user: { id: 'u_padre_79', name: `Julia Arias Martinez`, email: 'julia.arias.martinez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Julia%20Arias%20Martinez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'metortola',
-        user: { id: 'u_padre_80', name: `Tortola Martín Ezequiel`, email: 'metortola@gmail.com', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Tortola%20Mart%C3%ADn%20Ezequiel&background=random' },
+        emailPattern: 'lucia.molina.gimenez',
+        user: { id: 'u_padre_80', name: `Lucia Molina Gimenez`, email: 'lucia.molina.gimenez@demo.edu', role: 'PADRE', avatar: 'https://ui-avatars.com/api/?name=Lucia%20Molina%20Gimenez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'PADRE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
     {
-        emailPattern: 'tortola.torres.sofia',
-        user: { id: 'u_estudiante_45', name: `Tórtola Torres Sofía`, email: 'tortola.torres.sofia@alumnos.vinculos.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=T%C3%B3rtola%20Torres%20Sof%C3%ADa&background=random' },
+        emailPattern: 'alejandro.alvarez.vazquez',
+        user: { id: 'u_estudiante_45', name: `Alejandro Alvarez Vazquez`, email: 'alejandro.alvarez.vazquez@demo.edu', role: 'ESTUDIANTE', avatar: 'https://ui-avatars.com/api/?name=Alejandro%20Alvarez%20Vazquez&background=random' },
         institutions: [{ institutionId: 'inst-vinculos', institutionName: 'Vínculos de Libertad', institutionSlug: 'vinculos-de-libertad', role: 'ESTUDIANTE' as any, primaryColor: '#0ea5e9', secondaryColor: '#0369a1' }]
     },
 ];
