@@ -77,7 +77,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
             <div className="w-full lg:w-1/2 relative group">
               <div className="absolute -inset-2 bg-gradient-to-br from-amber-300 to-sky-300 rounded-[3rem] rotate-3 opacity-70 group-hover:rotate-6 transition-transform duration-500 blur-sm"></div>
               <img 
-                src="/kinder_playing.png" 
+                src="/students_hero.png" 
                 alt="Alumnos en clase" 
                 className="relative w-full object-cover h-[450px] lg:h-[550px] rounded-[3rem] shadow-2xl z-10 border-8 border-white"
               />
@@ -111,7 +111,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
             <div className="flex flex-col lg:flex-row items-center gap-16">
               <div className="w-full lg:w-1/2 relative group">
                 <div className="absolute -inset-4 bg-emerald-200 rounded-[3rem] -rotate-3 opacity-60 transition-transform duration-500 group-hover:rotate-0 blur-sm"></div>
-                <img src="/kinder_story.png" alt="Docente enseñando" className="relative w-full h-[400px] object-cover rounded-[3rem] border-8 border-white shadow-xl z-10" />
+                <img src="/students_tech.png" alt="Docente enseñando" className="relative w-full h-[400px] object-cover rounded-[3rem] border-8 border-white shadow-xl z-10" />
               </div>
               <div className="w-full lg:w-1/2">
                 <div className="w-16 h-16 rounded-[2rem] bg-emerald-100 text-emerald-500 flex items-center justify-center mb-6">
@@ -126,7 +126,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
             <div className="flex flex-col lg:flex-row-reverse items-center gap-16">
               <div className="w-full lg:w-1/2 relative group">
                 <div className="absolute -inset-4 bg-sky-200 rounded-[3rem] rotate-3 opacity-60 transition-transform duration-500 group-hover:-rotate-2 blur-sm"></div>
-                <img src="/kinder_painting.png" alt="Actividad escolar" className="relative w-full h-[400px] object-cover rounded-[3rem] border-8 border-white shadow-xl z-10" />
+                <img src="/students_class.png" alt="Actividad escolar" className="relative w-full h-[400px] object-cover rounded-[3rem] border-8 border-white shadow-xl z-10" />
               </div>
               <div className="w-full lg:w-1/2">
                 <div className="flex flex-col lg:items-end lg:text-right">
