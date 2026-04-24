@@ -149,8 +149,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
               <div className="w-full lg:w-1/2 relative group">
                 <div className="absolute inset-0 bg-[#E94F32] rounded-[2rem] rotate-3 transition-transform duration-500 group-hover:rotate-0"></div>
                 <img 
-                  src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1200&auto=format&fit=crop" 
-                  alt="Niños aprendiendo" 
+                  src="https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop" 
+                  alt="Niños aprendiendo en el aula" 
                   className="relative w-full h-[500px] object-cover rounded-[2rem] border-4 border-[#050505] shadow-2xl z-10" 
                 />
               </div>
@@ -285,12 +285,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
         {/* Collage Banner */}
         <section className="py-12 border-b border-[#050505]/10 overflow-hidden">
            <div className="flex flex-nowrap items-center gap-4 w-max animate-marquee">
-              <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=600&auto=format&fit=crop" className="h-64 rounded-2xl object-cover" />
+              <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=600&auto=format&fit=crop" className="h-64 rounded-2xl object-cover" />
               <div className="h-64 aspect-square landing-bg-orange rounded-2xl flex items-center justify-center text-center p-6"><h2 className="text-4xl font-black uppercase text-white">Sonrisas<br/>Tranquilidad</h2></div>
               <img src="/students_hero.png" className="h-64 rounded-2xl object-cover" />
               <img src="/students_class.png" className="h-64 rounded-2xl object-cover" />
               <div className="h-64 aspect-square landing-bg-blue rounded-2xl flex items-center justify-center text-center p-6"><h2 className="text-4xl font-black uppercase text-white">Educación<br/>Conectada</h2></div>
-              <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600&auto=format&fit=crop" className="h-64 rounded-2xl object-cover" />
+              <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=600&auto=format&fit=crop" className="h-64 rounded-2xl object-cover" />
            </div>
            <style>{`
              @keyframes marquee {
